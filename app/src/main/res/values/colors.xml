@@ -7,4 +7,28 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Main Neon Colors -->
+    <color name="neon_primary">#C8FF00</color> <!-- neon_300 -->
+    <color name="neon_900">#334400</color>
+    <color name="neon_800">#465900</color>
+    <color name="neon_700">#5A7300</color>
+    <color name="neon_600">#789900</color>
+    <color name="neon_500">#A0CC00</color>
+    <color name="neon_400">#B4E600</color>
+    <color name="neon_200">#E6FF8A</color>
+    <color name="neon_100">#F3FFC7</color>
+    <color name="neon_50">#FAFFE6</color>
+
+    <!-- Gray Colors -->
+    <color name="gray_primary">#171717</color> <!-- gray_900 -->
+    <color name="gray_800">#383838</color>
+    <color name="gray_700">#484848</color>
+    <color name="gray_600">#686868</color>
+    <color name="gray_500">#969696</color>
+    <color name="gray_400">#CECECE</color>
+    <color name="gray_300">#E1E1E1</color>
+    <color name="gray_200">#F0F0F0</color>
+    <color name="gray_100">#F5F5F5</color>
+    <color name="gray_50">#FFFFFF</color>
 </resources>

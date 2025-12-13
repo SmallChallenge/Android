@@ -8,45 +8,65 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
     private val CAMERA_PERMISSION_CODE = 100
+    private lateinit var bottomNav: BottomNavigationView
+    private lateinit var fabAdd: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNav = findViewById(R.id.bottom_navigation)
+        fabAdd = findViewById(R.id.fab_add)
 
+        // 앱 시작시 내 기록 프래그먼트를 기본으로 표시
+        if (savedInstanceState == null) {
+            loadFragment(MyRecordsFragment())
+            bottomNav.selectedItemId = R.id.navigation_storage
+        }
+
+        // 하단 네비게이션 리스너
         bottomNav.setOnItemSelectedListener { item ->
             when(item.itemId) {
                 R.id.navigation_storage -> {
-                    // 내 보관함 화면으로 이동
+                    loadFragment(MyRecordsFragment())
                     true
                 }
                 R.id.navigation_add -> {
-                    // 카메라 권한 확인 후 카메라 열기
-                    checkCameraPermissionAndOpen()
-                    true
+                    // 가운데 버튼은 FAB로 처리하므로 여기서는 false 반환
+                    false
                 }
                 R.id.navigation_community -> {
-                    // 커뮤니티 화면으로 이동
+                    loadFragment(CommunityFragment())
                     true
                 }
                 else -> false
             }
         }
+
+        // 플로팅 액션 버튼 클릭 리스너
+        fabAdd.setOnClickListener {
+            checkCameraPermissionAndOpen()
+        }
+    }
+
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
     }
 
     private fun checkCameraPermissionAndOpen() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED) {
-            // 권한이 이미 있으면 카메라 열기
             openCamera()
         } else {
-            // 권한 요청
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.CAMERA),
@@ -74,10 +94,8 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // 권한 승인됨 - 카메라 열기
                 openCamera()
             } else {
-                // 권한 거부됨
                 Toast.makeText(this, "카메라 권한이 필요합니다", Toast.LENGTH_SHORT).show()
             }
         }
