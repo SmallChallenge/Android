@@ -43,4 +43,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation ("com.google.android.material:material:1.11.0")  // Material Design
+    implementation ("androidx.fragment:fragment-ktx:1.6.2") // Fragment
+    implementation ("androidx.recyclerview:recyclerview:1.3.2") // RecyclerView
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")  // ConstraintLayout
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")    // CoordinatorLayout
 }
