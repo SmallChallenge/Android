@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Heading Styles -->
+    <style name="TextAppearance.App.H1" parent="TextAppearance.MaterialComponents.Headline1">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">40sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>    <!-- 온보딩 등 텍스트가 강조될 상황 -->
+
+    <style name="TextAppearance.App.H2" parent="TextAppearance.MaterialComponents.Headline2">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>    <!-- 페이지상 강조할 제목 -->
+
+    <style name="TextAppearance.App.H3" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>    <!-- 페이지에서 작은 제목 -->
+
+    <!-- Body Styles -->
+    <style name="TextAppearance.App.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>    <!-- 메인 텍스트 크기 -->
+
+    <style name="TextAppearance.App.Body2" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>    <!-- 가독성을 위해 작은 글씨 사용시 -->
+
+    <!-- Subtitle Styles -->
+    <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>    <!-- 메인 텍스트 크기 -->
+
+    <style name="TextAppearance.App.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>    <!-- 가독성을 위해 작은 글씨 사용시 -->
+
+    <!-- Button Styles -->
+    <style name="TextAppearance.App.Button.Large" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+    </style>    <!-- Primary button -->
+
+    <style name="TextAppearance.App.Button.Medium" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+    </style>    <!-- secondary button 강조하지 않아도 되는 버튼(일반 동작이나 반복적 사용시 -->
+
+    <style name="TextAppearance.App.Button2.Large" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+    </style>    <!-- Primary button -->
+
+    <style name="TextAppearance.App.Button2.Medium" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+    </style>    <!-- secondary button 강조하지 않아도 되는 버튼(일반 동작이나 반복적 사용시 -->
+
+    <!-- Caption and Label -->
+    <style name="TextAppearance.App.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>    <!-- 본문보다 작은 보조 텍스트 -->
+
+    <style name="TextAppearance.App.Label" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>    <!-- 요소, 입력필드, 아이콘의 정체를 표시할 때 -->
+    <!-- 영구적으로 화면에 존재해야하는 정보나 페이지&섹션의 정보/구분을 표현할 때 등 (Tooltip으로도 가능) -->
+
+</resources>
