@@ -6,6 +6,10 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
 
+        <!-- 시스템 네비게이션 바 색상 설정 -->
+        <item name="android:navigationBarColor">#121212</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
         <!-- 기본 색상 설정 -->
         <item name="colorPrimary">#C8FF00</item>
         <item name="colorPrimaryVariant">#B4E600</item>
