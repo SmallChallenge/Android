@@ -64,9 +64,6 @@ class MyRecordsFragment : Fragment() {
         imageView.setBackgroundResource(R.drawable.category_circle_selected)
         imageView.setColorFilter(ContextCompat.getColor(requireContext(), android.R.color.black))
         textView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-
-        // TODO: 선택된 카테고리에 따라 사진 필터링
-        Toast.makeText(context, "$category 선택됨", Toast.LENGTH_SHORT).show()
     }
 
     private fun resetCategoryStyle(categoryView: LinearLayout) {

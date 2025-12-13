@@ -3,6 +3,11 @@
     <!-- FAB 둥근 사각형 모양 -->
     <style name="ShapeAppearance.App.FAB" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">24dp</item>
+        <item name="cornerSize">34dp</item>
+    </style>
+
+    <!-- 네비게이션 인디케이터 제거 -->
+    <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@android:color/transparent</item>
     </style>
 </resources>
