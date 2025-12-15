@@ -101,4 +101,10 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.1")
     implementation("androidx.camera:camera-lifecycle:1.3.1")
     implementation("androidx.camera:camera-view:1.3.1")
+
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
+    // Kakao SDK
+    implementation("com.kakao.sdk:v2-user:2.19.0") // 카카오 로그인
 }
