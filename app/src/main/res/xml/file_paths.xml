@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 앱 내부 저장소의 pictures 폴더 -->
+    <files-path
+        name="stampy_images"
+        path="Pictures/" />
+
+    <!-- 앱 캐시 폴더 -->
+    <cache-path
+        name="stampy_cache"
+        path="/" />
+</paths>
