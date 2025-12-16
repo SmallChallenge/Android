@@ -25,6 +25,8 @@ class ImageRepository(
      */
     suspend fun uploadImage(
         imageFile: File,
+        category: String = "EXERCISE", // "EXERCISE", "FOOD", "STUDY"
+        visibility: String = "PRIVATE", // "PRIVATE", "PUBLIC"
         contentType: String = "image/jpeg"
     ): Result<ImageSaveResponse> {
         return try {
@@ -61,7 +63,10 @@ class ImageRepository(
             val saveRequest = ImageSaveRequest(
                 originalFilename = imageFile.name,
                 objectKey = presignedData.objectKey,
-                contentType = contentType
+                contentType = contentType,
+                fileSize = imageFile.length(),
+                category = category,
+                visibility = visibility
             )
 
             val saveResponse = imageApi.saveImage(token, saveRequest)
@@ -75,6 +80,107 @@ class ImageRepository(
                 }
             } else {
                 Result.failure(Exception("서버 오류: ${saveResponse.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 내 앨범 리스트 조회
+     */
+    suspend fun getMyImages(
+        category: String? = null, // null이면 전체, "EXERCISE", "FOOD", "STUDY"
+        page: Int = 0,
+        size: Int = 20
+    ): Result<ImageListResponse> {
+        return try {
+            val token = "Bearer ${tokenManager.getAccessToken()}"
+            val response = imageApi.getMyImages(token, category, page, size)
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body?.success == true && body.data != null) {
+                    Result.success(body.data)
+                } else {
+                    Result.failure(Exception(body?.message ?: "목록 조회 실패"))
+                }
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 이미지 상세 조회
+     */
+    suspend fun getImageDetail(imageId: Long): Result<ImageDetailResponse> {
+        return try {
+            val token = "Bearer ${tokenManager.getAccessToken()}"
+            val response = imageApi.getImageDetail(token, imageId)
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body?.success == true && body.data != null) {
+                    Result.success(body.data)
+                } else {
+                    Result.failure(Exception(body?.message ?: "상세 조회 실패"))
+                }
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 이미지 수정 (카테고리, 공개범위)
+     */
+    suspend fun updateImage(
+        imageId: Long,
+        category: String? = null,
+        visibility: String? = null
+    ): Result<ImageDetailResponse> {
+        return try {
+            val token = "Bearer ${tokenManager.getAccessToken()}"
+            val request = ImageUpdateRequest(category, visibility)
+            val response = imageApi.updateImage(token, imageId, request)
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body?.success == true && body.data != null) {
+                    Result.success(body.data)
+                } else {
+                    Result.failure(Exception(body?.message ?: "수정 실패"))
+                }
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 이미지 삭제 (Soft Delete)
+     */
+    suspend fun deleteImage(imageId: Long): Result<ImageDeleteResponse> {
+        return try {
+            val token = "Bearer ${tokenManager.getAccessToken()}"
+            val response = imageApi.deleteImage(token, imageId)
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body?.success == true && body.data != null) {
+                    Result.success(body.data)
+                } else {
+                    Result.failure(Exception(body?.message ?: "삭제 실패"))
+                }
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

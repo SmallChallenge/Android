@@ -37,4 +37,43 @@ interface ImageApiService {
         @Header("Content-Type") contentType: String,
         @Body file: RequestBody
     ): Response<Unit>
+
+    /**
+     * 내 앨범 리스트 조회
+     */
+    @GET("/api/v1/images")
+    suspend fun getMyImages(
+        @Header("Authorization") token: String,
+        @Query("category") category: String? = null, // EXERCISE, FOOD, STUDY
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20
+    ): Response<ApiResponse<ImageListResponse>>
+
+    /**
+     * 이미지 상세 조회
+     */
+    @GET("/api/v1/images/{imageId}")
+    suspend fun getImageDetail(
+        @Header("Authorization") token: String,
+        @Path("imageId") imageId: Long
+    ): Response<ApiResponse<ImageDetailResponse>>
+
+    /**
+     * 이미지 수정
+     */
+    @PATCH("/api/v1/images/{imageId}")
+    suspend fun updateImage(
+        @Header("Authorization") token: String,
+        @Path("imageId") imageId: Long,
+        @Body request: ImageUpdateRequest
+    ): Response<ApiResponse<ImageDetailResponse>>
+
+    /**
+     * 이미지 삭제
+     */
+    @DELETE("/api/v1/images/{imageId}")
+    suspend fun deleteImage(
+        @Header("Authorization") token: String,
+        @Path("imageId") imageId: Long
+    ): Response<ApiResponse<ImageDeleteResponse>>
 }
