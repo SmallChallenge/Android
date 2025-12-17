@@ -1,5 +1,6 @@
 package com.project.stampy
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -104,9 +105,13 @@ class MyRecordsFragment : Fragment() {
     private fun setupRecyclerView() {
         photoAdapter = PhotoGridAdapter()
 
-        // 3열 그리드 레이아웃
-        rvPhotos.layoutManager = GridLayoutManager(requireContext(), 3)
+        // 3열 그리드 레이아웃 (간격 조정)
+        val gridLayoutManager = GridLayoutManager(requireContext(), 3)
+        rvPhotos.layoutManager = gridLayoutManager
         rvPhotos.adapter = photoAdapter
+
+        // 아이템 간격 설정 (2dp)
+        rvPhotos.addItemDecoration(GridSpacingItemDecoration(3, 1/2, false))
 
         // 사진 클릭 리스너
         photoAdapter.setOnPhotoClickListener { photo ->
@@ -201,5 +206,41 @@ class MyRecordsFragment : Fragment() {
     private fun hideEmptyState() {
         rvPhotos.visibility = View.VISIBLE
         tvEmptyState.visibility = View.GONE
+    }
+
+    /**
+     * 그리드 아이템 간격 조정 ItemDecoration
+     */
+    class GridSpacingItemDecoration(
+        private val spanCount: Int,
+        private val spacing: Int,
+        private val includeEdge: Boolean
+    ) : RecyclerView.ItemDecoration() {
+
+        override fun getItemOffsets(
+            outRect: Rect,
+            view: View,
+            parent: RecyclerView,
+            state: RecyclerView.State
+        ) {
+            val position = parent.getChildAdapterPosition(view)
+            val column = position % spanCount
+
+            if (includeEdge) {
+                outRect.left = spacing - column * spacing / spanCount
+                outRect.right = (column + 1) * spacing / spanCount
+
+                if (position < spanCount) {
+                    outRect.top = spacing
+                }
+                outRect.bottom = spacing
+            } else {
+                outRect.left = column * spacing / spanCount
+                outRect.right = spacing - (column + 1) * spacing / spanCount
+                if (position >= spanCount) {
+                    outRect.top = spacing
+                }
+            }
+        }
     }
 }
