@@ -27,10 +27,10 @@
         <item name="textAppearanceButton">@style/TextAppearance.App.Button.Large</item>
     </style>
 
-    <!-- FAB 둥근 사각형 모양 -->
-    <style name="ShapeAppearance.App.FAB" parent="">
+    <!-- FAB 라운드 28 -->
+    <style name="ShapeAppearance.App.FAB.Round28" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">34dp</item>
+        <item name="cornerSize">28dp</item>
     </style>
 
     <!-- 네비게이션 인디케이터 제거 -->

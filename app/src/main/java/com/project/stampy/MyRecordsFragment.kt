@@ -105,13 +105,13 @@ class MyRecordsFragment : Fragment() {
     private fun setupRecyclerView() {
         photoAdapter = PhotoGridAdapter()
 
-        // 3열 그리드 레이아웃 (간격 조정)
+        // 3열 그리드 레이아웃
         val gridLayoutManager = GridLayoutManager(requireContext(), 3)
         rvPhotos.layoutManager = gridLayoutManager
         rvPhotos.adapter = photoAdapter
 
-        // 아이템 간격 설정 (2dp)
-        rvPhotos.addItemDecoration(GridSpacingItemDecoration(3, 1/2, false))
+        // 아이템 간격 설정 (1dp)
+        rvPhotos.addItemDecoration(GridSpacingItemDecoration(3, 1, false))  // 간격 1dp
 
         // 사진 클릭 리스너
         photoAdapter.setOnPhotoClickListener { photo ->
@@ -133,11 +133,11 @@ class MyRecordsFragment : Fragment() {
 
         // 모든 카테고리 업데이트
         categoryViews.forEach { (cat, views) ->
-            val (_, imageView, textView) = views
+            val (container, imageView, textView) = views
             if (cat == category) {
-                activateCategory(imageView, textView)
+                activateCategory(container, imageView, textView)
             } else {
-                resetCategory(imageView, textView)
+                resetCategory(container, imageView, textView)
             }
         }
 
@@ -145,23 +145,37 @@ class MyRecordsFragment : Fragment() {
         loadPhotos()
     }
 
-    private fun resetCategory(imageView: ImageView, textView: TextView) {
+    private fun resetCategory(container: LinearLayout, imageView: ImageView, textView: TextView) {
+        // 미선택 상태: opacity 40%
+        container.alpha = 0.4f
+
         imageView.setBackgroundResource(R.drawable.category_circle_unselected)
         imageView.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.gray_600)
+            ContextCompat.getColor(requireContext(), R.color.gray_500)
         )
+
         textView.setTextColor(
-            ContextCompat.getColor(requireContext(), R.color.gray_600)
+            ContextCompat.getColor(requireContext(), R.color.gray_500)
+        )
+        textView.setTypeface(
+            resources.getFont(R.font.pretendard_medium)
         )
     }
 
-    private fun activateCategory(imageView: ImageView, textView: TextView) {
+    private fun activateCategory(container: LinearLayout, imageView: ImageView, textView: TextView) {
+        // 선택 상태: opacity 100%
+        container.alpha = 1.0f
+
         imageView.setBackgroundResource(R.drawable.category_circle_selected)
         imageView.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.gray_primary)
         )
+
         textView.setTextColor(
-            ContextCompat.getColor(requireContext(), R.color.white)
+            ContextCompat.getColor(requireContext(), R.color.gray_50)
+        )
+        textView.setTypeface(
+            resources.getFont(R.font.pretendard_semibold)
         )
     }
 
@@ -207,39 +221,39 @@ class MyRecordsFragment : Fragment() {
         rvPhotos.visibility = View.VISIBLE
         tvEmptyState.visibility = View.GONE
     }
+}
 
-    /**
-     * 그리드 아이템 간격 조정 ItemDecoration
-     */
-    class GridSpacingItemDecoration(
-        private val spanCount: Int,
-        private val spacing: Int,
-        private val includeEdge: Boolean
-    ) : RecyclerView.ItemDecoration() {
+/**
+ * 그리드 아이템 간격 조정 ItemDecoration
+ */
+class GridSpacingItemDecoration(
+    private val spanCount: Int,
+    private val spacing: Int,
+    private val includeEdge: Boolean
+) : RecyclerView.ItemDecoration() {
 
-        override fun getItemOffsets(
-            outRect: Rect,
-            view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
-        ) {
-            val position = parent.getChildAdapterPosition(view)
-            val column = position % spanCount
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        val position = parent.getChildAdapterPosition(view)
+        val column = position % spanCount
 
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount
-                outRect.right = (column + 1) * spacing / spanCount
+        if (includeEdge) {
+            outRect.left = spacing - column * spacing / spanCount
+            outRect.right = (column + 1) * spacing / spanCount
 
-                if (position < spanCount) {
-                    outRect.top = spacing
-                }
-                outRect.bottom = spacing
-            } else {
-                outRect.left = column * spacing / spanCount
-                outRect.right = spacing - (column + 1) * spacing / spanCount
-                if (position >= spanCount) {
-                    outRect.top = spacing
-                }
+            if (position < spanCount) {
+                outRect.top = spacing
+            }
+            outRect.bottom = spacing
+        } else {
+            outRect.left = column * spacing / spanCount
+            outRect.right = spacing - (column + 1) * spacing / spanCount
+            if (position >= spanCount) {
+                outRect.top = spacing
             }
         }
     }
