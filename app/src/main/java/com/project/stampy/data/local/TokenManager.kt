@@ -90,7 +90,9 @@ class TokenManager(context: Context) {
      * 로그인 상태 확인
      */
     fun isLoggedIn(): Boolean {
-        return getAccessToken() != null && getRefreshToken() != null
+        val accessToken = getAccessToken()
+        val refreshToken = getRefreshToken()
+        return !accessToken.isNullOrEmpty() && !refreshToken.isNullOrEmpty()
     }
 
     /**

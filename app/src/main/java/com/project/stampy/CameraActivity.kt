@@ -32,6 +32,18 @@ class CameraActivity : AppCompatActivity() {
 
     private val CAMERA_PERMISSION_CODE = 101
 
+    companion object {
+        private const val TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss"
+        private const val FILE_PREFIX = "STAMPY_"
+        private const val FILE_EXTENSION = ".jpg"
+
+        fun generateFileName(): String {
+            val timestamp = SimpleDateFormat(TIMESTAMP_FORMAT, Locale.getDefault())
+                .format(Date())
+            return "$FILE_PREFIX$timestamp$FILE_EXTENSION"
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
@@ -142,15 +154,10 @@ class CameraActivity : AppCompatActivity() {
      * 앱 내부 저장소에 파일 생성
      */
     private fun createAppPhotoFile(): File {
-        val picturesDir = File(filesDir, "Pictures")
-        if (!picturesDir.exists()) {
-            picturesDir.mkdirs()
+        val picturesDir = File(filesDir, "Pictures").apply {
+            if (!exists()) mkdirs()
         }
-
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "STAMPY_$timestamp.jpg"
-
-        return File(picturesDir, fileName)
+        return File(picturesDir, generateFileName())
     }
 
     /**
@@ -158,8 +165,7 @@ class CameraActivity : AppCompatActivity() {
      */
     private fun saveToGallery(sourceFile: File) {
         try {
-            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val displayName = "STAMPY_$timestamp.jpg"
+            val displayName = generateFileName()
 
             val contentValues = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, displayName)

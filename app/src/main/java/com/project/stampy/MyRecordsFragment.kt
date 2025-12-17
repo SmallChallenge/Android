@@ -20,25 +20,39 @@ class MyRecordsFragment : Fragment() {
 
     // 카테고리 뷰들
     private lateinit var categoryAll: LinearLayout
+    private lateinit var categoryStudy: LinearLayout
     private lateinit var categoryExercise: LinearLayout
     private lateinit var categoryFood: LinearLayout
-    private lateinit var categoryStudy: LinearLayout
+    private lateinit var categoryEtc: LinearLayout
 
     private lateinit var ivCategoryAll: ImageView
+    private lateinit var ivCategoryStudy: ImageView
     private lateinit var ivCategoryExercise: ImageView
     private lateinit var ivCategoryFood: ImageView
-    private lateinit var ivCategoryStudy: ImageView
+    private lateinit var ivCategoryEtc: ImageView
 
     private lateinit var tvCategoryAll: TextView
+    private lateinit var tvCategoryStudy: TextView
     private lateinit var tvCategoryExercise: TextView
     private lateinit var tvCategoryFood: TextView
-    private lateinit var tvCategoryStudy: TextView
+    private lateinit var tvCategoryEtc: TextView
 
     private lateinit var rvPhotos: RecyclerView
     private lateinit var tvEmptyState: TextView
 
     private lateinit var photoAdapter: PhotoGridAdapter
     private var selectedCategory = "전체"
+
+    // 카테고리 뷰 맵
+    private val categoryViews by lazy {
+        mapOf(
+            "전체" to Triple(categoryAll, ivCategoryAll, tvCategoryAll),
+            "공부" to Triple(categoryStudy, ivCategoryStudy, tvCategoryStudy),
+            "운동" to Triple(categoryExercise, ivCategoryExercise, tvCategoryExercise),
+            "음식" to Triple(categoryFood, ivCategoryFood, tvCategoryFood),
+            "기타" to Triple(categoryEtc, ivCategoryEtc, tvCategoryEtc)
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,23 +66,7 @@ class MyRecordsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // View 초기화
-        categoryAll = view.findViewById(R.id.category_all)
-        categoryExercise = view.findViewById(R.id.category_exercise)
-        categoryFood = view.findViewById(R.id.category_food)
-        categoryStudy = view.findViewById(R.id.category_study)
-
-        ivCategoryAll = view.findViewById(R.id.iv_category_all)
-        ivCategoryExercise = view.findViewById(R.id.iv_category_exercise)
-        ivCategoryFood = view.findViewById(R.id.iv_category_food)
-        ivCategoryStudy = view.findViewById(R.id.iv_category_study)
-
-        tvCategoryAll = view.findViewById(R.id.tv_category_all)
-        tvCategoryExercise = view.findViewById(R.id.tv_category_exercise)
-        tvCategoryFood = view.findViewById(R.id.tv_category_food)
-        tvCategoryStudy = view.findViewById(R.id.tv_category_study)
-
-        rvPhotos = view.findViewById(R.id.rv_photos)
-        tvEmptyState = view.findViewById(R.id.tv_empty_state)
+        initViews(view)
 
         // RecyclerView 설정
         setupRecyclerView()
@@ -78,6 +76,29 @@ class MyRecordsFragment : Fragment() {
 
         // 사진 로드
         loadPhotos()
+    }
+
+    private fun initViews(view: View) {
+        categoryAll = view.findViewById(R.id.category_all)
+        categoryStudy = view.findViewById(R.id.category_study)
+        categoryExercise = view.findViewById(R.id.category_exercise)
+        categoryFood = view.findViewById(R.id.category_food)
+        categoryEtc = view.findViewById(R.id.category_etc)
+
+        ivCategoryAll = view.findViewById(R.id.iv_category_all)
+        ivCategoryStudy = view.findViewById(R.id.iv_category_study)
+        ivCategoryExercise = view.findViewById(R.id.iv_category_exercise)
+        ivCategoryFood = view.findViewById(R.id.iv_category_food)
+        ivCategoryEtc = view.findViewById(R.id.iv_category_etc)
+
+        tvCategoryAll = view.findViewById(R.id.tv_category_all)
+        tvCategoryStudy = view.findViewById(R.id.tv_category_study)
+        tvCategoryExercise = view.findViewById(R.id.tv_category_exercise)
+        tvCategoryFood = view.findViewById(R.id.tv_category_food)
+        tvCategoryEtc = view.findViewById(R.id.tv_category_etc)
+
+        rvPhotos = view.findViewById(R.id.rv_photos)
+        tvEmptyState = view.findViewById(R.id.tv_empty_state)
     }
 
     private fun setupRecyclerView() {
@@ -95,61 +116,47 @@ class MyRecordsFragment : Fragment() {
     }
 
     private fun setupCategoryListeners() {
-        categoryAll.setOnClickListener {
-            selectCategory("전체")
-        }
-
-        categoryExercise.setOnClickListener {
-            selectCategory("운동")
-        }
-
-        categoryFood.setOnClickListener {
-            selectCategory("음식")
-        }
-
-        categoryStudy.setOnClickListener {
-            selectCategory("공부")
+        categoryViews.forEach { (category, views) ->
+            views.first.setOnClickListener {
+                selectCategory(category)
+            }
         }
     }
 
     private fun selectCategory(category: String) {
         selectedCategory = category
 
-        // 모든 카테고리 초기화 (선택 안됨 상태)
-        resetCategory(ivCategoryAll, tvCategoryAll)
-        resetCategory(ivCategoryExercise, tvCategoryExercise)
-        resetCategory(ivCategoryFood, tvCategoryFood)
-        resetCategory(ivCategoryStudy, tvCategoryStudy)
-
-        // 선택된 카테고리 활성화
-        when (category) {
-            "전체" -> activateCategory(ivCategoryAll, tvCategoryAll)
-            "운동" -> activateCategory(ivCategoryExercise, tvCategoryExercise)
-            "음식" -> activateCategory(ivCategoryFood, tvCategoryFood)
-            "공부" -> activateCategory(ivCategoryStudy, tvCategoryStudy)
+        // 모든 카테고리 업데이트
+        categoryViews.forEach { (cat, views) ->
+            val (_, imageView, textView) = views
+            if (cat == category) {
+                activateCategory(imageView, textView)
+            } else {
+                resetCategory(imageView, textView)
+            }
         }
 
-        // 사진 필터링 (현재는 전체만 표시)
+        // 사진 필터링
         loadPhotos()
     }
 
     private fun resetCategory(imageView: ImageView, textView: TextView) {
         imageView.setBackgroundResource(R.drawable.category_circle_unselected)
         imageView.setColorFilter(
-            ContextCompat.getColor(requireContext(), android.R.color.darker_gray)
+            ContextCompat.getColor(requireContext(), R.color.gray_600)
         )
         textView.setTextColor(
-            ContextCompat.getColor(requireContext(), android.R.color.darker_gray)
+            ContextCompat.getColor(requireContext(), R.color.gray_600)
         )
     }
 
     private fun activateCategory(imageView: ImageView, textView: TextView) {
         imageView.setBackgroundResource(R.drawable.category_circle_selected)
         imageView.setColorFilter(
-            ContextCompat.getColor(requireContext(), android.R.color.black)
+            ContextCompat.getColor(requireContext(), R.color.gray_primary)
         )
         textView.setTextColor(
-            ContextCompat.getColor(requireContext(), android.R.color.white)
+            ContextCompat.getColor(requireContext(), R.color.white)
         )
     }
 
@@ -172,7 +179,7 @@ class MyRecordsFragment : Fragment() {
             showEmptyState()
         } else {
             hideEmptyState()
-            val photos = photoFiles.map { Photo(it) }
+            val photos = photoFiles.map { Photo(it, category = selectedCategory) }
             photoAdapter.setPhotos(photos)
 
             Log.d("MyRecordsFragment", "사진 ${photos.size}개 로드됨")

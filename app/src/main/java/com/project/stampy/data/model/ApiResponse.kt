@@ -31,3 +31,14 @@ data class ErrorResponse(
     val message: String,
     val timestamp: String
 )
+
+/**
+ * ApiResponse를 Result로 변환하는 확장 함수
+ */
+fun <T> ApiResponse<T>.toResult(): Result<T> {
+    return if (success && data != null) {
+        Result.success(data)
+    } else {
+        Result.failure(Exception(message))
+    }
+}

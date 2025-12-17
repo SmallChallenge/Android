@@ -19,7 +19,7 @@ data class ImageSaveRequest(
     val fileSize: Long,
 
     @SerializedName("category")
-    val category: String, // "EXERCISE", "FOOD", "STUDY"
+    val category: String, // "STUDY", "EXERCISE", "FOOD", "ETC"
 
     @SerializedName("visibility")
     val visibility: String = "PRIVATE" // "PRIVATE", "PUBLIC"

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#171717"
+    android:background="@color/background_primary"
     android:fitsSystemWindows="false">
 
     <!-- 상단 바 -->
@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="#171717"
+        android:background="@color/background_primary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Stampy"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:fontFamily="sans-serif-medium" />
 
@@ -33,7 +33,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@android:drawable/ic_menu_myplaces"
-            app:tint="#FFFFFF" />
+            app:tint="@color/text_primary" />
     </LinearLayout>
 
     <!-- 카테고리 탭 -->
@@ -55,6 +55,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <!-- 전체 -->
             <LinearLayout
                 android:id="@+id/category_all"
                 android:layout_width="wrap_content"
@@ -74,18 +75,51 @@
                     android:src="@android:drawable/ic_menu_camera"
                     android:background="@drawable/category_circle_selected"
                     android:padding="12dp"
-                    app:tint="#171717" />
+                    app:tint="@color/gray_primary" />
 
                 <TextView
                     android:id="@+id/tv_category_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="전체"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/white"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
 
+            <!-- 공부 -->
+            <LinearLayout
+                android:id="@+id/category_study"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="4dp"
+                android:layout_marginEnd="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/iv_category_study"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:background="@drawable/category_circle_unselected"
+                    android:padding="12dp"
+                    app:tint="@color/gray_600" />
+
+                <TextView
+                    android:id="@+id/tv_category_study"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="공부"
+                    android:textColor="@color/gray_600"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <!-- 운동 -->
             <LinearLayout
                 android:id="@+id/category_exercise"
                 android:layout_width="wrap_content"
@@ -102,21 +136,22 @@
                     android:id="@+id/iv_category_exercise"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
-                    android:src="@android:drawable/ic_menu_camera"
+                    android:src="@android:drawable/ic_menu_compass"
                     android:background="@drawable/category_circle_unselected"
                     android:padding="12dp"
-                    app:tint="#686868" />
+                    app:tint="@color/gray_600" />
 
                 <TextView
                     android:id="@+id/tv_category_exercise"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="운동"
-                    android:textColor="#686868"
+                    android:textColor="@color/gray_600"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
 
+            <!-- 음식 -->
             <LinearLayout
                 android:id="@+id/category_food"
                 android:layout_width="wrap_content"
@@ -133,23 +168,24 @@
                     android:id="@+id/iv_category_food"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
-                    android:src="@android:drawable/ic_menu_camera"
+                    android:src="@android:drawable/ic_menu_today"
                     android:background="@drawable/category_circle_unselected"
                     android:padding="12dp"
-                    app:tint="#686868" />
+                    app:tint="@color/gray_600" />
 
                 <TextView
                     android:id="@+id/tv_category_food"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="음식"
-                    android:textColor="#686868"
+                    android:textColor="@color/gray_600"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
 
+            <!-- 기타 -->
             <LinearLayout
-                android:id="@+id/category_study"
+                android:id="@+id/category_etc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -160,20 +196,20 @@
                 android:background="?attr/selectableItemBackground">
 
                 <ImageView
-                    android:id="@+id/iv_category_study"
+                    android:id="@+id/iv_category_etc"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
-                    android:src="@android:drawable/ic_menu_camera"
+                    android:src="@android:drawable/ic_menu_more"
                     android:background="@drawable/category_circle_unselected"
                     android:padding="12dp"
-                    app:tint="#686868" />
+                    app:tint="@color/gray_600" />
 
                 <TextView
-                    android:id="@+id/tv_category_study"
+                    android:id="@+id/tv_category_etc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="공부"
-                    android:textColor="#686868"
+                    android:text="기타"
+                    android:textColor="@color/gray_600"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
@@ -200,7 +236,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="아직 저장된 사진이 없습니다\n+ 버튼을 눌러 사진을 추가해보세요"
-        android:textColor="#808080"
+        android:textColor="@color/text_secondary"
         android:textSize="16sp"
         android:textAlignment="center"
         android:gravity="center"

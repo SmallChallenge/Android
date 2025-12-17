@@ -6,6 +6,7 @@ import com.project.stampy.data.network.ImageApiService
 import com.project.stampy.data.network.RetrofitClient
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.Response
 import java.io.File
 
 /**
@@ -18,6 +19,25 @@ class ImageRepository(
         RetrofitClient.createService(ImageApiService::class.java)
 
     /**
+     * 공통 API(서버 오류) 호출 처리
+     */
+    private suspend fun <T> safeApiCall(
+        apiCall: suspend () -> Response<ApiResponse<T>>
+    ): Result<T> {
+        return try {
+            val response = apiCall()
+            if (response.isSuccessful) {
+                response.body()?.toResult()
+                    ?: Result.failure(Exception("응답 없음"))
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
      * 이미지 업로드 (전체 프로세스)
      * 1. Presigned URL 생성
      * 2. S3에 업로드
@@ -25,7 +45,7 @@ class ImageRepository(
      */
     suspend fun uploadImage(
         imageFile: File,
-        category: String = "EXERCISE", // "EXERCISE", "FOOD", "STUDY"
+        category: String = "ETC", // "STUDY", "EXERCISE", "FOOD", "ETC"
         visibility: String = "PRIVATE", // "PRIVATE", "PUBLIC"
         contentType: String = "image/jpeg"
     ): Result<ImageSaveResponse> {
@@ -69,18 +89,7 @@ class ImageRepository(
                 visibility = visibility
             )
 
-            val saveResponse = imageApi.saveImage(token, saveRequest)
-
-            if (saveResponse.isSuccessful) {
-                val body = saveResponse.body()
-                if (body?.success == true && body.data != null) {
-                    Result.success(body.data)
-                } else {
-                    Result.failure(Exception(body?.message ?: "이미지 저장 실패"))
-                }
-            } else {
-                Result.failure(Exception("서버 오류: ${saveResponse.code()}"))
-            }
+            safeApiCall { imageApi.saveImage(token, saveRequest) }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -90,50 +99,20 @@ class ImageRepository(
      * 내 앨범 리스트 조회
      */
     suspend fun getMyImages(
-        category: String? = null, // null이면 전체, "EXERCISE", "FOOD", "STUDY"
+        category: String? = null, // null이면 전체, "STUDY", "EXERCISE", "FOOD", "ETC"
         page: Int = 0,
         size: Int = 20
     ): Result<ImageListResponse> {
-        return try {
-            val token = "Bearer ${tokenManager.getAccessToken()}"
-            val response = imageApi.getMyImages(token, category, page, size)
-
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body?.success == true && body.data != null) {
-                    Result.success(body.data)
-                } else {
-                    Result.failure(Exception(body?.message ?: "목록 조회 실패"))
-                }
-            } else {
-                Result.failure(Exception("서버 오류: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        val token = "Bearer ${tokenManager.getAccessToken()}"
+        return safeApiCall { imageApi.getMyImages(token, category, page, size) }
     }
 
     /**
      * 이미지 상세 조회
      */
     suspend fun getImageDetail(imageId: Long): Result<ImageDetailResponse> {
-        return try {
-            val token = "Bearer ${tokenManager.getAccessToken()}"
-            val response = imageApi.getImageDetail(token, imageId)
-
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body?.success == true && body.data != null) {
-                    Result.success(body.data)
-                } else {
-                    Result.failure(Exception(body?.message ?: "상세 조회 실패"))
-                }
-            } else {
-                Result.failure(Exception("서버 오류: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        val token = "Bearer ${tokenManager.getAccessToken()}"
+        return safeApiCall { imageApi.getImageDetail(token, imageId) }
     }
 
     /**
@@ -144,46 +123,16 @@ class ImageRepository(
         category: String? = null,
         visibility: String? = null
     ): Result<ImageDetailResponse> {
-        return try {
-            val token = "Bearer ${tokenManager.getAccessToken()}"
-            val request = ImageUpdateRequest(category, visibility)
-            val response = imageApi.updateImage(token, imageId, request)
-
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body?.success == true && body.data != null) {
-                    Result.success(body.data)
-                } else {
-                    Result.failure(Exception(body?.message ?: "수정 실패"))
-                }
-            } else {
-                Result.failure(Exception("서버 오류: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        val token = "Bearer ${tokenManager.getAccessToken()}"
+        val request = ImageUpdateRequest(category, visibility)
+        return safeApiCall { imageApi.updateImage(token, imageId, request) }
     }
 
     /**
      * 이미지 삭제 (Soft Delete)
      */
     suspend fun deleteImage(imageId: Long): Result<ImageDeleteResponse> {
-        return try {
-            val token = "Bearer ${tokenManager.getAccessToken()}"
-            val response = imageApi.deleteImage(token, imageId)
-
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body?.success == true && body.data != null) {
-                    Result.success(body.data)
-                } else {
-                    Result.failure(Exception(body?.message ?: "삭제 실패"))
-                }
-            } else {
-                Result.failure(Exception("서버 오류: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        val token = "Bearer ${tokenManager.getAccessToken()}"
+        return safeApiCall { imageApi.deleteImage(token, imageId) }
     }
 }
