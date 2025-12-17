@@ -7,37 +7,42 @@
     android:background="@color/background_primary"
     android:fitsSystemWindows="false">
 
-    <!-- 상단 바 -->
-    <LinearLayout
+    <!-- 상단 바 (60dp 고정) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_bar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="60dp"
+        android:background="@color/background_primary"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:background="@color/background_primary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:id="@+id/tv_stampy"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
             android:text="Stampy"
             android:textColor="@color/text_primary"
             android:textSize="24sp"
-            android:fontFamily="@font/pretendard_semibold" />
+            android:fontFamily="@font/pretendard_semibold"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/btn_profile"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_profile"
-            app:tint="@color/text_primary" />
-    </LinearLayout>
+            app:tint="@color/text_primary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- 카테고리 탭 -->
     <HorizontalScrollView
