@@ -26,7 +26,8 @@
             android:text="Stampy"
             android:textColor="@color/text_primary"
             android:textSize="24sp"
-            android:fontFamily="sans-serif-medium" />
+            android:fontFamily="@font/pretendard"
+            android:textFontWeight="600" />
 
         <ImageView
             android:id="@+id/btn_profile"

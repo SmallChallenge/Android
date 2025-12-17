@@ -13,6 +13,18 @@
         <item name="colorPrimary">@color/neon_primary</item>
         <item name="colorOnPrimary">@color/gray_primary</item>
         <item name="android:windowBackground">@color/gray_primary</item>
+
+        <!-- 프리텐다드 폰트 적용 -->
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="fontFamily">@font/pretendard</item>
+
+        <!-- 텍스트 스타일 기본값 -->
+        <item name="textAppearanceHeadline1">@style/TextAppearance.App.H1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.App.H2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.App.H3</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.App.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.App.Body2</item>
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button.Large</item>
     </style>
 
     <!-- FAB 둥근 사각형 모양 -->
