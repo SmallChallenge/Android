@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
  */
 data class SocialLoginRequest(
     @SerializedName("socialType")
-    val socialType: String, // "APPLE", "GOOGLE", "KAKAO"
+    val socialType: String, // "GOOGLE", "KAKAO"
 
     @SerializedName("accessToken")
     val accessToken: String

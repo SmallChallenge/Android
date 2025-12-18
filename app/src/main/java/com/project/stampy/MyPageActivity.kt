@@ -1,5 +1,6 @@
 package com.project.stampy
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -56,7 +57,6 @@ class MyPageActivity : AppCompatActivity() {
         btnLoginSignup = findViewById(R.id.btn_login_signup)
 
         // 공통 메뉴
-        tvAppVersion = findViewById(R.id.tv_app_version)
         btnLogout = findViewById(R.id.btn_logout)
         btnDeleteAccount = findViewById(R.id.btn_delete_account)
     }
@@ -69,12 +69,9 @@ class MyPageActivity : AppCompatActivity() {
 
         // 로그인/회원가입 버튼
         btnLoginSignup.setOnClickListener {
-            // TODO: 로그인 화면으로 이동
-            Toast.makeText(this, "로그인 화면으로 이동", Toast.LENGTH_SHORT).show()
-
-            // 테스트용: 로그인 처리
-            userPreferences.saveLoginInfo("000", "test@example.com")
-            updateUI()
+            // 로그인 화면으로 이동
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
         }
 
         // 사용자 정보 클릭 (로그인 상태)

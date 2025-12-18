@@ -61,6 +61,12 @@
             android:screenOrientation="portrait"
             android:exported="false" />
 
+        <!-- LoginActivity -->
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
         <!-- FileProvider 설정 (사진 저장용) -->
         <provider
             android:name="androidx.core.content.FileProvider"
