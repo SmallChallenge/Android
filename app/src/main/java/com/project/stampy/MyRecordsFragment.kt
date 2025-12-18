@@ -1,5 +1,6 @@
 package com.project.stampy
 
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
@@ -40,6 +41,7 @@ class MyRecordsFragment : Fragment() {
 
     private lateinit var rvPhotos: RecyclerView
     private lateinit var tvEmptyState: TextView
+    private lateinit var btnProfile: ImageView
 
     private lateinit var photoAdapter: PhotoGridAdapter
     private var selectedCategory = "전체"
@@ -75,6 +77,9 @@ class MyRecordsFragment : Fragment() {
         // 카테고리 클릭 리스너
         setupCategoryListeners()
 
+        // 프로필 버튼 클릭 리스너
+        setupProfileButton()
+
         // 사진 로드
         loadPhotos()
     }
@@ -100,6 +105,7 @@ class MyRecordsFragment : Fragment() {
 
         rvPhotos = view.findViewById(R.id.rv_photos)
         tvEmptyState = view.findViewById(R.id.tv_empty_state)
+        btnProfile = view.findViewById(R.id.btn_profile)
     }
 
     private fun setupRecyclerView() {
@@ -125,6 +131,16 @@ class MyRecordsFragment : Fragment() {
             views.first.setOnClickListener {
                 selectCategory(category)
             }
+        }
+    }
+
+    /**
+     * 프로필 버튼 클릭 리스너 설정
+     */
+    private fun setupProfileButton() {
+        btnProfile.setOnClickListener {
+            val intent = Intent(requireContext(), MyPageActivity::class.java)
+            startActivity(intent)
         }
     }
 
