@@ -56,11 +56,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupGoogleSignIn() {
         try {
-            val clientId = getString(R.string.google_client_id)
-            Log.d(TAG, "Google Client ID: $clientId")
+            val webClientId = getString(R.string.google_web_client_id)
+            Log.d(TAG, "Google Client ID: $webClientId")
 
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(clientId)
+                .requestIdToken(webClientId)  // Web 클라이언트 ID 사용!
                 .requestEmail()
                 .requestProfile()
                 .build()
