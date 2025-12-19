@@ -1,10 +1,7 @@
 package com.project.stampy
 
 import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -17,11 +14,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.user.UserApiClient
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
 import kotlinx.coroutines.launch
-import java.security.MessageDigest
 
 class LoginActivity : AppCompatActivity() {
 
@@ -42,9 +42,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // 앱 서명 정보 출력 (디버깅용)
-        printAppSignature()
-
         // TokenManager 및 Repository 초기화
         tokenManager = TokenManager(this)
         RetrofitClient.initialize(tokenManager)
@@ -57,46 +54,13 @@ class LoginActivity : AppCompatActivity() {
         setupListeners()
     }
 
-    /**
-     * 앱의 SHA-1 서명 출력 (디버깅용)
-     */
-    private fun printAppSignature() {
-        try {
-            val packageInfo: PackageInfo = packageManager.getPackageInfo(
-                packageName,
-                PackageManager.GET_SIGNATURES
-            )
-            for (signature in packageInfo.signatures) {
-                val md = MessageDigest.getInstance("SHA")
-                md.update(signature.toByteArray())
-                val sha1 = Base64.encodeToString(md.digest(), Base64.NO_WRAP)
-                Log.d(TAG, "========================================")
-                Log.d(TAG, "Package Name: $packageName")
-                Log.d(TAG, "SHA-1 (Base64): $sha1")
-
-                // SHA-1을 HEX 형식으로도 출력
-                val hexSha1 = md.digest().joinToString(":") { "%02X".format(it) }
-                Log.d(TAG, "SHA-1 (HEX): $hexSha1")
-                Log.d(TAG, "========================================")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting app signature", e)
-        }
-    }
-
     private fun setupGoogleSignIn() {
         try {
-            // Web 클라이언트 ID 사용 (requestIdToken을 위해 필요)
-            val webClientId = getString(R.string.google_web_client_id)
-            Log.d(TAG, "========================================")
-            Log.d(TAG, "Google Web Client ID from strings.xml:")
-            Log.d(TAG, webClientId)
-            Log.d(TAG, "Client ID length: ${webClientId.length}")
-            Log.d(TAG, "Contains '.apps.googleusercontent.com': ${webClientId.contains(".apps.googleusercontent.com")}")
-            Log.d(TAG, "========================================")
+            val clientId = getString(R.string.google_client_id)
+            Log.d(TAG, "Google Client ID: $clientId")
 
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(webClientId)  // Web 클라이언트 ID 사용!
+                .requestIdToken(clientId)
                 .requestEmail()
                 .requestProfile()
                 .build()
@@ -123,7 +87,7 @@ class LoginActivity : AppCompatActivity() {
 
         // 카카오 로그인
         btnKakaoLogin.setOnClickListener {
-            Toast.makeText(this, "카카오 로그인 준비중", Toast.LENGTH_SHORT).show()
+            signInWithKakao()
         }
 
         // 구글 로그인
@@ -132,9 +96,86 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 카카오 로그인
+     */
+    private fun signInWithKakao() {
+        Log.d(TAG, "Starting Kakao Sign-In")
+
+        // 카카오톡 설치 여부 확인
+        if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
+            // 카카오톡으로 로그인
+            UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
+                if (error != null) {
+                    Log.e(TAG, "카카오톡 로그인 실패", error)
+
+                    // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
+                    // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
+                    if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                        Log.d(TAG, "사용자가 로그인을 취소했습니다")
+                        return@loginWithKakaoTalk
+                    }
+
+                    // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도
+                    Log.d(TAG, "카카오톡 로그인 실패, 카카오계정으로 로그인 시도")
+                    loginWithKakaoAccount()
+                } else if (token != null) {
+                    Log.d(TAG, "카카오톡 로그인 성공: ${token.accessToken.take(20)}...")
+                    handleKakaoLogin(token)
+                }
+            }
+        } else {
+            // 카카오톡 미설치: 카카오계정으로 로그인
+            Log.d(TAG, "카카오톡 미설치, 카카오계정으로 로그인")
+            loginWithKakaoAccount()
+        }
+    }
+
+    /**
+     * 카카오계정으로 로그인
+     */
+    private fun loginWithKakaoAccount() {
+        UserApiClient.instance.loginWithKakaoAccount(this) { token, error ->
+            if (error != null) {
+                Log.e(TAG, "카카오계정 로그인 실패", error)
+                Toast.makeText(
+                    this,
+                    "카카오 로그인 실패: ${error.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else if (token != null) {
+                Log.d(TAG, "카카오계정 로그인 성공: ${token.accessToken.take(20)}...")
+                handleKakaoLogin(token)
+            }
+        }
+    }
+
+    /**
+     * 카카오 로그인 성공 처리
+     */
+    private fun handleKakaoLogin(token: OAuthToken) {
+        Log.d(TAG, "Kakao Access Token: ${token.accessToken.take(20)}...")
+
+        // 사용자 정보 확인 (디버깅용)
+        UserApiClient.instance.me { user, error ->
+            if (error != null) {
+                Log.e(TAG, "사용자 정보 요청 실패", error)
+            } else if (user != null) {
+                Log.d(TAG, "사용자 정보: ${user.kakaoAccount?.email}, ${user.kakaoAccount?.profile?.nickname}")
+            }
+        }
+
+        // 서버에 소셜 로그인 요청
+        performSocialLogin("KAKAO", token.accessToken)
+    }
+
+    /**
+     * 구글 로그인
+     */
     private fun signInWithGoogle() {
         Log.d(TAG, "Starting Google Sign-In")
         try {
+            // 기존 계정 로그아웃 (테스트용)
             googleSignInClient.signOut().addOnCompleteListener {
                 val signInIntent = googleSignInClient.signInIntent
                 startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
@@ -156,6 +197,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 구글 로그인 결과 처리
+     */
     private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>) {
         try {
             val account = completedTask.getResult(ApiException::class.java)
@@ -169,43 +213,34 @@ class LoginActivity : AppCompatActivity() {
 
             if (idToken != null) {
                 Log.d(TAG, "ID Token received: ${idToken.take(20)}...")
+                // 서버에 소셜 로그인 요청
                 performSocialLogin("GOOGLE", idToken)
             } else {
-                Log.e(TAG, "========================================")
-                Log.e(TAG, "ID Token is NULL!")
-                Log.e(TAG, "Web 클라이언트 ID가 올바르게 설정되었는지 확인하세요!")
-                Log.e(TAG, "========================================")
-
+                Log.e(TAG, "ID Token is null!")
+                Log.e(TAG, "Account object: $account")
                 Toast.makeText(
                     this,
                     "구글 로그인 실패: ID 토큰을 받지 못했습니다.\n" +
-                            "Web 클라이언트 ID를 확인하세요.",
+                            "Google Cloud Console에서 OAuth 클라이언트 ID를 확인해주세요.",
                     Toast.LENGTH_LONG
                 ).show()
             }
         } catch (e: ApiException) {
-            Log.e(TAG, "========================================")
-            Log.e(TAG, "Google Sign-In failed!")
-            Log.e(TAG, "Status Code: ${e.statusCode}")
-            Log.e(TAG, "Status Message: ${e.statusMessage}")
-            Log.e(TAG, "========================================")
-
-            val errorMessage = when (e.statusCode) {
-                10 -> "개발자 오류 (코드 10): Google Cloud Console 설정을 확인하세요.\n" +
-                        "- Android 클라이언트에 SHA-1 등록 확인\n" +
-                        "- Web 클라이언트 ID 생성 및 사용 확인"
-                12501 -> "사용자가 로그인을 취소했습니다"
-                7 -> "네트워크 연결 오류"
-                else -> "구글 로그인 실패 (코드: ${e.statusCode})\n${e.message}"
-            }
-
-            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+            Log.e(TAG, "Google sign in failed with status code: ${e.statusCode}", e)
+            Toast.makeText(
+                this,
+                "구글 로그인 실패 (코드: ${e.statusCode})\n${e.message}",
+                Toast.LENGTH_LONG
+            ).show()
         } catch (e: Exception) {
             Log.e(TAG, "Unexpected error during sign in", e)
             Toast.makeText(this, "로그인 중 오류 발생: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
+    /**
+     * 소셜 로그인 API 호출
+     */
     private fun performSocialLogin(socialType: String, accessToken: String) {
         Log.d(TAG, "Performing social login: $socialType")
 
@@ -217,9 +252,11 @@ class LoginActivity : AppCompatActivity() {
                     Log.d(TAG, "로그인 성공: ${response.username}, needNickname: ${response.needNickname}")
 
                     if (response.needNickname) {
+                        // 닉네임 설정 필요 → NicknameActivity로 이동
                         Log.d(TAG, "Navigating to NicknameActivity")
                         navigateToNickname()
                     } else {
+                        // 이미 닉네임 있음 → MainActivity로 이동
                         Log.d(TAG, "Navigating to MainActivity")
                         navigateToMain()
                     }
@@ -242,6 +279,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 닉네임 설정 화면으로 이동
+     */
     private fun navigateToNickname() {
         val intent = Intent(this, NicknameActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -249,6 +289,9 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
+    /**
+     * 메인 화면으로 이동
+     */
     private fun navigateToMain() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
