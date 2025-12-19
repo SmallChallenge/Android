@@ -3,4 +3,6 @@
 
     <!-- Google OAuth 클라이언트 ID -->
     <string name="google_client_id">18886173344-i69n30rhbvvusl76gvnpec54eckcrqvg.apps.googleusercontent.com</string>
+    <string name="google_web_client_id">18886173344-f2or6k591dm19k0ntl2ib5kec3obm2f1.apps.googleusercontent.com</string>
+
 </resources>
