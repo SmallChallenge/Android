@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
 
     <!-- Main Neon Colors -->
     <color name="neon_primary">#C8FF00</color> <!-- neon_300 -->
@@ -21,14 +16,23 @@
     <color name="neon_50">#FAFFE6</color>
 
     <!-- Gray Colors -->
-    <color name="gray_primary">#171717</color> <!-- gray_900 -->
-    <color name="gray_800">#383838</color>
-    <color name="gray_700">#484848</color>
-    <color name="gray_600">#686868</color>
-    <color name="gray_500">#969696</color>
-    <color name="gray_400">#CECECE</color>
-    <color name="gray_300">#E1E1E1</color>
-    <color name="gray_200">#F0F0F0</color>
-    <color name="gray_100">#F5F5F5</color>
-    <color name="gray_50">#FFFFFF</color>
+    <color name="gray_primary">#171717</color> <!-- gray_900, 배경 -->
+    <color name="gray_800">#202020</color>
+    <color name="gray_700">#383838</color> <!-- 선 요소 -->
+    <color name="gray_600">#484848</color>
+    <color name="gray_500">#686868</color> <!-- (텍스트+아이콘)비활성화 -->
+    <color name="gray_400">#969696</color> <!-- 플레이스 홀더, 설명, 서브아이콘 -->
+    <color name="gray_300">#CECECE</color> <!-- 서브 텍스트 -->
+    <color name="gray_200">#E1E1E1</color>
+    <color name="gray_100">#F0F0F0</color>
+    <color name="gray_50">#FFFFFF</color> <!-- 메인 텍스트, 메인 아이콘 -->
+
+    <color name="navigationBar">#121212</color>
+
+    <!-- Semantic Colors -->
+    <color name="background_primary">@color/gray_primary</color>
+    <color name="surface_primary">@color/gray_800</color>
+    <color name="text_primary">@color/white</color>
+    <color name="text_secondary">@color/gray_600</color>
+    <color name="accent">@color/neon_primary</color>
 </resources>

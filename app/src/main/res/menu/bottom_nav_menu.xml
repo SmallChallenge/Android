@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigation_storage"
-        android:icon="@android:drawable/ic_menu_gallery"
+        android:icon="@drawable/ic_my_records_selector"
         android:title="내 기록" />
 
     <item
@@ -12,6 +12,6 @@
 
     <item
         android:id="@+id/navigation_community"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_community_selector"
         android:title="커뮤니티" />
 </menu>

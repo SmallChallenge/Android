@@ -1,22 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Stampy" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- 상태바 투명하게 -->
+<resources>
+    <style name="Theme.Stampy" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- 상태바 투명 -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- 시스템 네비게이션 바 색상 설정 -->
-        <item name="android:navigationBarColor">#121212</item>
+        <item name="android:navigationBarColor">@color/navigationBar</item>
         <item name="android:windowLightNavigationBar">false</item>
 
-        <!-- 기본 색상 설정 -->
-        <item name="colorPrimary">#C8FF00</item>
-        <item name="colorPrimaryVariant">#B4E600</item>
-        <item name="colorOnPrimary">#171717</item>
-        <item name="colorSecondary">#C8FF00</item>
-        <item name="android:windowBackground">#171717</item>
+        <!-- 색상 -->
+        <item name="colorPrimary">@color/neon_primary</item>
+        <item name="colorOnPrimary">@color/gray_primary</item>
+        <item name="android:windowBackground">@color/gray_primary</item>
+
+        <!-- 프리텐다드 폰트 적용 -->
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="fontFamily">@font/pretendard</item>
+
+        <!-- 텍스트 스타일 기본값 -->
+        <item name="textAppearanceHeadline1">@style/TextAppearance.App.H1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.App.H2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.App.H3</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.App.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.App.Body2</item>
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button.Large</item>
     </style>
 
-    <style name="Theme.Stampy" parent="Base.Theme.Stampy" />
+    <!-- FAB 라운드 28 -->
+    <style name="ShapeAppearance.App.FAB.Round28" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">28dp</item>
+    </style>
+
+    <!-- 네비게이션 인디케이터 제거 -->
+    <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@android:color/transparent</item>
+    </style>
 </resources>

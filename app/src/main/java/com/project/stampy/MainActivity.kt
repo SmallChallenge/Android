@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_add -> {
-                    // 가운데 버튼은 FAB로 처리하므로 여기서는 false 반환
                     false
                 }
                 R.id.navigation_community -> {
@@ -76,13 +75,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openCamera() {
-        // 나중에 커스텀 카메라 Activity로 변경할 예정
-        val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivity(intent)
-        } else {
-            Toast.makeText(this, "카메라를 사용할 수 없습니다", Toast.LENGTH_SHORT).show()
-        }
+        val intent = Intent(this, CameraActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onRequestPermissionsResult(
@@ -98,6 +92,15 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "카메라 권한이 필요합니다", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 카메라에서 돌아왔을 때 프래그먼트 새로고침
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+        if (currentFragment is MyRecordsFragment) {
+            currentFragment.refreshPhotos()
         }
     }
 }

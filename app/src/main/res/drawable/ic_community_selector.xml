@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- 상태별 아이콘 전환 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_community_filled" android:state_checked="true"/>
+    <item android:drawable="@drawable/ic_community_outline"/>
+</selector>

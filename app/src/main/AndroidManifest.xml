@@ -2,11 +2,28 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 인터넷 권한 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <!-- 카메라 권한 -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- 저장소 읽기 권한 (Android 12 이하) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <!-- 저장소 쓰기 권한 (Android 9 이하) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"
+        tools:ignore="ScopedStorage" />
+
+    <!-- 이미지 읽기 권한 (Android 13 이상) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
     <application
+        android:name=".StampyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,7 +32,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Stampy"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31" >
+
+        <!-- 카카오 SDK 초기화 -->
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="cdcf8640c0483fccee4f1d8d51811081" />
 
         <activity
             android:name=".MainActivity"
@@ -25,6 +48,41 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- CameraActivity -->
+        <activity
+            android:name=".CameraActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- MyPageActivity -->
+        <activity
+            android:name=".MyPageActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- LoginActivity -->
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- NicknameActivity -->
+        <activity
+            android:name=".NicknameActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- FileProvider 설정 (사진 저장용) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 
