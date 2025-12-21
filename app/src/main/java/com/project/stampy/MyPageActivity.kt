@@ -2,6 +2,7 @@ package com.project.stampy
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -34,6 +35,10 @@ class MyPageActivity : AppCompatActivity() {
 
     private lateinit var tokenManager: TokenManager
     private lateinit var authRepository: AuthRepository
+
+    companion object {
+        private const val TAG = "MyPageActivity"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +110,8 @@ class MyPageActivity : AppCompatActivity() {
     private fun updateUI() {
         val isLoggedIn = authRepository.isLoggedIn()
 
+        Log.d(TAG, "updateUI called - isLoggedIn: $isLoggedIn")
+
         if (isLoggedIn) {
             // 로그인 상태
             layoutGuest.visibility = View.GONE
@@ -114,12 +121,21 @@ class MyPageActivity : AppCompatActivity() {
             // 사용자 이름 표시
             val nickname = tokenManager.getNickname() ?: "사용자"
             tvUserName.text = nickname
+
+            Log.d(TAG, "UI updated to LOGGED IN state - nickname: $nickname")
         } else {
             // 비로그인 상태
             layoutGuest.visibility = View.VISIBLE
             layoutLoggedIn.visibility = View.GONE
             btnLogout.visibility = View.GONE
+
+            Log.d(TAG, "UI updated to LOGGED OUT state")
         }
+
+        // 강제로 레이아웃 갱신
+        layoutGuest.invalidate()
+        layoutLoggedIn.invalidate()
+        btnLogout.invalidate()
     }
 
     /**
@@ -142,19 +158,25 @@ class MyPageActivity : AppCompatActivity() {
     private fun performLogout() {
         lifecycleScope.launch {
             try {
+                Log.d(TAG, "로그아웃 시작")
+
                 val result = authRepository.logout(allDevices = false)
 
                 result.onSuccess {
+                    Log.d(TAG, "로그아웃 성공")
                     showToast("로그아웃 되었습니다")
-                    updateUI()
                 }.onFailure { error ->
-                    // 로그아웃 실패해도 로컬 토큰은 삭제됨
-                    showToast("로그아웃 처리되었습니다")
-                    updateUI()
+                    Log.e(TAG, "로그아웃 실패: ${error.message}")
+                    // 실패해도 로컬 토큰은 이미 삭제됨
+                    showToast("로그아웃 되었습니다")
                 }
+
+                // UI 업데이트 (로컬 토큰이 삭제되었으므로 비로그인 상태로 표시)
+                updateUI()
+
             } catch (e: Exception) {
-                // 예외 발생해도 로컬 토큰은 삭제됨
-                showToast("로그아웃 처리되었습니다")
+                Log.e(TAG, "로그아웃 오류", e)
+                showToast("로그아웃 되었습니다")
                 updateUI()
             }
         }
@@ -180,9 +202,12 @@ class MyPageActivity : AppCompatActivity() {
     private fun performWithdrawal() {
         lifecycleScope.launch {
             try {
+                Log.d(TAG, "회원탈퇴 시작")
+
                 val result = authRepository.withdrawal()
 
                 result.onSuccess {
+                    Log.d(TAG, "회원탈퇴 성공")
                     showToast("회원탈퇴가 완료되었습니다")
                     // 로그인 화면으로 이동
                     val intent = Intent(this@MyPageActivity, LoginActivity::class.java)
@@ -190,9 +215,11 @@ class MyPageActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 }.onFailure { error ->
+                    Log.e(TAG, "회원탈퇴 실패: ${error.message}")
                     showToast("회원탈퇴 실패: ${error.message}")
                 }
             } catch (e: Exception) {
+                Log.e(TAG, "회원탈퇴 중 오류", e)
                 showToast("회원탈퇴 중 오류가 발생했습니다")
             }
         }

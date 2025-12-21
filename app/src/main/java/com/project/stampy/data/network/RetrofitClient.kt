@@ -39,8 +39,12 @@ object RetrofitClient {
             .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
             .addInterceptor(loggingInterceptor)
             .apply {
-                tokenManager?.let {
-                    addInterceptor(AuthInterceptor(it))
+                tokenManager?.let { tm ->
+                    // Interceptor: 모든 요청에 Authorization 헤더 추가
+                    addInterceptor(AuthInterceptor(tm))
+
+                    // Authenticator: 401 에러 시 자동으로 토큰 갱신
+                    authenticator(TokenAuthenticator(tm))
                 }
             }
             .build()
@@ -51,7 +55,7 @@ object RetrofitClient {
      */
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://api.stampy.kr/")  // BuildConfig 대신 직접 입력
+            .baseUrl("https://api.stampy.kr/")
             .client(createOkHttpClient())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
