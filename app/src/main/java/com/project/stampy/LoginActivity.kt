@@ -249,7 +249,7 @@ class LoginActivity : AppCompatActivity() {
                 val result = authRepository.socialLogin(socialType, accessToken)
 
                 result.onSuccess { response ->
-                    Log.d(TAG, "로그인 성공: ${response.username}, needNickname: ${response.needNickname}")
+                    Log.d(TAG, "로그인 성공: ${response.nickname}, needNickname: ${response.needNickname}")
 
                     if (response.needNickname) {
                         // 닉네임 설정 필요 → NicknameActivity로 이동

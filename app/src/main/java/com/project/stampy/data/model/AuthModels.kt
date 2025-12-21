@@ -20,8 +20,8 @@ data class SocialLoginResponse(
     @SerializedName("userId")
     val userId: Long,
 
-    @SerializedName("username")
-    val username: String,
+    @SerializedName("nickname")
+    val nickname: String?,
 
     @SerializedName("socialType")
     val socialType: String,
@@ -34,6 +34,9 @@ data class SocialLoginResponse(
 
     @SerializedName("refreshToken")
     val refreshToken: String,
+
+    @SerializedName("isNewUser")
+    val isNewUser: Boolean,
 
     @SerializedName("needNickname")
     val needNickname: Boolean

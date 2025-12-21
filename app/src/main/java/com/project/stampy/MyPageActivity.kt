@@ -209,8 +209,9 @@ class MyPageActivity : AppCompatActivity() {
                 result.onSuccess {
                     Log.d(TAG, "회원탈퇴 성공")
                     showToast("회원탈퇴가 완료되었습니다")
-                    // 로그인 화면으로 이동
-                    val intent = Intent(this@MyPageActivity, LoginActivity::class.java)
+
+                    // 메인 화면(내 기록)으로 이동
+                    val intent = Intent(this@MyPageActivity, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     finish()

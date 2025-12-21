@@ -52,7 +52,16 @@ class AuthRepository(
             tokenManager.saveAccessToken(data.accessToken)
             tokenManager.saveRefreshToken(data.refreshToken)
             tokenManager.saveUserId(data.userId)
-            Log.d(TAG, "소셜 로그인 성공 - userId: ${data.userId}")
+
+            // needNickname이 false면 이미 닉네임이 있음
+            if (!data.needNickname && data.nickname != null) {
+                tokenManager.saveNickname(data.nickname)
+                Log.d(TAG, "소셜 로그인 성공 - 닉네임: ${data.nickname}")
+            } else {
+                Log.d(TAG, "소셜 로그인 성공 - 닉네임 설정 필요")
+            }
+
+            Log.d(TAG, "userId: ${data.userId}, needNickname: ${data.needNickname}")
         }
     }
 
