@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
@@ -20,7 +20,7 @@ class NicknameActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
     private lateinit var etNickname: EditText
-    private lateinit var btnComplete: Button
+    private lateinit var btnComplete: MaterialButton
 
     private lateinit var tokenManager: TokenManager
     private lateinit var authRepository: AuthRepository
@@ -46,6 +46,9 @@ class NicknameActivity : AppCompatActivity() {
         btnBack = findViewById(R.id.btn_back)
         etNickname = findViewById(R.id.et_nickname)
         btnComplete = findViewById(R.id.btn_complete)
+
+        // 버튼 텍스트 설정
+        btnComplete.text = "확인"
 
         // 초기 상태: 버튼 비활성화
         btnComplete.isEnabled = false

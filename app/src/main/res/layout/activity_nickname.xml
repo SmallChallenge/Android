@@ -70,21 +70,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 완료 버튼 -->
-    <Button
+    <!-- 완료 버튼 (Large Button 컴포넌트) -->
+    <include
+        layout="@layout/button_large"
         android:id="@+id/btn_complete"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:text="확인"
-        android:textColor="@color/gray_primary"
-        android:textSize="16sp"
-        android:fontFamily="@font/pretendard_semibold"
-        android:background="@drawable/bg_button_neon"
-        android:backgroundTint="@null"
-        android:stateListAnimator="@null"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

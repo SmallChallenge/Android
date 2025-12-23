@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Large Button Component -->
+<com.google.android.material.button.MaterialButton
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/btn_large"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:text="완료하기"
+    android:textAppearance="@style/TextAppearance.App.Button.Large"
+    android:gravity="center"
+    app:cornerRadius="16dp"
+    app:backgroundTint="@color/button_large_background_selector"
+    android:textColor="@color/button_large_text_selector"
+    app:strokeWidth="0dp"
+    android:insetTop="0dp"
+    android:insetBottom="0dp"
+    android:stateListAnimator="@null" />
