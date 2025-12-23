@@ -67,6 +67,11 @@
             android:screenOrientation="portrait"
             android:exported="false" />
 
+        <!-- WebViewActivity -->
+        <activity
+            android:name=".WebViewActivity"
+            android:exported="false" />
+
         <!-- NicknameActivity -->
         <activity
             android:name=".NicknameActivity"

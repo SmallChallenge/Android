@@ -2,9 +2,16 @@ package com.project.stampy
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.UnderlineSpan
 import android.util.Log
+import android.view.View
 import android.widget.FrameLayout
-import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -25,9 +32,9 @@ import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var btnBack: ImageView
     private lateinit var btnKakaoLogin: FrameLayout
     private lateinit var btnGoogleLogin: FrameLayout
+    private lateinit var tvTerms: TextView
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var tokenManager: TokenManager
@@ -36,6 +43,7 @@ class LoginActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "LoginActivity"
         private const val RC_GOOGLE_SIGN_IN = 9001
+        private const val TERMS_URL = "https://placid-aurora-3ad.notion.site/2b54e8ebd8b080c1a8bdd9267b94dc3e?source=copy_link"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,6 +60,7 @@ class LoginActivity : AppCompatActivity() {
 
         initViews()
         setupListeners()
+        setupTermsText()
     }
 
     private fun setupGoogleSignIn() {
@@ -60,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
             Log.d(TAG, "Google Client ID: $webClientId")
 
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(webClientId)  // Web 클라이언트 ID 사용!
+                .requestIdToken(webClientId)
                 .requestEmail()
                 .requestProfile()
                 .build()
@@ -74,26 +83,58 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        btnBack = findViewById(R.id.btn_back)
         btnKakaoLogin = findViewById(R.id.btn_kakao_login)
         btnGoogleLogin = findViewById(R.id.btn_google_login)
+        tvTerms = findViewById(R.id.tv_terms)
     }
 
     private fun setupListeners() {
-        // 뒤로가기
-        btnBack.setOnClickListener {
-            finish()
+        btnKakaoLogin.setOnClickListener { signInWithKakao() }
+        btnGoogleLogin.setOnClickListener { signInWithGoogle() }
+    }
+
+    private fun setupTermsText() {
+        val fullText = "로그인하시면 이용약관 및 동의에 자동으로 동의합니다"
+        val termsText = "이용약관"
+
+        val spannableString = SpannableString(fullText)
+        val startIndex = fullText.indexOf(termsText)
+        val endIndex = startIndex + termsText.length
+
+        spannableString.setSpan(
+            UnderlineSpan(),
+            startIndex,
+            endIndex,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                openTermsInWebView()
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.isUnderlineText = true
+                ds.color = tvTerms.currentTextColor
+            }
         }
 
-        // 카카오 로그인
-        btnKakaoLogin.setOnClickListener {
-            signInWithKakao()
-        }
+        spannableString.setSpan(
+            clickableSpan,
+            startIndex,
+            endIndex,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
 
-        // 구글 로그인
-        btnGoogleLogin.setOnClickListener {
-            signInWithGoogle()
-        }
+        tvTerms.text = spannableString
+        tvTerms.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    private fun openTermsInWebView() {
+        val intent = Intent(this, WebViewActivity::class.java)
+        intent.putExtra(WebViewActivity.EXTRA_URL, TERMS_URL)
+        startActivity(intent)
     }
 
     /**
@@ -138,11 +179,7 @@ class LoginActivity : AppCompatActivity() {
         UserApiClient.instance.loginWithKakaoAccount(this) { token, error ->
             if (error != null) {
                 Log.e(TAG, "카카오계정 로그인 실패", error)
-                Toast.makeText(
-                    this,
-                    "카카오 로그인 실패: ${error.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "카카오 로그인 실패: ${error.message}", Toast.LENGTH_SHORT).show()
             } else if (token != null) {
                 Log.d(TAG, "카카오계정 로그인 성공: ${token.accessToken.take(20)}...")
                 handleKakaoLogin(token)
@@ -154,18 +191,6 @@ class LoginActivity : AppCompatActivity() {
      * 카카오 로그인 성공 처리
      */
     private fun handleKakaoLogin(token: OAuthToken) {
-        Log.d(TAG, "Kakao Access Token: ${token.accessToken.take(20)}...")
-
-        // 사용자 정보 확인 (디버깅용)
-        UserApiClient.instance.me { user, error ->
-            if (error != null) {
-                Log.e(TAG, "사용자 정보 요청 실패", error)
-            } else if (user != null) {
-                Log.d(TAG, "사용자 정보: ${user.kakaoAccount?.email}, ${user.kakaoAccount?.profile?.nickname}")
-            }
-        }
-
-        // 서버에 소셜 로그인 요청
         performSocialLogin("KAKAO", token.accessToken)
     }
 
@@ -175,10 +200,8 @@ class LoginActivity : AppCompatActivity() {
     private fun signInWithGoogle() {
         Log.d(TAG, "Starting Google Sign-In")
         try {
-            // 기존 계정 로그아웃 (테스트용)
             googleSignInClient.signOut().addOnCompleteListener {
-                val signInIntent = googleSignInClient.signInIntent
-                startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
+                startActivityForResult(googleSignInClient.signInIntent, RC_GOOGLE_SIGN_IN)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start sign in", e)
@@ -192,8 +215,7 @@ class LoginActivity : AppCompatActivity() {
         Log.d(TAG, "onActivityResult: requestCode=$requestCode, resultCode=$resultCode")
 
         if (requestCode == RC_GOOGLE_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleGoogleSignInResult(task)
+            handleGoogleSignInResult(GoogleSignIn.getSignedInAccountFromIntent(data))
         }
     }
 
@@ -283,9 +305,9 @@ class LoginActivity : AppCompatActivity() {
      * 닉네임 설정 화면으로 이동
      */
     private fun navigateToNickname() {
-        val intent = Intent(this, NicknameActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
+        startActivity(Intent(this, NicknameActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
         finish()
     }
 
@@ -293,9 +315,9 @@ class LoginActivity : AppCompatActivity() {
      * 메인 화면으로 이동
      */
     private fun navigateToMain() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
         finish()
     }
 }
