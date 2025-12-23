@@ -5,10 +5,15 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.EditText
-import android.widget.ImageView
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.project.stampy.data.local.TokenManager
@@ -18,8 +23,10 @@ import kotlinx.coroutines.launch
 
 class NicknameActivity : AppCompatActivity() {
 
-    private lateinit var btnBack: ImageView
+    private lateinit var layoutContent: ConstraintLayout
+    private lateinit var layoutInput: FrameLayout
     private lateinit var etNickname: EditText
+    private lateinit var viewUnderline: View
     private lateinit var btnComplete: MaterialButton
 
     private lateinit var tokenManager: TokenManager
@@ -40,11 +47,14 @@ class NicknameActivity : AppCompatActivity() {
 
         initViews()
         setupListeners()
+        setupKeyboardListener()
     }
 
     private fun initViews() {
-        btnBack = findViewById(R.id.btn_back)
+        layoutContent = findViewById(R.id.layout_content)
+        layoutInput = findViewById(R.id.layout_input)
         etNickname = findViewById(R.id.et_nickname)
+        viewUnderline = findViewById(R.id.view_underline)
         btnComplete = findViewById(R.id.btn_complete)
 
         // 버튼 텍스트 설정
@@ -55,9 +65,9 @@ class NicknameActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        // 뒤로가기
-        btnBack.setOnClickListener {
-            finish()
+        // 입력 영역 전체 클릭 시 EditText 포커스
+        layoutInput.setOnClickListener {
+            etNickname.requestFocus()
         }
 
         // 닉네임 입력 감지
@@ -65,12 +75,25 @@ class NicknameActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // 입력이 있으면 버튼 활성화
-                btnComplete.isEnabled = !s.isNullOrEmpty()
+                val input = s?.toString() ?: ""
+                btnComplete.isEnabled = input.isNotEmpty() && isValidNickname(input)
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
+
+        // 포커스 변경 감지 (밑줄 색상 변경)
+        etNickname.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                viewUnderline.setBackgroundColor(
+                    ContextCompat.getColor(this, R.color.neon_primary)
+                )
+            } else {
+                viewUnderline.setBackgroundColor(
+                    ContextCompat.getColor(this, R.color.gray_700)
+                )
+            }
+        }
 
         // 완료 버튼
         btnComplete.setOnClickListener {
@@ -81,12 +104,52 @@ class NicknameActivity : AppCompatActivity() {
                 Toast.makeText(this, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
             }
         }
+
+        // 빈 영역 클릭 시 포커스 해제
+        findViewById<View>(android.R.id.content).setOnClickListener {
+            etNickname.clearFocus()
+        }
+    }
+
+    private fun setupKeyboardListener() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { _, insets ->
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+
+            if (imeVisible && imeHeight > 0) {
+                // 키보드 올라옴 - 버튼을 키보드 바로 위로
+                val params = btnComplete.layoutParams as ConstraintLayout.LayoutParams
+                params.bottomMargin = imeHeight + 40
+                btnComplete.layoutParams = params
+            } else {
+                // 키보드 내려감 - 원래 위치로
+                val params = btnComplete.layoutParams as ConstraintLayout.LayoutParams
+                params.bottomMargin = 40
+                btnComplete.layoutParams = params
+            }
+
+            insets
+        }
     }
 
     /**
      * 닉네임 설정 API 호출
      */
+    private fun isValidNickname(nickname: String): Boolean {
+        val regex = Regex("^[가-힣a-zA-Z0-9]{1,10}$")
+        return regex.matches(nickname)
+    }
+
     private fun setNickname(nickname: String) {
+        if (!isValidNickname(nickname)) {
+            Toast.makeText(
+                this,
+                "닉네임은 한글, 영문, 숫자만 1-10자로 입력해주세요",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
         lifecycleScope.launch {
             try {
                 val result = authRepository.setNickname(nickname)
@@ -126,6 +189,17 @@ class NicknameActivity : AppCompatActivity() {
     private fun navigateToMain() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    override fun onBackPressed() {
+        navigateToMyPage()
+    }
+
+    private fun navigateToMyPage() {
+        val intent = Intent(this, MyPageActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
         finish()
     }
