@@ -3,10 +3,13 @@ package com.project.stampy
 import android.Manifest
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.graphics.Rect
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,6 +19,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.project.stampy.utils.showToast
 import java.io.File
 import java.text.SimpleDateFormat
@@ -31,7 +36,12 @@ class CameraActivity : AppCompatActivity() {
     // 카메라
     private lateinit var previewView: PreviewView
 
+    // 갤러리
+    private lateinit var rvGallery: RecyclerView
+    private lateinit var galleryAdapter: GalleryAdapter
+
     // 촬영 버튼
+    private lateinit var captureArea: View
     private lateinit var btnCapture: ImageView
     private lateinit var btnSwitchCameraTouchArea: FrameLayout
     private lateinit var ivSwitchCamera: ImageView
@@ -50,7 +60,11 @@ class CameraActivity : AppCompatActivity() {
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private var flashMode = ImageCapture.FLASH_MODE_OFF
 
+    // 현재 탭 (true: 카메라, false: 갤러리)
+    private var isCameraMode = true
+
     private val CAMERA_PERMISSION_CODE = 101
+    private val GALLERY_PERMISSION_CODE = 102
 
     companion object {
         private const val TAG = "CameraActivity"
@@ -71,11 +85,12 @@ class CameraActivity : AppCompatActivity() {
 
         initViews()
         setupListeners()
+        setupGalleryRecyclerView()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         // 카메라 권한 확인
-        if (allPermissionsGranted()) {
+        if (allCameraPermissionsGranted()) {
             startCamera()
         } else {
             ActivityCompat.requestPermissions(
@@ -93,7 +108,11 @@ class CameraActivity : AppCompatActivity() {
         // 카메라
         previewView = findViewById(R.id.preview_view)
 
-        // 촬영 버튼
+        // 갤러리
+        rvGallery = findViewById(R.id.rv_gallery)
+
+        // 촬영 버튼 영역
+        captureArea = findViewById(R.id.capture_area)
         btnCapture = findViewById(R.id.btn_capture)
         btnSwitchCameraTouchArea = findViewById(R.id.btn_switch_camera_touch_area)
         ivSwitchCamera = findViewById(R.id.iv_switch_camera)
@@ -126,15 +145,117 @@ class CameraActivity : AppCompatActivity() {
             toggleFlash()
         }
 
-        // 갤러리 버튼 (TODO)
+        // 갤러리 버튼
         btnGallery.setOnClickListener {
-            showToast("갤러리 기능은 곧 추가됩니다")
+            switchToGalleryMode()
         }
 
-        // 카메라 버튼 (이미 활성화 상태)
+        // 카메라 버튼
         btnCamera.setOnClickListener {
-            // 이미 카메라 화면
+            switchToCameraMode()
         }
+    }
+
+    /**
+     * 갤러리 RecyclerView 설정
+     */
+    private fun setupGalleryRecyclerView() {
+        galleryAdapter = GalleryAdapter()
+
+        // 3열 그리드 레이아웃
+        val gridLayoutManager = GridLayoutManager(this, 3)
+        rvGallery.layoutManager = gridLayoutManager
+        rvGallery.adapter = galleryAdapter
+
+        // 아이템 간격 설정 (1dp)
+        rvGallery.addItemDecoration(CameraGridSpacingItemDecoration(3, 1, false))
+
+        // 사진 클릭 리스너
+        galleryAdapter.setOnPhotoClickListener { uri ->
+            // TODO: 사진 편집 화면으로 이동
+            showToast("사진 편집 기능은 곧 추가됩니다")
+        }
+    }
+
+    /**
+     * 갤러리 모드로 전환
+     */
+    private fun switchToGalleryMode() {
+        if (!isCameraMode) return
+
+        // 갤러리 권한 확인
+        if (!allGalleryPermissionsGranted()) {
+            requestGalleryPermission()
+            return
+        }
+
+        isCameraMode = false
+
+        // UI 업데이트
+        previewView.visibility = View.GONE
+        captureArea.visibility = View.GONE
+        rvGallery.visibility = View.VISIBLE
+
+        // 버튼 상태 변경
+        btnGallery.setTextColor(ContextCompat.getColor(this, R.color.gray_50))
+        btnCamera.setTextColor(ContextCompat.getColor(this, R.color.gray_500))
+
+        // 갤러리 사진 로드
+        loadGalleryPhotos()
+    }
+
+    /**
+     * 카메라 모드로 전환
+     */
+    private fun switchToCameraMode() {
+        if (isCameraMode) return
+
+        isCameraMode = true
+
+        // UI 업데이트
+        rvGallery.visibility = View.GONE
+        previewView.visibility = View.VISIBLE
+        captureArea.visibility = View.VISIBLE
+
+        // 버튼 상태 변경
+        btnCamera.setTextColor(ContextCompat.getColor(this, R.color.gray_50))
+        btnGallery.setTextColor(ContextCompat.getColor(this, R.color.gray_500))
+    }
+
+    /**
+     * 갤러리 사진 로드
+     */
+    private fun loadGalleryPhotos() {
+        val photos = mutableListOf<Uri>()
+
+        val projection = arrayOf(
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DATE_ADDED
+        )
+
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+
+        contentResolver.query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            null,
+            null,
+            sortOrder
+        )?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val uri = Uri.withAppendedPath(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    id.toString()
+                )
+                photos.add(uri)
+            }
+        }
+
+        galleryAdapter.setPhotos(photos)
+        Log.d(TAG, "갤러리 사진 ${photos.size}개 로드됨")
     }
 
     /**
@@ -301,9 +422,44 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    private fun allPermissionsGranted() = ContextCompat.checkSelfPermission(
+    /**
+     * 카메라 권한 확인
+     */
+    private fun allCameraPermissionsGranted() = ContextCompat.checkSelfPermission(
         this, Manifest.permission.CAMERA
     ) == PackageManager.PERMISSION_GRANTED
+
+    /**
+     * 갤러리 권한 확인
+     */
+    private fun allGalleryPermissionsGranted(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_MEDIA_IMAGES
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    /**
+     * 갤러리 권한 요청
+     */
+    private fun requestGalleryPermission() {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(permission),
+            GALLERY_PERMISSION_CODE
+        )
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -312,12 +468,21 @@ class CameraActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == CAMERA_PERMISSION_CODE) {
-            if (allPermissionsGranted()) {
-                startCamera()
-            } else {
-                showToast("카메라 권한이 필요합니다")
-                finish()
+        when (requestCode) {
+            CAMERA_PERMISSION_CODE -> {
+                if (allCameraPermissionsGranted()) {
+                    startCamera()
+                } else {
+                    showToast("카메라 권한이 필요합니다")
+                    finish()
+                }
+            }
+            GALLERY_PERMISSION_CODE -> {
+                if (allGalleryPermissionsGranted()) {
+                    switchToGalleryMode()
+                } else {
+                    showToast("갤러리 권한이 필요합니다")
+                }
             }
         }
     }
@@ -325,5 +490,41 @@ class CameraActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+    }
+}
+
+/**
+ * 그리드 아이템 간격 조정 ItemDecoration (Camera용)
+ */
+class CameraGridSpacingItemDecoration(
+    private val spanCount: Int,
+    private val spacing: Int,
+    private val includeEdge: Boolean
+) : RecyclerView.ItemDecoration() {
+
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        val position = parent.getChildAdapterPosition(view)
+        val column = position % spanCount
+
+        if (includeEdge) {
+            outRect.left = spacing - column * spacing / spanCount
+            outRect.right = (column + 1) * spacing / spanCount
+
+            if (position < spanCount) {
+                outRect.top = spacing
+            }
+            outRect.bottom = spacing
+        } else {
+            outRect.left = column * spacing / spanCount
+            outRect.right = spacing - (column + 1) * spacing / spanCount
+            if (position >= spanCount) {
+                outRect.top = spacing
+            }
+        }
     }
 }

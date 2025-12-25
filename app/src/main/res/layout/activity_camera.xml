@@ -22,10 +22,24 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="40dp"
+        android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@id/top_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="1:1" />
+
+    <!-- 갤러리 그리드 (초기 상태: GONE) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_gallery"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:padding="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintBottom_toTopOf="@id/bottom_buttons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 하단 버튼 영역 (갤러리/카메라) -->
     <LinearLayout
