@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -15,6 +14,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.project.stampy.utils.showToast
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -128,22 +128,13 @@ class CameraActivity : AppCompatActivity() {
 
                     // 2. 갤러리(공용 저장소)에도 저장
                     saveToGallery(appFile)
-
-                    Toast.makeText(
-                        this@CameraActivity,
-                        "사진 저장 완료!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showToast("사진 저장 완료!")
 
                     finish()
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(
-                        this@CameraActivity,
-                        "사진 저장 실패: ${exception.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showToast("사진 저장 실패:  ${exception.message}")
                     Log.e("CameraActivity", "사진 저장 실패", exception)
                 }
             }
@@ -219,7 +210,7 @@ class CameraActivity : AppCompatActivity() {
             if (allPermissionsGranted()) {
                 startCamera()
             } else {
-                Toast.makeText(this, "카메라 권한이 필요합니다", Toast.LENGTH_SHORT).show()
+                showToast("카메라 권한이 필요합니다")
                 finish()
             }
         }

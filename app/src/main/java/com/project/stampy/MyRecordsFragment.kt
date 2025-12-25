@@ -10,13 +10,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.project.stampy.data.model.Photo
 import java.io.File
+import com.project.stampy.utils.showToast
 
 class MyRecordsFragment : Fragment() {
 
@@ -122,7 +122,7 @@ class MyRecordsFragment : Fragment() {
         // 사진 클릭 리스너
         photoAdapter.setOnPhotoClickListener { photo ->
             // TODO: 사진 상세보기 화면으로 이동
-            Toast.makeText(requireContext(), "사진 클릭: ${photo.file.name}", Toast.LENGTH_SHORT).show()
+            showToast("사진 클릭: ${photo.file.name}")
         }
     }
 

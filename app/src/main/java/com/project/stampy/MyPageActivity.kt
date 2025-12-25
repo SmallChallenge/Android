@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
+import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
 class MyPageActivity : AppCompatActivity() {
@@ -224,9 +225,5 @@ class MyPageActivity : AppCompatActivity() {
                 showToast("회원탈퇴 중 오류가 발생했습니다")
             }
         }
-    }
-
-    private fun showToast(message: String) {
-        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
     }
 }

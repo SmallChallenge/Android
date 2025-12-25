@@ -31,6 +31,7 @@ import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
 import com.project.stampy.ui.dialog.SingleButtonDialog
+import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -83,7 +84,7 @@ class LoginActivity : AppCompatActivity() {
             Log.d(TAG, "Google Sign-In client initialized successfully")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to initialize Google Sign-In", e)
-            Toast.makeText(this, "구글 로그인 초기화 실패: ${e.message}", Toast.LENGTH_LONG).show()
+            showToast("구글 로그인 초기화 실패: ${e.message}", Toast.LENGTH_LONG)
         }
     }
 
@@ -223,7 +224,7 @@ class LoginActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start sign in", e)
-            Toast.makeText(this, "로그인 시작 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+            showToast("로그인 시작 실패: ${e.message}")
         }
     }
 

@@ -22,6 +22,7 @@ import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
 import com.project.stampy.ui.dialog.SingleButtonDialog
+import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
 class NicknameActivity : AppCompatActivity() {
@@ -148,7 +149,7 @@ class NicknameActivity : AppCompatActivity() {
             if (nickname.isNotEmpty()) {
                 setNickname(nickname)
             } else {
-                Toast.makeText(this, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
+                showToast("닉네임을 입력해주세요")
             }
         }
 
@@ -285,11 +286,7 @@ class NicknameActivity : AppCompatActivity() {
 
     private fun setNickname(nickname: String) {
         if (!isValidNickname(nickname)) {
-            Toast.makeText(
-                this,
-                "닉네임은 한글, 영문, 숫자만 2-10자로 입력해주세요",
-                Toast.LENGTH_SHORT
-            ).show()
+            showToast("닉네임은 한글, 영문, 숫자만 2-10자로 입력해주세요")
             return
         }
 
@@ -344,11 +341,7 @@ class NicknameActivity : AppCompatActivity() {
      */
     private fun navigateToMain(nickname: String) {
         // 토스트 메시지 표시
-        Toast.makeText(
-            this,
-            "반가워요, ${nickname}님! 이제 기록을 시작해볼까요?",
-            Toast.LENGTH_LONG
-        ).show()
+        showToast("반가워요, ${nickname}님! 이제 기록을 시작해볼까요?", Toast.LENGTH_LONG)
 
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
