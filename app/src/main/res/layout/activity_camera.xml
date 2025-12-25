@@ -1,56 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <!-- 카메라 프리뷰 -->
+    <!-- 상단바 (재사용 가능한 컴포넌트) -->
+    <include
+        android:id="@+id/top_bar"
+        layout="@layout/top_bar_with_back"
+        android:layout_width="0dp"
+        android:layout_height="66dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 카메라 프리뷰 (1:1 정사각형, 상단바 아래 40dp) -->
     <androidx.camera.view.PreviewView
         android:id="@+id/preview_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="1:1" />
 
-    <!-- 닫기 버튼 (왼쪽 상단) -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btn_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|start"
-        android:layout_margin="24dp"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
-        app:backgroundTint="#80000000"
-        app:tint="#FFFFFF"
-        app:fabSize="normal"
-        app:borderWidth="0dp" />
+    <!-- 하단 버튼 영역 (갤러리/카메라) -->
+    <LinearLayout
+        android:id="@+id/bottom_buttons"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- 촬영 버튼 컨테이너 (하단 중앙) -->
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="48dp">
+        <!-- 갤러리 버튼 -->
+        <TextView
+            android:id="@+id/btn_gallery"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="갤러리"
+            android:textAppearance="@style/TextAppearance.App.Button.Medium"
+            android:textColor="@color/gray_500"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground" />
 
-        <!-- 외곽 원 (테두리) -->
-        <View
-            android:layout_width="84dp"
-            android:layout_height="84dp"
-            android:layout_gravity="center"
-            android:background="@drawable/camera_button_outer" />
+        <!-- 카메라 버튼 (활성화 상태) -->
+        <TextView
+            android:id="@+id/btn_camera"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="카메라"
+            android:textAppearance="@style/TextAppearance.App.Button.Medium"
+            android:textColor="@color/gray_50"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground" />
 
-        <!-- 촬영 버튼 -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+    </LinearLayout>
+
+    <!-- 촬영 버튼 영역 (카메라 프리뷰와 하단 버튼 사이 중앙) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/capture_area"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/preview_view"
+        app:layout_constraintBottom_toTopOf="@id/bottom_buttons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 전면/후면 전환 버튼 (왼쪽) -->
+        <FrameLayout
+            android:id="@+id/btn_switch_camera_touch_area"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_capture">
+
+            <ImageView
+                android:id="@+id/iv_switch_camera"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_camera_switch"
+                app:tint="@color/gray_50"
+                android:contentDescription="전면/후면 전환" />
+        </FrameLayout>
+
+        <!-- 촬영 버튼 (중앙) -->
+        <ImageView
             android:id="@+id/btn_capture"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_gravity="center"
-            app:backgroundTint="#FFFFFF"
-            app:tint="#FFFFFF"
-            app:fabSize="normal"
-            app:borderWidth="0dp"
-            app:maxImageSize="0dp"
-            android:elevation="0dp" />
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_camera_capture"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/gray_50"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:contentDescription="촬영" />
 
-    </FrameLayout>
+        <!-- 플래시 전환 버튼 (오른쪽) -->
+        <FrameLayout
+            android:id="@+id/btn_flash_touch_area"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btn_capture"
+            app:layout_constraintEnd_toEndOf="parent">
 
-</FrameLayout>
+            <ImageView
+                android:id="@+id/iv_flash"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_flash_off"
+                app:tint="@color/gray_50"
+                android:contentDescription="플래시" />
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

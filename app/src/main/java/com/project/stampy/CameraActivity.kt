@@ -7,13 +7,15 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.project.stampy.utils.showToast
 import java.io.File
 import java.text.SimpleDateFormat
@@ -23,16 +25,35 @@ import java.util.concurrent.Executors
 
 class CameraActivity : AppCompatActivity() {
 
+    // 상단바
+    private lateinit var btnBackTouchArea: FrameLayout
+
+    // 카메라
     private lateinit var previewView: PreviewView
-    private lateinit var captureButton: FloatingActionButton
-    private lateinit var closeButton: FloatingActionButton
+
+    // 촬영 버튼
+    private lateinit var btnCapture: ImageView
+    private lateinit var btnSwitchCameraTouchArea: FrameLayout
+    private lateinit var ivSwitchCamera: ImageView
+    private lateinit var btnFlashTouchArea: FrameLayout
+    private lateinit var ivFlash: ImageView
+
+    // 하단 버튼
+    private lateinit var btnGallery: TextView
+    private lateinit var btnCamera: TextView
 
     private var imageCapture: ImageCapture? = null
+    private var camera: Camera? = null
     private lateinit var cameraExecutor: ExecutorService
+
+    // 카메라 상태
+    private var lensFacing = CameraSelector.LENS_FACING_BACK
+    private var flashMode = ImageCapture.FLASH_MODE_OFF
 
     private val CAMERA_PERMISSION_CODE = 101
 
     companion object {
+        private const val TAG = "CameraActivity"
         private const val TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss"
         private const val FILE_PREFIX = "STAMPY_"
         private const val FILE_EXTENSION = ".jpg"
@@ -48,9 +69,8 @@ class CameraActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
-        previewView = findViewById(R.id.preview_view)
-        captureButton = findViewById(R.id.btn_capture)
-        closeButton = findViewById(R.id.btn_close)
+        initViews()
+        setupListeners()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -64,18 +84,62 @@ class CameraActivity : AppCompatActivity() {
                 CAMERA_PERMISSION_CODE
             )
         }
+    }
+
+    private fun initViews() {
+        // 상단바
+        btnBackTouchArea = findViewById(R.id.btn_back_touch_area)
+
+        // 카메라
+        previewView = findViewById(R.id.preview_view)
 
         // 촬영 버튼
-        captureButton.setOnClickListener {
+        btnCapture = findViewById(R.id.btn_capture)
+        btnSwitchCameraTouchArea = findViewById(R.id.btn_switch_camera_touch_area)
+        ivSwitchCamera = findViewById(R.id.iv_switch_camera)
+        btnFlashTouchArea = findViewById(R.id.btn_flash_touch_area)
+        ivFlash = findViewById(R.id.iv_flash)
+
+        // 하단 버튼
+        btnGallery = findViewById(R.id.btn_gallery)
+        btnCamera = findViewById(R.id.btn_camera)
+    }
+
+    private fun setupListeners() {
+        // 뒤로가기
+        btnBackTouchArea.setOnClickListener {
+            finish()
+        }
+
+        // 촬영
+        btnCapture.setOnClickListener {
             takePhoto()
         }
 
-        // 닫기 버튼
-        closeButton.setOnClickListener {
-            finish()
+        // 전면/후면 전환
+        btnSwitchCameraTouchArea.setOnClickListener {
+            switchCamera()
+        }
+
+        // 플래시 전환
+        btnFlashTouchArea.setOnClickListener {
+            toggleFlash()
+        }
+
+        // 갤러리 버튼 (TODO)
+        btnGallery.setOnClickListener {
+            showToast("갤러리 기능은 곧 추가됩니다")
+        }
+
+        // 카메라 버튼 (이미 활성화 상태)
+        btnCamera.setOnClickListener {
+            // 이미 카메라 화면
         }
     }
 
+    /**
+     * 카메라 시작
+     */
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
@@ -92,26 +156,68 @@ class CameraActivity : AppCompatActivity() {
             // ImageCapture 설정
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .setFlashMode(flashMode)
                 .build()
 
-            // 후면 카메라 선택
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            // 카메라 선택 (전면/후면)
+            val cameraSelector = CameraSelector.Builder()
+                .requireLensFacing(lensFacing)
+                .build()
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
+                camera = cameraProvider.bindToLifecycle(
                     this,
                     cameraSelector,
                     preview,
                     imageCapture
                 )
             } catch (e: Exception) {
-                Log.e("CameraActivity", "카메라 시작 실패", e)
+                Log.e(TAG, "카메라 시작 실패", e)
+                showToast("카메라 시작 실패")
             }
 
         }, ContextCompat.getMainExecutor(this))
     }
 
+    /**
+     * 전면/후면 카메라 전환
+     */
+    private fun switchCamera() {
+        lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
+            CameraSelector.LENS_FACING_FRONT
+        } else {
+            CameraSelector.LENS_FACING_BACK
+        }
+        startCamera()
+    }
+
+    /**
+     * 플래시 모드 전환 (OFF → AUTO → ON → OFF)
+     */
+    private fun toggleFlash() {
+        flashMode = when (flashMode) {
+            ImageCapture.FLASH_MODE_OFF -> {
+                ivFlash.setImageResource(R.drawable.ic_flash_auto)
+                ImageCapture.FLASH_MODE_AUTO
+            }
+            ImageCapture.FLASH_MODE_AUTO -> {
+                ivFlash.setImageResource(R.drawable.ic_flash_on)
+                ImageCapture.FLASH_MODE_ON
+            }
+            else -> {
+                ivFlash.setImageResource(R.drawable.ic_flash_off)
+                ImageCapture.FLASH_MODE_OFF
+            }
+        }
+
+        // ImageCapture 플래시 모드 업데이트
+        imageCapture?.flashMode = flashMode
+    }
+
+    /**
+     * 사진 촬영
+     */
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
 
@@ -124,7 +230,7 @@ class CameraActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    Log.d("CameraActivity", "앱 저장소 저장: ${appFile.absolutePath}")
+                    Log.d(TAG, "앱 저장소 저장: ${appFile.absolutePath}")
 
                     // 2. 갤러리(공용 저장소)에도 저장
                     saveToGallery(appFile)
@@ -134,8 +240,8 @@ class CameraActivity : AppCompatActivity() {
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    showToast("사진 저장 실패:  ${exception.message}")
-                    Log.e("CameraActivity", "사진 저장 실패", exception)
+                    showToast("사진 저장 실패: ${exception.message}")
+                    Log.e(TAG, "사진 저장 실패", exception)
                 }
             }
         )
@@ -188,10 +294,10 @@ class CameraActivity : AppCompatActivity() {
                     contentResolver.update(uri, contentValues, null, null)
                 }
 
-                Log.d("CameraActivity", "갤러리 저장 성공: $uri")
+                Log.d(TAG, "갤러리 저장 성공: $uri")
             }
         } catch (e: Exception) {
-            Log.e("CameraActivity", "갤러리 저장 실패", e)
+            Log.e(TAG, "갤러리 저장 실패", e)
         }
     }
 
