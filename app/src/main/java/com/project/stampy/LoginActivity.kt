@@ -30,6 +30,7 @@ import com.kakao.sdk.user.UserApiClient
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
+import com.project.stampy.ui.dialog.SingleButtonDialog
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -196,7 +197,7 @@ class LoginActivity : AppCompatActivity() {
         UserApiClient.instance.loginWithKakaoAccount(this) { token, error ->
             if (error != null) {
                 Log.e(TAG, "카카오계정 로그인 실패", error)
-                Toast.makeText(this, "카카오 로그인 실패: ${error.message}", Toast.LENGTH_SHORT).show()
+                showLoginFailedDialog()
             } else if (token != null) {
                 Log.d(TAG, "카카오계정 로그인 성공: ${token.accessToken.take(20)}...")
                 handleKakaoLogin(token)
@@ -267,23 +268,21 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 Log.e(TAG, "ID Token is null!")
                 Log.e(TAG, "Account object: $account")
-                Toast.makeText(
-                    this,
-                    "구글 로그인 실패: ID 토큰을 받지 못했습니다.\n" +
-                            "Google Cloud Console에서 OAuth 클라이언트 ID를 확인해주세요.",
-                    Toast.LENGTH_LONG
-                ).show()
+                showLoginFailedDialog()
             }
         } catch (e: ApiException) {
+            // 12501: 사용자가 로그인 취소 - 모달 표시 안 함
+            if (e.statusCode == 12501) {
+                Log.d(TAG, "User cancelled Google sign in")
+                return
+            }
+
+            // 그 외 에러 - 모달 표시
             Log.e(TAG, "Google sign in failed with status code: ${e.statusCode}", e)
-            Toast.makeText(
-                this,
-                "구글 로그인 실패 (코드: ${e.statusCode})\n${e.message}",
-                Toast.LENGTH_LONG
-            ).show()
+            showLoginFailedDialog()
         } catch (e: Exception) {
             Log.e(TAG, "Unexpected error during sign in", e)
-            Toast.makeText(this, "로그인 중 오류 발생: ${e.message}", Toast.LENGTH_LONG).show()
+            showLoginFailedDialog()
         }
     }
 
@@ -311,21 +310,23 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }.onFailure { error ->
                     Log.e(TAG, "로그인 실패: ${error.message}", error)
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "서버 로그인 실패: ${error.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showLoginFailedDialog()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "로그인 오류", e)
-                Toast.makeText(
-                    this@LoginActivity,
-                    "로그인 중 오류가 발생했습니다: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                showLoginFailedDialog()
             }
         }
+    }
+
+    /**
+     * 로그인 실패 모달 표시
+     */
+    private fun showLoginFailedDialog() {
+        SingleButtonDialog(this)
+            .setTitle("로그인 실패")
+            .setDescription("로그인에 실패했어요. 다시 시도해주세요.")
+            .show()
     }
 
     /**

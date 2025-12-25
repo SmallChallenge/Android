@@ -21,6 +21,7 @@ import com.google.android.material.button.MaterialButton
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
+import com.project.stampy.ui.dialog.SingleButtonDialog
 import kotlinx.coroutines.launch
 
 class NicknameActivity : AppCompatActivity() {
@@ -317,23 +318,25 @@ class NicknameActivity : AppCompatActivity() {
                         btnComplete.isEnabled = false
                         updateColors(false)
                     } else {
-                        // 기타 에러
-                        Toast.makeText(
-                            this@NicknameActivity,
-                            "닉네임 설정 실패: ${error.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        // 기타 에러 - 회원가입 실패 모달
+                        showSignUpFailedDialog()
                     }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "닉네임 설정 오류", e)
-                Toast.makeText(
-                    this@NicknameActivity,
-                    "닉네임 설정 중 오류가 발생했습니다",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showSignUpFailedDialog()
             }
         }
+    }
+
+    /**
+     * 회원가입 실패 모달 표시
+     */
+    private fun showSignUpFailedDialog() {
+        SingleButtonDialog(this)
+            .setTitle("회원가입 실패")
+            .setDescription("회원가입에 실패했어요. 다시 시도해주세요.")
+            .show()
     }
 
     /**
