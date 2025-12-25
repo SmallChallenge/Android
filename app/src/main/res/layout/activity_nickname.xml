@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_primary"
+    android:fitsSystemWindows="false"
     android:focusable="true"
     android:focusableInTouchMode="true">
 
@@ -17,6 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- "닉네임 입력" 텍스트 -->
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="281dp"
@@ -31,7 +33,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- "STAMPY에서 사용할 닉네임을 입력해주세요." -->
         <TextView
             android:id="@+id/tv_subtitle"
             android:layout_width="281dp"

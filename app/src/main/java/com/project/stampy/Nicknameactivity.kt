@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -13,8 +14,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.project.stampy.data.local.TokenManager
@@ -51,8 +50,10 @@ class NicknameActivity : AppCompatActivity() {
         setupKeyboardListener()
         setupBackPressHandler()
 
-        // 초기 포커스 (커서 보이게)
-        etNickname.requestFocus()
+        // 초기 포커스 (커서 깜빡임)
+        etNickname.post {
+            etNickname.requestFocus()
+        }
     }
 
     private fun initViews() {
@@ -107,7 +108,6 @@ class NicknameActivity : AppCompatActivity() {
             updateColors(hasInput)
         }
 
-        // 완료 버튼
         btnComplete.setOnClickListener {
             val nickname = etNickname.text.toString().trim()
             if (nickname.isNotEmpty()) {
@@ -149,24 +149,54 @@ class NicknameActivity : AppCompatActivity() {
     }
 
     private fun setupKeyboardListener() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { _, insets ->
-            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+        val rootView = window.decorView.findViewById<View>(android.R.id.content)
 
-            if (imeVisible && imeHeight > 0) {
-                // 키보드 올라옴 - 버튼을 키보드 바로 위로
-                val params = btnComplete.layoutParams as ConstraintLayout.LayoutParams
-                params.bottomMargin = imeHeight + 40
-                btnComplete.layoutParams = params
-            } else {
-                // 키보드 내려감 - 원래 위치로
-                val params = btnComplete.layoutParams as ConstraintLayout.LayoutParams
-                params.bottomMargin = 40
-                btnComplete.layoutParams = params
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            private var wasKeyboardVisible = false
+
+            override fun onGlobalLayout() {
+                val rect = android.graphics.Rect()
+                rootView.getWindowVisibleDisplayFrame(rect)
+
+                val screenHeight = rootView.rootView.height
+                val keypadHeight = screenHeight - rect.bottom
+
+                val isKeyboardVisible = keypadHeight > screenHeight * 0.15
+
+                Log.d(TAG, "Screen: $screenHeight, Keypad: $keypadHeight, Visible: $isKeyboardVisible")
+
+                if (isKeyboardVisible && !wasKeyboardVisible) {
+                    onKeyboardShown(keypadHeight)
+                } else if (!isKeyboardVisible && wasKeyboardVisible) {
+                    onKeyboardHidden()
+                }
+
+                wasKeyboardVisible = isKeyboardVisible
             }
+        })
+    }
 
-            insets
-        }
+    private fun onKeyboardShown(keyboardHeight: Int) {
+        Log.d(TAG, "Keyboard SHOWN: $keyboardHeight")
+
+        // 컨텐츠만 살짝 위로 이동 (키보드 높이의 1/4만큼)
+        val contentParams = layoutContent.layoutParams as ConstraintLayout.LayoutParams
+        contentParams.topMargin = -(keyboardHeight / 4)
+        layoutContent.layoutParams = contentParams
+
+        // 확인 버튼은 원래대로 (하단 40dp 고정 - 안 움직임)
+    }
+
+    private fun onKeyboardHidden() {
+        Log.d(TAG, "Keyboard HIDDEN")
+
+        // 컨텐츠 원래 위치로
+        val contentParams = layoutContent.layoutParams as ConstraintLayout.LayoutParams
+        contentParams.topMargin = 0
+        layoutContent.layoutParams = contentParams
+
+        // 버튼도 원래 위치로
+        // 아무것도 안 함
     }
 
     /**
