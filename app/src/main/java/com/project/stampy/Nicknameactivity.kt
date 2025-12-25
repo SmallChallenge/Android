@@ -10,6 +10,7 @@ import android.view.ViewTreeObserver
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,7 @@ class NicknameActivity : AppCompatActivity() {
     private lateinit var layoutInput: FrameLayout
     private lateinit var etNickname: EditText
     private lateinit var viewUnderline: View
+    private lateinit var tvError: TextView
     private lateinit var btnComplete: MaterialButton
     private lateinit var btnBackTouchArea: FrameLayout
     private lateinit var btnCloseTouchArea: FrameLayout
@@ -85,6 +87,7 @@ class NicknameActivity : AppCompatActivity() {
         layoutInput = findViewById(R.id.layout_input)
         etNickname = findViewById(R.id.et_nickname)
         viewUnderline = findViewById(R.id.view_underline)
+        tvError = findViewById(R.id.tv_error)
         btnComplete = findViewById(R.id.btn_complete)
         btnBackTouchArea = findViewById(R.id.btn_back_touch_area)
         btnCloseTouchArea = findViewById(R.id.btn_close_touch_area)
@@ -121,19 +124,13 @@ class NicknameActivity : AppCompatActivity() {
             etNickname.requestFocus()
         }
 
-        // 닉네임 입력 감지
+        // 닉네임 입력 감지 - 실시간 유효성 검사
         etNickname.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val input = s?.toString() ?: ""
-                val isValid = input.isNotEmpty() && isValidNickname(input)
-
-                // 버튼 활성화 상태
-                btnComplete.isEnabled = isValid
-
-                // 입력값 있으면 네온, 없으면 회색
-                updateColors(input.isNotEmpty())
+                validateNickname(input)
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -158,6 +155,47 @@ class NicknameActivity : AppCompatActivity() {
         findViewById<View>(android.R.id.content).setOnClickListener {
             etNickname.clearFocus()
         }
+    }
+
+    /**
+     * 닉네임 실시간 유효성 검사
+     */
+    private fun validateNickname(nickname: String) {
+        // 에러 메시지 초기화
+        tvError.visibility = View.GONE
+
+        when {
+            // 빈 값
+            nickname.isEmpty() -> {
+                btnComplete.isEnabled = false
+                updateColors(false)
+            }
+            // 2자 미만, 10자 초과
+            nickname.length < 2 || nickname.length > 10 -> {
+                btnComplete.isEnabled = false
+                updateColors(false)
+                showError("닉네임은 2~10자로 입력해주세요.")
+            }
+            // 특수문자 또는 공백 포함 (한글, 영문, 숫자만 허용)
+            !nickname.matches(Regex("^[가-힣a-zA-Z0-9]+$")) -> {
+                btnComplete.isEnabled = false
+                updateColors(false)
+                showError("닉네임은 공백 없이 한글, 영문, 숫자만 가능해요.")
+            }
+            // 유효한 닉네임
+            else -> {
+                btnComplete.isEnabled = true
+                updateColors(true)
+            }
+        }
+    }
+
+    /**
+     * 에러 메시지 표시
+     */
+    private fun showError(message: String) {
+        tvError.text = message
+        tvError.visibility = View.VISIBLE
     }
 
     /**
@@ -240,7 +278,7 @@ class NicknameActivity : AppCompatActivity() {
      * 닉네임 설정 API 호출
      */
     private fun isValidNickname(nickname: String): Boolean {
-        val regex = Regex("^[가-힣a-zA-Z0-9]{1,10}$")
+        val regex = Regex("^[가-힣a-zA-Z0-9]{2,10}$")
         return regex.matches(nickname)
     }
 
@@ -248,7 +286,7 @@ class NicknameActivity : AppCompatActivity() {
         if (!isValidNickname(nickname)) {
             Toast.makeText(
                 this,
-                "닉네임은 한글, 영문, 숫자만 1-10자로 입력해주세요",
+                "닉네임은 한글, 영문, 숫자만 2-10자로 입력해주세요",
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -260,20 +298,32 @@ class NicknameActivity : AppCompatActivity() {
 
                 result.onSuccess { response ->
                     Log.d(TAG, "닉네임 설정 성공: ${response.nickname}")
-                    Toast.makeText(
-                        this@NicknameActivity,
-                        "닉네임이 설정되었습니다",
-                        Toast.LENGTH_SHORT
-                    ).show()
 
-                    navigateToMain()
+                    // 메인 화면으로 이동하면서 환영 메시지 전달
+                    navigateToMain(response.nickname ?: nickname)
                 }.onFailure { error ->
                     Log.e(TAG, "닉네임 설정 실패: ${error.message}")
-                    Toast.makeText(
-                        this@NicknameActivity,
-                        "닉네임 설정 실패: ${error.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+
+                    // 409 에러 코드 또는 중복 관련 메시지 확인
+                    val errorMessage = error.message ?: ""
+                    if (errorMessage.contains("409") ||
+                        errorMessage.contains("중복") ||
+                        errorMessage.contains("이미") ||
+                        errorMessage.contains("duplicate") ||
+                        errorMessage.contains("already") ||
+                        errorMessage.contains("exist")) {
+                        // 중복 닉네임
+                        showError("이미 누군가 사용하고 있어요.")
+                        btnComplete.isEnabled = false
+                        updateColors(false)
+                    } else {
+                        // 기타 에러
+                        Toast.makeText(
+                            this@NicknameActivity,
+                            "닉네임 설정 실패: ${error.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "닉네임 설정 오류", e)
@@ -289,7 +339,14 @@ class NicknameActivity : AppCompatActivity() {
     /**
      * 메인 화면으로 이동
      */
-    private fun navigateToMain() {
+    private fun navigateToMain(nickname: String) {
+        // 토스트 메시지 표시
+        Toast.makeText(
+            this,
+            "반가워요, ${nickname}님! 이제 기록을 시작해볼까요?",
+            Toast.LENGTH_LONG
+        ).show()
+
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
