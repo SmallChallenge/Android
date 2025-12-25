@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,8 @@ class NicknameActivity : AppCompatActivity() {
     private lateinit var etNickname: EditText
     private lateinit var viewUnderline: View
     private lateinit var btnComplete: MaterialButton
+    private lateinit var btnBackTouchArea: FrameLayout
+    private lateinit var btnCloseTouchArea: FrameLayout
 
     private lateinit var tokenManager: TokenManager
     private lateinit var authRepository: AuthRepository
@@ -50,10 +53,31 @@ class NicknameActivity : AppCompatActivity() {
         setupKeyboardListener()
         setupBackPressHandler()
 
+        // 아이콘 색상 변경 (흰색)
+        setIconColors()
+
         // 초기 포커스 (커서 깜빡임)
         etNickname.post {
             etNickname.requestFocus()
         }
+    }
+
+    /**
+     * 뒤로가기 아이콘 색상을 흰색으로 변경
+     */
+    private fun setIconColors() {
+        val ivBack = findViewById<ImageView>(R.id.iv_back)
+        val ivClose = findViewById<ImageView>(R.id.iv_close)
+
+        ivBack.setColorFilter(
+            ContextCompat.getColor(this, android.R.color.white),
+            android.graphics.PorterDuff.Mode.SRC_IN
+        )
+
+        ivClose.setColorFilter(
+            ContextCompat.getColor(this, android.R.color.white),
+            android.graphics.PorterDuff.Mode.SRC_IN
+        )
     }
 
     private fun initViews() {
@@ -62,6 +86,8 @@ class NicknameActivity : AppCompatActivity() {
         etNickname = findViewById(R.id.et_nickname)
         viewUnderline = findViewById(R.id.view_underline)
         btnComplete = findViewById(R.id.btn_complete)
+        btnBackTouchArea = findViewById(R.id.btn_back_touch_area)
+        btnCloseTouchArea = findViewById(R.id.btn_close_touch_area)
 
         // 버튼 텍스트 설정
         btnComplete.text = "확인"
@@ -79,7 +105,18 @@ class NicknameActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        // 입력 영역 클릭 시 포커스
+        // 뒤로가기 버튼 - 로그인 페이지로
+        btnBackTouchArea.setOnClickListener {
+            navigateToLogin()
+        }
+
+        // 닫기 버튼 - 그냥 finish() (LoginActivity와 함께 스택에서 제거됨)
+        btnCloseTouchArea.setOnClickListener {
+            // LoginActivity의 결과로 취소 전달
+            setResult(RESULT_CANCELED)
+            finish()
+        }
+
         layoutInput.setOnClickListener {
             etNickname.requestFocus()
         }
@@ -255,6 +292,16 @@ class NicknameActivity : AppCompatActivity() {
     private fun navigateToMain() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    /**
+     * 로그인 페이지로 이동 (뒤로가기)
+     */
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
         finish()
     }

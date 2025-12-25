@@ -11,9 +11,11 @@ import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -34,6 +36,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var btnKakaoLogin: FrameLayout
     private lateinit var btnGoogleLogin: FrameLayout
+    private lateinit var btnCloseTouchArea: FrameLayout
     private lateinit var tvTerms: TextView
 
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -43,6 +46,7 @@ class LoginActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "LoginActivity"
         private const val RC_GOOGLE_SIGN_IN = 9001
+        private const val REQUEST_CODE_NICKNAME = 1001
         private const val TERMS_URL = "https://placid-aurora-3ad.notion.site/2b54e8ebd8b080c1a8bdd9267b94dc3e?source=copy_link"
     }
 
@@ -85,10 +89,23 @@ class LoginActivity : AppCompatActivity() {
     private fun initViews() {
         btnKakaoLogin = findViewById(R.id.btn_kakao_login)
         btnGoogleLogin = findViewById(R.id.btn_google_login)
+        btnCloseTouchArea = findViewById(R.id.btn_close_touch_area)
         tvTerms = findViewById(R.id.tv_terms)
+
+        // 닫기 아이콘 색상 변경 (흰색)
+        val ivClose = findViewById<ImageView>(R.id.iv_close)
+        ivClose.setColorFilter(
+            ContextCompat.getColor(this, android.R.color.white),
+            android.graphics.PorterDuff.Mode.SRC_IN
+        )
     }
 
     private fun setupListeners() {
+        // 닫기 버튼 - 로그인 페이지 닫기
+        btnCloseTouchArea.setOnClickListener {
+            finish()
+        }
+
         btnKakaoLogin.setOnClickListener { signInWithKakao() }
         btnGoogleLogin.setOnClickListener { signInWithGoogle() }
     }
@@ -214,8 +231,18 @@ class LoginActivity : AppCompatActivity() {
 
         Log.d(TAG, "onActivityResult: requestCode=$requestCode, resultCode=$resultCode")
 
-        if (requestCode == RC_GOOGLE_SIGN_IN) {
-            handleGoogleSignInResult(GoogleSignIn.getSignedInAccountFromIntent(data))
+        when (requestCode) {
+            RC_GOOGLE_SIGN_IN -> {
+                handleGoogleSignInResult(GoogleSignIn.getSignedInAccountFromIntent(data))
+            }
+            REQUEST_CODE_NICKNAME -> {
+                if (resultCode == RESULT_CANCELED) {
+                    // 닫기 버튼을 눌렀을 때 - LoginActivity도 종료
+                    Log.d(TAG, "NicknameActivity closed, finishing LoginActivity")
+                    finish()
+                }
+                // RESULT_OK인 경우는 정상 완료 (이미 MainActivity로 이동함)
+            }
         }
     }
 
@@ -305,10 +332,8 @@ class LoginActivity : AppCompatActivity() {
      * 닉네임 설정 화면으로 이동
      */
     private fun navigateToNickname() {
-        startActivity(Intent(this, NicknameActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        })
-        finish()
+        val intent = Intent(this, NicknameActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE_NICKNAME)
     }
 
     /**
