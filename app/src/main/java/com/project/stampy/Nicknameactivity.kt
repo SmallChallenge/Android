@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -48,6 +49,10 @@ class NicknameActivity : AppCompatActivity() {
         initViews()
         setupListeners()
         setupKeyboardListener()
+        setupBackPressHandler()
+
+        // 초기 포커스 (커서 보이게)
+        etNickname.requestFocus()
     }
 
     private fun initViews() {
@@ -64,8 +69,16 @@ class NicknameActivity : AppCompatActivity() {
         btnComplete.isEnabled = false
     }
 
+    private fun setupBackPressHandler() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                navigateToMyPage()
+            }
+        })
+    }
+
     private fun setupListeners() {
-        // 입력 영역 전체 클릭 시 EditText 포커스
+        // 입력 영역 클릭 시 포커스
         layoutInput.setOnClickListener {
             etNickname.requestFocus()
         }
@@ -76,23 +89,22 @@ class NicknameActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val input = s?.toString() ?: ""
-                btnComplete.isEnabled = input.isNotEmpty() && isValidNickname(input)
+                val isValid = input.isNotEmpty() && isValidNickname(input)
+
+                // 버튼 활성화 상태
+                btnComplete.isEnabled = isValid
+
+                // 입력값 있으면 네온, 없으면 회색
+                updateColors(input.isNotEmpty())
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // 포커스 변경 감지 (밑줄 색상 변경)
+        // 포커스 변경 감지
         etNickname.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                viewUnderline.setBackgroundColor(
-                    ContextCompat.getColor(this, R.color.neon_primary)
-                )
-            } else {
-                viewUnderline.setBackgroundColor(
-                    ContextCompat.getColor(this, R.color.gray_700)
-                )
-            }
+            val hasInput = etNickname.text.toString().isNotEmpty()
+            updateColors(hasInput)
         }
 
         // 완료 버튼
@@ -108,6 +120,31 @@ class NicknameActivity : AppCompatActivity() {
         // 빈 영역 클릭 시 포커스 해제
         findViewById<View>(android.R.id.content).setOnClickListener {
             etNickname.clearFocus()
+        }
+    }
+
+    /**
+     * 밑줄과 버튼 색상 업데이트
+     */
+    private fun updateColors(hasInput: Boolean) {
+        if (hasInput) {
+            // 입력값 있으면 네온
+            viewUnderline.setBackgroundColor(
+                ContextCompat.getColor(this, R.color.neon_primary)
+            )
+            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.neon_primary)
+            btnComplete.setTextColor(
+                ContextCompat.getColor(this, R.color.button_text_active)
+            )
+        } else {
+            // 입력값 없으면 회색
+            viewUnderline.setBackgroundColor(
+                ContextCompat.getColor(this, R.color.gray_700)
+            )
+            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.button_inactive)
+            btnComplete.setTextColor(
+                ContextCompat.getColor(this, R.color.button_text_inactive)
+            )
         }
     }
 
@@ -162,7 +199,6 @@ class NicknameActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
 
-                    // 메인 화면으로 이동
                     navigateToMain()
                 }.onFailure { error ->
                     Log.e(TAG, "닉네임 설정 실패: ${error.message}")
@@ -191,10 +227,6 @@ class NicknameActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
-    }
-
-    override fun onBackPressed() {
-        navigateToMyPage()
     }
 
     private fun navigateToMyPage() {

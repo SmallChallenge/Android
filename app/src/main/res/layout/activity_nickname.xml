@@ -31,6 +31,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- "STAMPY에서 사용할 닉네임을 입력해주세요." -->
         <TextView
             android:id="@+id/tv_subtitle"
             android:layout_width="281dp"
@@ -44,7 +45,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- 닉네임 입력 영역 -->
+        <!-- 닉네임 입력 영역 (EditText + 밑줄을 하나로) -->
         <FrameLayout
             android:id="@+id/layout_input"
             android:layout_width="280dp"
@@ -85,7 +86,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 완료 버튼 -->
+    <!-- 완료 버튼 (하단 40dp) -->
     <include
         layout="@layout/button_large"
         android:id="@+id/btn_complete"
