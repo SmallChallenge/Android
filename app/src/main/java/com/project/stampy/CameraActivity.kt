@@ -2,6 +2,7 @@ package com.project.stampy
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.net.Uri
@@ -172,8 +173,10 @@ class CameraActivity : AppCompatActivity() {
 
         // 사진 클릭 리스너
         galleryAdapter.setOnPhotoClickListener { uri ->
-            // TODO: 사진 편집 화면으로 이동
-            showToast("사진 편집 기능은 곧 추가됩니다")
+            // 사진 편집 화면으로 이동
+            val intent = Intent(this, PhotoEditActivity::class.java)
+            intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_URI, uri)
+            startActivity(intent)
         }
     }
 

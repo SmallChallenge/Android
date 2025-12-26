@@ -55,6 +55,12 @@
             android:screenOrientation="portrait"
             android:exported="false" />
 
+        <!-- PhotoEditActivity -->
+        <activity
+            android:name=".PhotoEditActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
         <!-- MyPageActivity -->
         <activity
             android:name=".MyPageActivity"
