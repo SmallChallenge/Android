@@ -357,8 +357,15 @@ class CameraActivity : AppCompatActivity() {
                     Log.d(TAG, "앱 저장소 저장: ${appFile.absolutePath}")
 
                     // 2. 갤러리(공용 저장소)에도 저장
-                    saveToGallery(appFile)
+                    val savedUri = saveToGallery(appFile)
                     showToast("사진 저장 완료!")
+
+                    // 3. 사진 편집 화면으로 이동
+                    if (savedUri != null) {
+                        val intent = Intent(this@CameraActivity, PhotoEditActivity::class.java)
+                        intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_URI, savedUri)
+                        startActivity(intent)
+                    }
 
                     finish()
                 }
@@ -384,7 +391,7 @@ class CameraActivity : AppCompatActivity() {
     /**
      * 갤러리(공용 저장소)에 저장
      */
-    private fun saveToGallery(sourceFile: File) {
+    private fun saveToGallery(sourceFile: File): Uri? {
         try {
             val displayName = generateFileName()
 
@@ -419,10 +426,12 @@ class CameraActivity : AppCompatActivity() {
                 }
 
                 Log.d(TAG, "갤러리 저장 성공: $uri")
+                return uri
             }
         } catch (e: Exception) {
             Log.e(TAG, "갤러리 저장 실패", e)
         }
+        return null
     }
 
     /**

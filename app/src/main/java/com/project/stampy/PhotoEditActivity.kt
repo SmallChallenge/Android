@@ -38,6 +38,8 @@ class PhotoEditActivity : AppCompatActivity() {
     private lateinit var template4: FrameLayout
     private lateinit var template5: FrameLayout
 
+    private var selectedTemplate: FrameLayout? = null
+
     private var selectedCategory = "전체"
     private var photoUri: Uri? = null
 
@@ -105,11 +107,11 @@ class PhotoEditActivity : AppCompatActivity() {
         }
 
         // 템플릿 선택
-        template1.setOnClickListener { applyTemplate("템플릿 1") }
-        template2.setOnClickListener { applyTemplate("템플릿 2") }
-        template3.setOnClickListener { applyTemplate("템플릿 3") }
-        template4.setOnClickListener { applyTemplate("템플릿 4") }
-        template5.setOnClickListener { applyTemplate("템플릿 5") }
+        template1.setOnClickListener { selectTemplate(template1, "템플릿 1") }
+        template2.setOnClickListener { selectTemplate(template2, "템플릿 2") }
+        template3.setOnClickListener { selectTemplate(template3, "템플릿 3") }
+        template4.setOnClickListener { selectTemplate(template4, "템플릿 4") }
+        template5.setOnClickListener { selectTemplate(template5, "템플릿 5") }
     }
 
     /**
@@ -139,8 +141,6 @@ class PhotoEditActivity : AppCompatActivity() {
 
         // 선택된 버튼 활성화
         activateCategoryButton(button)
-
-        showToast("${category} 카테고리 선택")
     }
 
     private fun resetCategoryButton(button: TextView) {
@@ -149,8 +149,23 @@ class PhotoEditActivity : AppCompatActivity() {
     }
 
     private fun activateCategoryButton(button: TextView) {
-        button.setTextColor(getColor(R.color.neon_primary))
+        button.setTextColor(getColor(R.color.gray_50))
         button.setBackgroundResource(R.drawable.bg_category_selected)
+    }
+
+    /**
+     * 템플릿 선택
+     */
+    private fun selectTemplate(template: FrameLayout, templateName: String) {
+        // 이전 선택 해제
+        selectedTemplate?.setBackgroundResource(R.drawable.bg_template_item)
+
+        // 새로운 템플릿 선택
+        selectedTemplate = template
+        template.setBackgroundResource(R.drawable.bg_template_item_selected)
+
+        // 템플릿 적용
+        applyTemplate(templateName)
     }
 
     /**
@@ -180,6 +195,5 @@ class PhotoEditActivity : AppCompatActivity() {
     private fun applyTemplate(templateName: String) {
         tvTemplateOverlay.text = templateName
         tvTemplateOverlay.visibility = View.VISIBLE
-        showToast("${templateName} 적용")
     }
 }
