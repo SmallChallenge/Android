@@ -36,6 +36,7 @@ class PhotoEditActivity : AppCompatActivity() {
     private lateinit var template2: FrameLayout
     private lateinit var template3: FrameLayout
     private lateinit var template4: FrameLayout
+    private lateinit var template5: FrameLayout
 
     private var selectedCategory = "전체"
     private var photoUri: Uri? = null
@@ -79,6 +80,7 @@ class PhotoEditActivity : AppCompatActivity() {
         template2 = findViewById(R.id.template_2)
         template3 = findViewById(R.id.template_3)
         template4 = findViewById(R.id.template_4)
+        template5 = findViewById(R.id.template_5)
     }
 
     private fun setupListeners() {
@@ -107,6 +109,7 @@ class PhotoEditActivity : AppCompatActivity() {
         template2.setOnClickListener { applyTemplate("템플릿 2") }
         template3.setOnClickListener { applyTemplate("템플릿 3") }
         template4.setOnClickListener { applyTemplate("템플릿 4") }
+        template5.setOnClickListener { applyTemplate("템플릿 5") }
     }
 
     /**
@@ -165,7 +168,8 @@ class PhotoEditActivity : AppCompatActivity() {
             .setOnConfirmListener {
                 // 광고 시청 (TODO: 광고 연결)
                 showToast("광고 기능은 곧 추가됩니다")
-                switchLogo.isChecked = true
+                // 광고 성공 후 OFF 유지
+                switchLogo.isChecked = false
             }
             .show()
     }
