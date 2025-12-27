@@ -43,13 +43,24 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_cancel"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:text="취소"
             android:textAppearance="@style/TextAppearance.App.Button.Large"
             android:textColor="@color/gray_300"
             android:background="@drawable/bg_button_cancel"
-            app:backgroundTint="@null" />
+            app:backgroundTint="@null"
+            app:cornerRadius="16dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp" />
 
         <!-- 버튼 사이 간격 -->
         <Space
@@ -66,7 +77,17 @@
             android:textAppearance="@style/TextAppearance.App.Button.Large"
             android:textColor="@color/gray_primary"
             android:backgroundTint="@color/neon_primary"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="16dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp" />
 
     </LinearLayout>
 

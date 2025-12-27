@@ -16,6 +16,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 다음 버튼 (top_bar 위에 오버레이) -->
+    <include
+        android:id="@+id/btn_next"
+        layout="@layout/button_small_primary"
+        android:layout_width="50dp"
+        android:layout_height="34dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toTopOf="@id/top_bar"
+        app:layout_constraintEnd_toEndOf="@id/top_bar" />
+
     <!-- 편집 사진 (1:1 정사각형, 상단바 아래 40dp) -->
     <FrameLayout
         android:id="@+id/photo_container"

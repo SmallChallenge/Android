@@ -16,6 +16,7 @@ class PhotoEditActivity : AppCompatActivity() {
 
     // 상단바
     private lateinit var btnBackTouchArea: FrameLayout
+    private var btnNext: com.google.android.material.button.MaterialButton? = null
 
     // 사진
     private lateinit var ivPhoto: ImageView
@@ -63,6 +64,10 @@ class PhotoEditActivity : AppCompatActivity() {
         // 상단바
         btnBackTouchArea = findViewById(R.id.btn_back_touch_area)
 
+        // 다음 버튼 (include로 추가된 버튼)
+        val btnNextView = findViewById<View>(R.id.btn_next)
+        btnNext = btnNextView.findViewById(R.id.btn_small_primary)
+
         // 사진
         ivPhoto = findViewById(R.id.iv_photo)
         tvTemplateOverlay = findViewById(R.id.tv_template_overlay)
@@ -89,6 +94,12 @@ class PhotoEditActivity : AppCompatActivity() {
         // 뒤로가기
         btnBackTouchArea.setOnClickListener {
             finish()
+        }
+
+        // 다음 버튼
+        btnNext?.setOnClickListener {
+            // TODO: 다음 화면으로 이동
+            showToast("다음 화면으로 이동")
         }
 
         // 카테고리 선택
