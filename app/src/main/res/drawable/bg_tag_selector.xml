@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Active 상태 (selected) -->
+    <item android:state_selected="true" android:drawable="@drawable/bg_tag_active" />
+
+    <!-- Pressed 상태 -->
+    <item android:state_pressed="true" android:drawable="@drawable/bg_tag_pressed" />
+
+    <!-- Inactive 상태 (기본) -->
+    <item android:drawable="@drawable/bg_tag_inactive" />
+</selector>

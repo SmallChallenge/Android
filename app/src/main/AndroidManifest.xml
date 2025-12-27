@@ -61,6 +61,12 @@
             android:screenOrientation="portrait"
             android:exported="false" />
 
+        <!-- PhotoSaveActivity -->
+        <activity
+            android:name=".PhotoSaveActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
         <!-- MyPageActivity -->
         <activity
             android:name=".MyPageActivity"

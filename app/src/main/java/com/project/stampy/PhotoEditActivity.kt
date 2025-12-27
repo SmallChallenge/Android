@@ -1,7 +1,9 @@
 package com.project.stampy
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -9,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.bumptech.glide.Glide
+import com.google.android.material.button.MaterialButton
 import com.project.stampy.ui.dialog.DoubleButtonDialog
 import com.project.stampy.utils.showToast
 
@@ -16,7 +19,7 @@ class PhotoEditActivity : AppCompatActivity() {
 
     // 상단바
     private lateinit var btnBackTouchArea: FrameLayout
-    private var btnNext: com.google.android.material.button.MaterialButton? = null
+    private var btnNext: MaterialButton? = null
 
     // 사진
     private lateinit var ivPhoto: ImageView
@@ -45,6 +48,7 @@ class PhotoEditActivity : AppCompatActivity() {
     private var photoUri: Uri? = null
 
     companion object {
+        const val TAG = "PhotoEditActivity"
         const val EXTRA_PHOTO_URI = "extra_photo_uri"
     }
 
@@ -54,6 +58,7 @@ class PhotoEditActivity : AppCompatActivity() {
 
         // Intent로 전달받은 사진 URI
         photoUri = intent.getParcelableExtra(EXTRA_PHOTO_URI)
+        Log.d(TAG, "onCreate - photoUri: $photoUri")
 
         initViews()
         setupListeners()
@@ -64,9 +69,9 @@ class PhotoEditActivity : AppCompatActivity() {
         // 상단바
         btnBackTouchArea = findViewById(R.id.btn_back_touch_area)
 
-        // 다음 버튼 (include로 추가된 버튼)
-        val btnNextView = findViewById<View>(R.id.btn_next)
-        btnNext = btnNextView.findViewById(R.id.btn_small_primary)
+        // 다음 버튼 - include의 id로 직접 찾기
+        btnNext = findViewById(R.id.btn_next)
+        Log.d(TAG, "btnNext found: $btnNext")
 
         // 사진
         ivPhoto = findViewById(R.id.iv_photo)
@@ -93,14 +98,36 @@ class PhotoEditActivity : AppCompatActivity() {
     private fun setupListeners() {
         // 뒤로가기
         btnBackTouchArea.setOnClickListener {
+            Log.d(TAG, "Back button clicked")
             finish()
         }
 
         // 다음 버튼
         btnNext?.setOnClickListener {
-            // TODO: 다음 화면으로 이동
-            showToast("다음 화면으로 이동")
-        }
+            Log.d(TAG, "다음 버튼 클릭됨!")
+            Log.d(TAG, "photoUri: $photoUri")
+            Log.d(TAG, "template overlay visible: ${tvTemplateOverlay.visibility == View.VISIBLE}")
+
+            try {
+                // 사진 저장 화면으로 이동
+                val intent = Intent(this, PhotoSaveActivity::class.java)
+                intent.putExtra(PhotoSaveActivity.EXTRA_PHOTO_URI, photoUri)
+
+                // 선택된 템플릿 정보 전달
+                if (tvTemplateOverlay.visibility == View.VISIBLE) {
+                    intent.putExtra(PhotoSaveActivity.EXTRA_TEMPLATE_NAME, tvTemplateOverlay.text.toString())
+                    Log.d(TAG, "Template name: ${tvTemplateOverlay.text}")
+                }
+
+                Log.d(TAG, "Starting PhotoSaveActivity...")
+                startActivity(intent)
+                Log.d(TAG, "PhotoSaveActivity started successfully")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error starting PhotoSaveActivity: ${e.message}")
+                e.printStackTrace()
+                showToast("화면 전환 오류: ${e.message}")
+            }
+        } ?: Log.e(TAG, "btnNext is null!")
 
         // 카테고리 선택
         btnCategoryAll.setOnClickListener { selectCategory("전체", btnCategoryAll) }
@@ -130,11 +157,12 @@ class PhotoEditActivity : AppCompatActivity() {
      */
     private fun loadPhoto() {
         photoUri?.let { uri ->
+            Log.d(TAG, "Loading photo: $uri")
             Glide.with(this)
                 .load(uri)
                 .centerCrop()
                 .into(ivPhoto)
-        }
+        } ?: Log.e(TAG, "photoUri is null, cannot load photo")
     }
 
     /**
