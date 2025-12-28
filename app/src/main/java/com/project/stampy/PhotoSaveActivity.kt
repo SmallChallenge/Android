@@ -1,5 +1,6 @@
 package com.project.stampy
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -37,8 +38,12 @@ class PhotoSaveActivity : AppCompatActivity() {
     private lateinit var tagPublic: TagView
     private lateinit var tagPrivate: TagView
 
+    // 에러 메시지
+    private lateinit var tvCategoryError: TextView
+    private lateinit var tvPrivacyError: TextView
+
     private var selectedCategory: String? = null
-    private var isPublic = true  // 기본값: 전체 공개
+    private var isPublic: Boolean? = null  // null: 미선택, true: 공개, false: 비공개
 
     private var photoUri: Uri? = null
     private var templateName: String? = null
@@ -89,9 +94,9 @@ class PhotoSaveActivity : AppCompatActivity() {
         tagPublic = findViewById(R.id.tag_public)
         tagPrivate = findViewById(R.id.tag_private)
 
-        // 기본값: 전체 공개 선택
-        tagPublic.isSelected = true
-        tagPrivate.isSelected = false
+        // 에러 메시지
+        tvCategoryError = findViewById(R.id.tv_category_error)
+        tvPrivacyError = findViewById(R.id.tv_privacy_error)
     }
 
     private fun setupListeners() {
@@ -102,25 +107,84 @@ class PhotoSaveActivity : AppCompatActivity() {
 
         // 완료 버튼
         btnComplete?.setOnClickListener {
-            if (selectedCategory == null) {
-                showToast("카테고리를 선택해주세요")
-                return@setOnClickListener
-            }
+            if (validateInputs()) {
+                // TODO: 사진 저장 로직
+                showToast("사진이 저장되었습니다")
 
-            // TODO: 사진 저장 로직
-            showToast("사진이 저장되었습니다")
-            finish()
+                // 메인 화면으로 돌아가기 (모든 이전 Activity 제거)
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(intent)
+                finish()
+            }
         }
 
         // 카테고리 선택
-        categoryStudy.setOnClickListener { selectCategory("공부") }
-        categoryExercise.setOnClickListener { selectCategory("운동") }
-        categoryFood.setOnClickListener { selectCategory("음식") }
-        categoryEtc.setOnClickListener { selectCategory("기타") }
+        categoryStudy.setOnClickListener {
+            selectCategory("공부")
+            hideError(tvCategoryError)
+        }
+        categoryExercise.setOnClickListener {
+            selectCategory("운동")
+            hideError(tvCategoryError)
+        }
+        categoryFood.setOnClickListener {
+            selectCategory("음식")
+            hideError(tvCategoryError)
+        }
+        categoryEtc.setOnClickListener {
+            selectCategory("기타")
+            hideError(tvCategoryError)
+        }
 
         // 공개 여부 태그
-        tagPublic.setOnClickListener { selectPrivacy(true) }
-        tagPrivate.setOnClickListener { selectPrivacy(false) }
+        tagPublic.setOnClickListener {
+            selectPrivacy(true)
+            hideError(tvPrivacyError)
+        }
+        tagPrivate.setOnClickListener {
+            selectPrivacy(false)
+            hideError(tvPrivacyError)
+        }
+    }
+
+    /**
+     * 입력값 검증
+     */
+    private fun validateInputs(): Boolean {
+        var isValid = true
+
+        // 카테고리 검증
+        if (selectedCategory == null) {
+            showError(tvCategoryError)
+            isValid = false
+        } else {
+            hideError(tvCategoryError)
+        }
+
+        // 공개 여부 검증
+        if (isPublic == null) {
+            showError(tvPrivacyError)
+            isValid = false
+        } else {
+            hideError(tvPrivacyError)
+        }
+
+        return isValid
+    }
+
+    /**
+     * 에러 메시지 표시
+     */
+    private fun showError(errorView: TextView) {
+        errorView.visibility = View.VISIBLE
+    }
+
+    /**
+     * 에러 메시지 숨김
+     */
+    private fun hideError(errorView: TextView) {
+        errorView.visibility = View.GONE
     }
 
     /**

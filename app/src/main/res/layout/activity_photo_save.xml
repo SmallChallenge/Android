@@ -81,15 +81,34 @@
             android:orientation="vertical"
             android:paddingBottom="24dp">
 
-            <!-- 카테고리 선택 타이틀 -->
-            <TextView
-                android:id="@+id/tv_category_title"
-                android:layout_width="wrap_content"
+            <!-- 카테고리 선택 타이틀 영역 -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="카테고리 선택"
-                android:textAppearance="@style/TextAppearance.App.Subtitle2"
-                android:textColor="@color/gray_50"
-                android:layout_marginStart="20dp" />
+                android:orientation="horizontal"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp">
+
+                <TextView
+                    android:id="@+id/tv_category_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="카테고리 선택"
+                    android:textAppearance="@style/TextAppearance.App.Subtitle2"
+                    android:textColor="@color/gray_50" />
+
+                <!-- 카테고리 에러 메시지 -->
+                <TextView
+                    android:id="@+id/tv_category_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="* 필수 선택"
+                    android:textAppearance="@style/TextAppearance.App.Caption"
+                    android:textColor="#FF2334"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <!-- 카테고리 아이콘 영역 -->
             <LinearLayout
@@ -249,16 +268,35 @@
 
             </LinearLayout>
 
-            <!-- 공개 여부 선택 타이틀 -->
-            <TextView
-                android:id="@+id/tv_privacy_title"
-                android:layout_width="wrap_content"
+            <!-- 공개 여부 선택 타이틀 영역 -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="공개 여부 선택"
-                android:textAppearance="@style/TextAppearance.App.Subtitle2"
-                android:textColor="@color/gray_50"
+                android:orientation="horizontal"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="40dp" />
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="40dp">
+
+                <TextView
+                    android:id="@+id/tv_privacy_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="공개 여부 선택"
+                    android:textAppearance="@style/TextAppearance.App.Subtitle2"
+                    android:textColor="@color/gray_50" />
+
+                <!-- 공개 여부 에러 메시지 -->
+                <TextView
+                    android:id="@+id/tv_privacy_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="* 필수 선택"
+                    android:textAppearance="@style/TextAppearance.App.Caption"
+                    android:textColor="#FF2334"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <!-- 태그 버튼 영역 -->
             <LinearLayout
