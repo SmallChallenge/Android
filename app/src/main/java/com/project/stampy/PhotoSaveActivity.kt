@@ -65,9 +65,8 @@ class PhotoSaveActivity : AppCompatActivity() {
         // 상단바
         btnBackTouchArea = findViewById(R.id.btn_back_touch_area)
 
-        // 완료 버튼
-        val btnCompleteView = findViewById<View>(R.id.btn_complete)
-        btnComplete = btnCompleteView.findViewById(R.id.btn_small_primary)
+        // 완료 버튼 - include의 id로 직접 찾기
+        btnComplete = findViewById(R.id.btn_complete)
         btnComplete?.text = "완료"
 
         // 사진
