@@ -325,8 +325,7 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun showLoginFailedDialog() {
         SingleButtonDialog(this)
-            .setTitle("로그인 실패")
-            .setDescription("로그인에 실패했어요. 다시 시도해주세요.")
+            .setTitle("로그인에 실패했어요.\n다시 시도해주세요.")
             .show()
     }
 

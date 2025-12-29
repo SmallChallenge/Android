@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,7 +16,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.exifinterface.media.ExifInterface
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
@@ -50,13 +49,9 @@ class PhotoSaveActivity : AppCompatActivity() {
 
     // 카테고리
     private lateinit var categoryStudy: LinearLayout
-    private lateinit var categoryStudyFrame: FrameLayout
     private lateinit var categoryExercise: LinearLayout
-    private lateinit var categoryExerciseFrame: FrameLayout
     private lateinit var categoryFood: LinearLayout
-    private lateinit var categoryFoodFrame: FrameLayout
     private lateinit var categoryEtc: LinearLayout
-    private lateinit var categoryEtcFrame: FrameLayout
 
     // 공개 여부 태그
     private lateinit var tagPublic: TagView
@@ -77,6 +72,15 @@ class PhotoSaveActivity : AppCompatActivity() {
 
     private var photoUri: Uri? = null
     private var templateName: String? = null
+
+    private val categoryMap by lazy {
+        mapOf(
+            "공부" to Pair(categoryStudy, R.id.tv_category_study),
+            "운동" to Pair(categoryExercise, R.id.tv_category_exercise),
+            "음식" to Pair(categoryFood, R.id.tv_category_food),
+            "기타" to Pair(categoryEtc, R.id.tv_category_etc)
+        )
+    }
 
     companion object {
         private const val TAG = "PhotoSaveActivity"
@@ -144,12 +148,6 @@ class PhotoSaveActivity : AppCompatActivity() {
         categoryFood = findViewById(R.id.category_food)
         categoryEtc = findViewById(R.id.category_etc)
 
-        // 카테고리 FrameLayout
-        categoryStudyFrame = findViewById(R.id.frame_study)
-        categoryExerciseFrame = findViewById(R.id.frame_exercise)
-        categoryFoodFrame = findViewById(R.id.frame_food)
-        categoryEtcFrame = findViewById(R.id.frame_etc)
-
         // 공개 여부 태그
         tagPublic = findViewById(R.id.tag_public)
         tagPrivate = findViewById(R.id.tag_private)
@@ -207,14 +205,42 @@ class PhotoSaveActivity : AppCompatActivity() {
     }
 
     /**
+     * 카테고리 선택
+     */
+    private fun selectCategory(category: String) {
+        selectedCategory = category
+
+        // 모든 카테고리 순회하며 스타일 적용
+        categoryMap.forEach { (name, views) ->
+            val (container, textViewId) = views
+            val textView = findViewById<TextView>(textViewId)
+
+            if (name == category) {
+                // 선택된 카테고리: opacity 100%, gray_50, Bold
+                container.alpha = 1.0f
+                textView?.apply {
+                    setTextColor(ContextCompat.getColor(this@PhotoSaveActivity, R.color.gray_50))
+                    setTypeface(resources.getFont(R.font.pretendard_semibold))
+                }
+            } else {
+                // 미선택 카테고리: opacity 40%, gray_500, Medium
+                container.alpha = 0.4f
+                textView?.apply {
+                    setTextColor(ContextCompat.getColor(this@PhotoSaveActivity, R.color.gray_500))
+                    setTypeface(resources.getFont(R.font.pretendard_medium))
+                }
+            }
+        }
+    }
+
+    /**
      * 로그인 필요 다이얼로그 표시
      */
     private fun showLoginRequiredDialog() {
         DoubleButtonDialog(this)
             .setTitle("로그인이 필요해요.")
-            .setDescription("지금 로그인할까요?")
             .setCancelButtonText("취소")
-            .setConfirmButtonText("확인")
+            .setConfirmButtonText("로그인")
             .setOnCancelListener {
                 Log.d(TAG, "로그인 취소")
             }
@@ -259,7 +285,6 @@ class PhotoSaveActivity : AppCompatActivity() {
 
         // 로딩 시작
         btnComplete?.isEnabled = false
-        showToast("저장 중...")
 
         lifecycleScope.launch {
             try {
@@ -439,12 +464,10 @@ class PhotoSaveActivity : AppCompatActivity() {
     }
 
     /**
-     * 화면에 보이는 뷰를 비트맵으로 캡처 (템플릿 포함)
-     * 반드시 Main 스레드에서 호출!
+     * 화면 캡처
      */
     private fun captureViewAsBitmap(): Bitmap? {
         try {
-            // ivPhoto와 tvTemplateOverlay를 포함하는 부모 뷰 찾기
             val parentView = ivPhoto.parent as? View ?: return null
 
             // 뷰가 그려지지 않았으면 null 반환
@@ -584,7 +607,7 @@ class PhotoSaveActivity : AppCompatActivity() {
     }
 
     /**
-     * 갤러리(공용 저장소)에 저장 - 모든 유저
+     * 갤러리 저장
      */
     private suspend fun saveToGallery(bitmap: Bitmap, fileName: String): Uri? = withContext(Dispatchers.IO) {
         try {
@@ -735,9 +758,6 @@ class PhotoSaveActivity : AppCompatActivity() {
         errorView.visibility = View.VISIBLE
     }
 
-    /**
-     * 에러 메시지 숨김
-     */
     private fun hideError(errorView: TextView) {
         errorView.visibility = View.GONE
     }
@@ -757,27 +777,6 @@ class PhotoSaveActivity : AppCompatActivity() {
         templateName?.let { name ->
             tvTemplateOverlay.text = name
             tvTemplateOverlay.visibility = View.VISIBLE
-        }
-    }
-
-    /**
-     * 카테고리 선택
-     */
-    private fun selectCategory(category: String) {
-        selectedCategory = category
-
-        // 모든 카테고리를 40% opacity로 변경
-        categoryStudyFrame.setBackgroundResource(R.drawable.bg_category_circle_unselected)
-        categoryExerciseFrame.setBackgroundResource(R.drawable.bg_category_circle_unselected)
-        categoryFoodFrame.setBackgroundResource(R.drawable.bg_category_circle_unselected)
-        categoryEtcFrame.setBackgroundResource(R.drawable.bg_category_circle_unselected)
-
-        // 선택된 카테고리만 100% opacity로 변경
-        when (category) {
-            "공부" -> categoryStudyFrame.setBackgroundResource(R.drawable.bg_category_circle_selected)
-            "운동" -> categoryExerciseFrame.setBackgroundResource(R.drawable.bg_category_circle_selected)
-            "음식" -> categoryFoodFrame.setBackgroundResource(R.drawable.bg_category_circle_selected)
-            "기타" -> categoryEtcFrame.setBackgroundResource(R.drawable.bg_category_circle_selected)
         }
     }
 

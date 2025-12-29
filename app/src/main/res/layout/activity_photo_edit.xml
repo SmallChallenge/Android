@@ -88,60 +88,60 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="16dp">
 
-                <!-- 전체 -->
+                <!-- All -->
                 <TextView
                     android:id="@+id/btn_category_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="전체"
+                    android:text="All"
                     android:textAppearance="@style/TextAppearance.App.Button2.Large"
                     android:textColor="@color/gray_50"
                     android:background="@drawable/bg_category_selected"
                     android:clickable="true"
                     android:focusable="true" />
 
-                <!-- 공부 -->
+                <!-- Basic -->
                 <TextView
-                    android:id="@+id/btn_category_study"
+                    android:id="@+id/btn_category_Basic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="공부"
+                    android:text="Basic"
                     android:textAppearance="@style/TextAppearance.App.Button2.Large"
                     android:textColor="@color/gray_500"
                     android:layout_marginStart="16dp"
                     android:clickable="true"
                     android:focusable="true" />
 
-                <!-- 운동 -->
+                <!-- Moody -->
                 <TextView
-                    android:id="@+id/btn_category_exercise"
+                    android:id="@+id/btn_category_Moody"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="운동"
+                    android:text="Moody"
                     android:textAppearance="@style/TextAppearance.App.Button2.Large"
                     android:textColor="@color/gray_500"
                     android:layout_marginStart="16dp"
                     android:clickable="true"
                     android:focusable="true" />
 
-                <!-- 음식 -->
+                <!-- Active -->
                 <TextView
-                    android:id="@+id/btn_category_food"
+                    android:id="@+id/btn_category_Active"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="음식"
+                    android:text="Active"
                     android:textAppearance="@style/TextAppearance.App.Button2.Large"
                     android:textColor="@color/gray_500"
                     android:layout_marginStart="16dp"
                     android:clickable="true"
                     android:focusable="true" />
 
-                <!-- 기타 -->
+                <!-- Digital -->
                 <TextView
-                    android:id="@+id/btn_category_etc"
+                    android:id="@+id/btn_category_Digital"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="기타"
+                    android:text="Digital"
                     android:textAppearance="@style/TextAppearance.App.Button2.Large"
                     android:textColor="@color/gray_500"
                     android:layout_marginStart="16dp"

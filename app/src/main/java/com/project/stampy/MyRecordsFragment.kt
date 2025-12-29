@@ -179,11 +179,7 @@ class MyRecordsFragment : Fragment() {
         // 미선택 상태: opacity 40%
         container.alpha = 0.4f
 
-        imageView.setBackgroundResource(R.drawable.category_circle_unselected)
-        imageView.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.gray_500)
-        )
-
+        // 텍스트: gray_500, btn2(Medium)
         textView.setTextColor(
             ContextCompat.getColor(requireContext(), R.color.gray_500)
         )
@@ -196,11 +192,7 @@ class MyRecordsFragment : Fragment() {
         // 선택 상태: opacity 100%
         container.alpha = 1.0f
 
-        imageView.setBackgroundResource(R.drawable.category_circle_selected)
-        imageView.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.gray_primary)
-        )
-
+        // 텍스트: gray_50, btn2_B(Large)
         textView.setTextColor(
             ContextCompat.getColor(requireContext(), R.color.gray_50)
         )
@@ -241,16 +233,16 @@ class MyRecordsFragment : Fragment() {
                     page = 0,
                     size = 100
                 ).onSuccess { response ->
-                    Log.d("MyRecordsFragment", "서버 사진 ${response.images.size}개 로드됨")  // ⭐ content → images
+                    Log.d("MyRecordsFragment", "서버 사진 ${response.images.size}개 로드됨")
 
-                    if (response.images.isEmpty()) {  // ⭐ content → images
+                    if (response.images.isEmpty()) {
                         showEmptyState()
                     } else {
                         // ImageItem을 Photo로 변환
-                        val photos = response.images.map { imageItem ->  // ⭐ content → images
+                        val photos = response.images.map { imageItem ->
                             // 더미 File 객체 (서버 URL만 사용)
                             Photo(
-                                file = File(imageItem.imageId.toString()),  // ⭐ 더미 이름
+                                file = File(imageItem.imageId.toString()),
                                 category = selectedCategory,
                                 serverUrl = imageItem.accessUrl,
                                 imageId = imageItem.imageId

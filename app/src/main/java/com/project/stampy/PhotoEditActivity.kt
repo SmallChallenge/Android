@@ -27,10 +27,10 @@ class PhotoEditActivity : AppCompatActivity() {
 
     // 카테고리
     private lateinit var btnCategoryAll: TextView
-    private lateinit var btnCategoryStudy: TextView
-    private lateinit var btnCategoryExercise: TextView
-    private lateinit var btnCategoryFood: TextView
-    private lateinit var btnCategoryEtc: TextView
+    private lateinit var btnCategoryBasic: TextView
+    private lateinit var btnCategoryMoody: TextView
+    private lateinit var btnCategoryActive: TextView
+    private lateinit var btnCategoryDigital: TextView
 
     // 로고 토글
     private lateinit var switchLogo: SwitchCompat
@@ -79,10 +79,10 @@ class PhotoEditActivity : AppCompatActivity() {
 
         // 카테고리
         btnCategoryAll = findViewById(R.id.btn_category_all)
-        btnCategoryStudy = findViewById(R.id.btn_category_study)
-        btnCategoryExercise = findViewById(R.id.btn_category_exercise)
-        btnCategoryFood = findViewById(R.id.btn_category_food)
-        btnCategoryEtc = findViewById(R.id.btn_category_etc)
+        btnCategoryBasic = findViewById(R.id.btn_category_Basic)
+        btnCategoryMoody = findViewById(R.id.btn_category_Moody)
+        btnCategoryActive = findViewById(R.id.btn_category_Active)
+        btnCategoryDigital = findViewById(R.id.btn_category_Digital)
 
         // 로고 토글
         switchLogo = findViewById(R.id.switch_logo)
@@ -130,11 +130,11 @@ class PhotoEditActivity : AppCompatActivity() {
         } ?: Log.e(TAG, "btnNext is null!")
 
         // 카테고리 선택
-        btnCategoryAll.setOnClickListener { selectCategory("전체", btnCategoryAll) }
-        btnCategoryStudy.setOnClickListener { selectCategory("공부", btnCategoryStudy) }
-        btnCategoryExercise.setOnClickListener { selectCategory("운동", btnCategoryExercise) }
-        btnCategoryFood.setOnClickListener { selectCategory("음식", btnCategoryFood) }
-        btnCategoryEtc.setOnClickListener { selectCategory("기타", btnCategoryEtc) }
+        btnCategoryAll.setOnClickListener { selectCategory("All", btnCategoryAll) }
+        btnCategoryBasic.setOnClickListener { selectCategory("Basic", btnCategoryBasic) }
+        btnCategoryMoody.setOnClickListener { selectCategory("Moody", btnCategoryMoody) }
+        btnCategoryActive.setOnClickListener { selectCategory("Active", btnCategoryActive) }
+        btnCategoryDigital.setOnClickListener { selectCategory("Digital", btnCategoryDigital) }
 
         // 로고 토글
         switchLogo.setOnCheckedChangeListener { _, isChecked ->
@@ -173,10 +173,10 @@ class PhotoEditActivity : AppCompatActivity() {
 
         // 모든 버튼 초기화
         resetCategoryButton(btnCategoryAll)
-        resetCategoryButton(btnCategoryStudy)
-        resetCategoryButton(btnCategoryExercise)
-        resetCategoryButton(btnCategoryFood)
-        resetCategoryButton(btnCategoryEtc)
+        resetCategoryButton(btnCategoryBasic)
+        resetCategoryButton(btnCategoryMoody)
+        resetCategoryButton(btnCategoryActive)
+        resetCategoryButton(btnCategoryDigital)
 
         // 선택된 버튼 활성화
         activateCategoryButton(button)

@@ -129,28 +129,21 @@
                     android:clickable="true"
                     android:focusable="true">
 
-                    <!-- 원형 테두리 -->
-                    <FrameLayout
-                        android:id="@+id/frame_study"
+                    <ImageView
+                        android:id="@+id/iv_category_study"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@drawable/bg_category_circle_selected">
-
-                        <ImageView
-                            android:id="@+id/iv_category_study"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_stampy_logo"
-                            android:contentDescription="공부" />
-                    </FrameLayout>
+                        android:src="@drawable/ic_category_study"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="공부" />
 
                     <!-- 카테고리 이름 -->
                     <TextView
+                        android:id="@+id/tv_category_study"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="공부"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
                         android:textColor="@color/gray_300"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
@@ -166,28 +159,21 @@
                     android:clickable="true"
                     android:focusable="true">
 
-                    <!-- 원형 테두리 -->
-                    <FrameLayout
-                        android:id="@+id/frame_exercise"
+                    <ImageView
+                        android:id="@+id/iv_category_exercise"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@drawable/bg_category_circle_selected">
-
-                        <ImageView
-                            android:id="@+id/iv_category_exercise"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_stampy_logo"
-                            android:contentDescription="운동" />
-                    </FrameLayout>
+                        android:src="@drawable/ic_category_exercise"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="운동" />
 
                     <!-- 카테고리 이름 -->
                     <TextView
+                        android:id="@+id/tv_category_exercise"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="운동"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
                         android:textColor="@color/gray_300"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
@@ -203,28 +189,21 @@
                     android:clickable="true"
                     android:focusable="true">
 
-                    <!-- 원형 테두리 -->
-                    <FrameLayout
-                        android:id="@+id/frame_food"
+                    <ImageView
+                        android:id="@+id/iv_category_food"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@drawable/bg_category_circle_selected">
-
-                        <ImageView
-                            android:id="@+id/iv_category_food"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_stampy_logo"
-                            android:contentDescription="음식" />
-                    </FrameLayout>
+                        android:src="@drawable/ic_category_food"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="음식" />
 
                     <!-- 카테고리 이름 -->
                     <TextView
+                        android:id="@+id/tv_category_food"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="음식"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
                         android:textColor="@color/gray_300"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
@@ -240,28 +219,21 @@
                     android:clickable="true"
                     android:focusable="true">
 
-                    <!-- 원형 테두리 -->
-                    <FrameLayout
-                        android:id="@+id/frame_etc"
+                    <ImageView
+                        android:id="@+id/iv_category_etc"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@drawable/bg_category_circle_selected">
-
-                        <ImageView
-                            android:id="@+id/iv_category_etc"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="12dp"
-                            android:src="@drawable/ic_stampy_logo"
-                            android:contentDescription="기타" />
-                    </FrameLayout>
+                        android:src="@drawable/ic_category_etc"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="기타" />
 
                     <!-- 카테고리 이름 -->
                     <TextView
+                        android:id="@+id/tv_category_etc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="기타"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
                         android:textColor="@color/gray_300"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>

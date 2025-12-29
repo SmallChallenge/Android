@@ -331,8 +331,7 @@ class NicknameActivity : AppCompatActivity() {
      */
     private fun showSignUpFailedDialog() {
         SingleButtonDialog(this)
-            .setTitle("회원가입 실패")
-            .setDescription("회원가입에 실패했어요. 다시 시도해주세요.")
+            .setTitle("회원가입에 실패했어요. \n다시 시도해주세요.")
             .show()
     }
 

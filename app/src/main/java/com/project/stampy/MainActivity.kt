@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         bottomNav = findViewById(R.id.bottom_navigation)
-        fabAdd = findViewById(R.id.fab_add)
+        val fabAdd = findViewById<ImageView>(R.id.fab_add)
 
         // 앱 시작시 내 기록 프래그먼트를 기본으로 표시
         if (savedInstanceState == null) {
@@ -51,7 +52,9 @@ class MainActivity : AppCompatActivity() {
 
         // 플로팅 액션 버튼 클릭 리스너
         fabAdd.setOnClickListener {
-            checkCameraPermissionAndOpen()
+            // 사진 촬영 화면으로 이동
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
         }
     }
 
