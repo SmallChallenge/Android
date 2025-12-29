@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +17,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
@@ -394,29 +396,119 @@ class PhotoSaveActivity : AppCompatActivity() {
      */
     private suspend fun createFinalImage(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
         try {
-            // 원본 이미지 로드
-            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+            // 1. 원본 이미지 로드
+            val originalBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
-            // 템플릿이 없으면 원본 반환
-            if (templateName.isNullOrEmpty()) {
-                return@withContext bitmap
+            // 2. EXIF 정보 읽어서 회전 처리
+            val rotatedBitmap = fixImageRotation(uri, originalBitmap)
+
+            // 3. 1:1 비율로 크롭 (정사각형)
+            val croppedBitmap = cropToSquare(rotatedBitmap)
+
+            // 4. 최대 크기 제한 (iOS와 동일하게, 메모리 절약)
+            val resizedBitmap = resizeIfNeeded(croppedBitmap, maxSize = 2048)
+
+            // 5. 템플릿 적용 (있는 경우)
+            val finalBitmap = if (!templateName.isNullOrEmpty()) {
+                applyTemplate(resizedBitmap)
+            } else {
+                resizedBitmap
             }
 
-            // 템플릿 적용 (현재는 텍스트 오버레이만)
-            val resultBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
-            val canvas = Canvas(resultBitmap)
+            // 메모리 정리
+            if (rotatedBitmap != originalBitmap) originalBitmap.recycle()
+            if (croppedBitmap != rotatedBitmap) rotatedBitmap.recycle()
+            if (resizedBitmap != croppedBitmap && resizedBitmap != finalBitmap) resizedBitmap.recycle()
 
-            // 원본 이미지 그리기
-            canvas.drawBitmap(bitmap, 0f, 0f, null)
-
-            // TODO: 템플릿 실제 적용 로직 (추후 구현)
-            // 현재는 원본 그대로 반환
-
-            resultBitmap
+            finalBitmap
         } catch (e: Exception) {
             Log.e(TAG, "이미지 생성 실패", e)
             null
         }
+    }
+
+    /**
+     * EXIF 정보를 읽어서 이미지 회전 수정
+     */
+    private fun fixImageRotation(uri: Uri, bitmap: Bitmap): Bitmap {
+        try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return bitmap
+            val exif = androidx.exifinterface.media.ExifInterface(inputStream)
+            val orientation = exif.getAttributeInt(
+                androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION,
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL
+            )
+
+            val matrix = android.graphics.Matrix()
+            when (orientation) {
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.postScale(-1f, 1f)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.postScale(1f, -1f)
+                else -> return bitmap
+            }
+
+            val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            Log.d(TAG, "이미지 회전 처리: orientation=$orientation")
+            return rotatedBitmap
+        } catch (e: Exception) {
+            Log.e(TAG, "회전 처리 실패", e)
+            return bitmap
+        }
+    }
+
+    /**
+     * 1:1 정사각형으로 크롭 (중앙 기준)
+     */
+    private fun cropToSquare(bitmap: Bitmap): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+
+        if (width == height) {
+            return bitmap
+        }
+
+        val size = minOf(width, height)
+        val x = (width - size) / 2
+        val y = (height - size) / 2
+
+        val croppedBitmap = Bitmap.createBitmap(bitmap, x, y, size, size)
+        Log.d(TAG, "1:1 크롭 완료: ${width}x${height} -> ${size}x${size}")
+        return croppedBitmap
+    }
+
+    /**
+     * 최대 크기 제한 (메모리 및 용량 절약)
+     */
+    private fun resizeIfNeeded(bitmap: Bitmap, maxSize: Int): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+
+        if (width <= maxSize && height <= maxSize) {
+            return bitmap
+        }
+
+        val scale = maxSize.toFloat() / maxOf(width, height)
+        val newWidth = (width * scale).toInt()
+        val newHeight = (height * scale).toInt()
+
+        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+        Log.d(TAG, "리사이즈 완료: ${width}x${height} -> ${newWidth}x${newHeight}")
+        return resizedBitmap
+    }
+
+    /**
+     * 템플릿 적용 (추후 구현)
+     */
+    private fun applyTemplate(bitmap: Bitmap): Bitmap {
+        val resultBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
+        val canvas = Canvas(resultBitmap)
+        canvas.drawBitmap(bitmap, 0f, 0f, null)
+
+        // TODO: 템플릿 텍스트/이미지 오버레이
+
+        return resultBitmap
     }
 
     /**
@@ -430,10 +522,11 @@ class PhotoSaveActivity : AppCompatActivity() {
 
             val file = File(picturesDir, fileName)
             FileOutputStream(file).use { out ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out)
+                // iOS와 동일하게 품질 85% (용량 최적화)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
             }
 
-            Log.d(TAG, "로컬 저장 성공: ${file.absolutePath}")
+            Log.d(TAG, "로컬 저장 성공: ${file.absolutePath}, 크기: ${file.length() / 1024}KB")
             file
         } catch (e: Exception) {
             Log.e(TAG, "로컬 저장 실패", e)
@@ -448,10 +541,11 @@ class PhotoSaveActivity : AppCompatActivity() {
         try {
             val tempFile = File(cacheDir, fileName)
             FileOutputStream(tempFile).use { out ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out)
+                // iOS와 동일하게 품질 85% (용량 최적화)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
             }
 
-            Log.d(TAG, "임시 파일 생성 성공: ${tempFile.absolutePath}")
+            Log.d(TAG, "임시 파일 생성 성공: ${tempFile.absolutePath}, 크기: ${tempFile.length() / 1024}KB")
             tempFile
         } catch (e: Exception) {
             Log.e(TAG, "임시 파일 생성 실패", e)
@@ -480,7 +574,8 @@ class PhotoSaveActivity : AppCompatActivity() {
 
             if (uri != null) {
                 contentResolver.openOutputStream(uri)?.use { outputStream ->
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)
+                    // iOS와 동일하게 품질 85% (용량 최적화)
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

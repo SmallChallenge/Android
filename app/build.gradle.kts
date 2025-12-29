@@ -107,4 +107,7 @@ dependencies {
 
     // Kakao SDK
     implementation("com.kakao.sdk:v2-user:2.19.0") // 카카오 로그인
+
+    // ExifInterface
+    implementation("androidx.exifinterface:exifinterface:1.3.6")
 }
