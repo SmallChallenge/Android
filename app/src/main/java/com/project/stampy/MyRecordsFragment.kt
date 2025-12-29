@@ -12,11 +12,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.model.Photo
-import java.io.File
+import com.project.stampy.data.network.RetrofitClient
+import com.project.stampy.data.repository.ImageRepository
 import com.project.stampy.utils.showToast
+import kotlinx.coroutines.launch
+import java.io.File
 
 class MyRecordsFragment : Fragment() {
 
@@ -46,6 +51,10 @@ class MyRecordsFragment : Fragment() {
     private lateinit var photoAdapter: PhotoGridAdapter
     private var selectedCategory = "전체"
 
+    // 서버 API 관련
+    private lateinit var tokenManager: TokenManager
+    private lateinit var imageRepository: ImageRepository
+
     // 카테고리 뷰 맵
     private val categoryViews by lazy {
         mapOf(
@@ -67,6 +76,11 @@ class MyRecordsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // 서버 API 초기화
+        tokenManager = TokenManager(requireContext())
+        RetrofitClient.initialize(tokenManager)
+        imageRepository = ImageRepository(tokenManager)
 
         // View 초기화
         initViews(view)
@@ -196,9 +210,72 @@ class MyRecordsFragment : Fragment() {
     }
 
     /**
-     * 사진 로드
+     * 사진 로드 (서버 + 로컬 통합)
      */
     fun loadPhotos() {
+        // 로그인 상태에 따라 다르게 처리
+        if (tokenManager.isLoggedIn()) {
+            loadServerPhotos()  // 로그인: 서버 사진
+        } else {
+            loadLocalPhotos()   // 비로그인: 로컬 사진
+        }
+    }
+
+    /**
+     * 서버에서 사진 로드 (로그인 사용자)
+     */
+    private fun loadServerPhotos() {
+        // 카테고리 매핑
+        val categoryCode = when (selectedCategory) {
+            "공부" -> "STUDY"
+            "운동" -> "EXERCISE"
+            "음식" -> "FOOD"
+            "기타" -> "ETC"
+            else -> null  // 전체
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                imageRepository.getMyImages(
+                    category = categoryCode,
+                    page = 0,
+                    size = 100
+                ).onSuccess { response ->
+                    Log.d("MyRecordsFragment", "서버 사진 ${response.images.size}개 로드됨")  // ⭐ content → images
+
+                    if (response.images.isEmpty()) {  // ⭐ content → images
+                        showEmptyState()
+                    } else {
+                        // ImageItem을 Photo로 변환
+                        val photos = response.images.map { imageItem ->  // ⭐ content → images
+                            // 더미 File 객체 (서버 URL만 사용)
+                            Photo(
+                                file = File(imageItem.imageId.toString()),  // ⭐ 더미 이름
+                                category = selectedCategory,
+                                serverUrl = imageItem.accessUrl,
+                                imageId = imageItem.imageId
+                            )
+                        }
+
+                        photoAdapter.setPhotos(photos)
+                        hideEmptyState()
+                    }
+                }.onFailure { error ->
+                    Log.e("MyRecordsFragment", "서버 사진 로드 실패", error)
+                    showEmptyState()
+                    showToast("사진을 불러올 수 없습니다")
+                }
+            } catch (e: Exception) {
+                Log.e("MyRecordsFragment", "사진 로드 오류", e)
+                showEmptyState()
+            }
+        }
+    }
+
+    /**
+     * 로컬에서 사진 로드 (비로그인 사용자)
+     */
+    private fun loadLocalPhotos() {
         val picturesDir = File(requireContext().filesDir, "Pictures")
 
         if (!picturesDir.exists() || !picturesDir.isDirectory) {
@@ -217,7 +294,7 @@ class MyRecordsFragment : Fragment() {
             val photos = photoFiles.map { Photo(it, category = selectedCategory) }
             photoAdapter.setPhotos(photos)
 
-            Log.d("MyRecordsFragment", "사진 ${photos.size}개 로드됨")
+            Log.d("MyRecordsFragment", "로컬 사진 ${photos.size}개 로드됨")
         }
     }
 
