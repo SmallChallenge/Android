@@ -15,8 +15,13 @@ import java.io.File
 class ImageRepository(
     private val tokenManager: TokenManager
 ) {
+    // 일반 API 서비스
     private val imageApi: ImageApiService =
         RetrofitClient.createService(ImageApiService::class.java)
+
+    // S3 전용 API 서비스 (iOS와 동일한 최소 헤더)
+    private val s3Api: ImageApiService =
+        RetrofitClient.createS3Service(ImageApiService::class.java)
 
     /**
      * 공통 API(서버 오류) 호출 처리
@@ -42,20 +47,24 @@ class ImageRepository(
      * 1. Presigned URL 생성
      * 2. S3에 업로드
      * 3. 메타데이터 저장
+     *
+     * CRITICAL: Content-Type을 image/jpeg로 통일! (백엔드 Presigned URL 서명과 일치)
      */
     suspend fun uploadImage(
         imageFile: File,
         category: String = "ETC", // "STUDY", "EXERCISE", "FOOD", "ETC"
-        visibility: String = "PRIVATE", // "PRIVATE", "PUBLIC"
-        contentType: String = "image/jpeg"
+        visibility: String = "PRIVATE" // "PRIVATE", "PUBLIC"
     ): Result<ImageSaveResponse> {
         return try {
             val token = "Bearer ${tokenManager.getAccessToken()}"
 
+            // CRITICAL: contentType을 image/jpeg로 고정 (백엔드 Presigned URL 서명과 일치)
+            val contentType = "image/jpeg"
+
             // 1. Presigned URL 요청
             val presignedRequest = PresignedUrlRequest(
                 filename = imageFile.name,
-                contentType = contentType,
+                contentType = contentType,  // image/jpeg
                 fileSize = imageFile.length()
             )
 
@@ -67,11 +76,12 @@ class ImageRepository(
 
             val presignedData = presignedResponse.body()!!.data!!
 
-            // 2. S3에 이미지 업로드
+            // 2. S3에 이미지 업로드 (iOS와 동일한 최소 헤더)
             val requestBody = imageFile.asRequestBody(contentType.toMediaType())
-            val uploadResponse = imageApi.uploadToS3(
+            val uploadResponse = s3Api.uploadToS3(  // s3Api 사용
                 url = presignedData.uploadUrl,
-                contentType = contentType,
+                contentType = contentType,  // image/jpeg (백엔드 서명과 일치)
+                acl = "public-read",  // ACL 헤더 포함 (iOS와 동일)
                 file = requestBody
             )
 
@@ -83,7 +93,7 @@ class ImageRepository(
             val saveRequest = ImageSaveRequest(
                 originalFilename = imageFile.name,
                 objectKey = presignedData.objectKey,
-                contentType = contentType,
+                contentType = contentType,  // image/jpg
                 fileSize = imageFile.length(),
                 category = category,
                 visibility = visibility

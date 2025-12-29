@@ -1,7 +1,6 @@
 package com.project.stampy
 
 import android.Manifest
-import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Rect
@@ -70,7 +69,7 @@ class CameraActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "CameraActivity"
         private const val TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss"
-        private const val FILE_PREFIX = "STAMPY_"
+        private const val FILE_PREFIX = "STAMPY_TEMP_"
         private const val FILE_EXTENSION = ".jpg"
 
         fun generateFileName(): String {
@@ -340,98 +339,35 @@ class CameraActivity : AppCompatActivity() {
     }
 
     /**
-     * 사진 촬영
+     * 사진 촬영 - 임시 파일로만 저장
      */
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
 
-        // 1. 앱 내부 저장소에 저장
-        val appFile = createAppPhotoFile()
-        val appOutputOptions = ImageCapture.OutputFileOptions.Builder(appFile).build()
+        // 임시 파일로 저장 (캐시 디렉토리)
+        val tempFile = File(cacheDir, generateFileName())
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(tempFile).build()
 
         imageCapture.takePicture(
-            appOutputOptions,
+            outputOptions,
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    Log.d(TAG, "앱 저장소 저장: ${appFile.absolutePath}")
+                    val savedUri = Uri.fromFile(tempFile)
+                    Log.d(TAG, "임시 사진 저장: ${tempFile.absolutePath}")
 
-                    // 2. 갤러리(공용 저장소)에도 저장
-                    val savedUri = saveToGallery(appFile)
-                    showToast("사진 저장 완료!")
-
-                    // 3. 사진 편집 화면으로 이동
-                    if (savedUri != null) {
-                        val intent = Intent(this@CameraActivity, PhotoEditActivity::class.java)
-                        intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_URI, savedUri)
-                        startActivity(intent)
-                    }
-
-                    finish()
+                    // 사진 편집 화면으로 이동
+                    val intent = Intent(this@CameraActivity, PhotoEditActivity::class.java)
+                    intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_URI, savedUri)
+                    startActivity(intent)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    showToast("사진 저장 실패: ${exception.message}")
-                    Log.e(TAG, "사진 저장 실패", exception)
+                    showToast("사진 촬영 실패: ${exception.message}")
+                    Log.e(TAG, "사진 촬영 실패", exception)
                 }
             }
         )
-    }
-
-    /**
-     * 앱 내부 저장소에 파일 생성
-     */
-    private fun createAppPhotoFile(): File {
-        val picturesDir = File(filesDir, "Pictures").apply {
-            if (!exists()) mkdirs()
-        }
-        return File(picturesDir, generateFileName())
-    }
-
-    /**
-     * 갤러리(공용 저장소)에 저장
-     */
-    private fun saveToGallery(sourceFile: File): Uri? {
-        try {
-            val displayName = generateFileName()
-
-            val contentValues = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
-                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
-
-                // Android 10 (Q) 이상
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Stampy")
-                    put(MediaStore.Images.Media.IS_PENDING, 1)
-                }
-            }
-
-            val contentResolver = contentResolver
-            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-            if (uri != null) {
-                contentResolver.openOutputStream(uri)?.use { outputStream ->
-                    sourceFile.inputStream().use { inputStream ->
-                        inputStream.copyTo(outputStream)
-                    }
-                }
-
-                // Android 10 이상: IS_PENDING을 0으로 설정하여 완료 표시
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    contentValues.clear()
-                    contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-                    contentResolver.update(uri, contentValues, null, null)
-                }
-
-                Log.d(TAG, "갤러리 저장 성공: $uri")
-                return uri
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "갤러리 저장 실패", e)
-        }
-        return null
     }
 
     /**

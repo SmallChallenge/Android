@@ -1,18 +1,40 @@
 package com.project.stampy
 
+import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
+import com.project.stampy.data.local.NonLoginPhotoManager
+import com.project.stampy.data.local.PhotoMetadataManager
+import com.project.stampy.data.local.TokenManager
+import com.project.stampy.data.model.PhotoMetadata
+import com.project.stampy.data.network.RetrofitClient
+import com.project.stampy.data.repository.ImageRepository
 import com.project.stampy.ui.components.TagView
+import com.project.stampy.ui.dialog.DoubleButtonDialog
 import com.project.stampy.utils.showToast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 class PhotoSaveActivity : AppCompatActivity() {
 
@@ -42,6 +64,12 @@ class PhotoSaveActivity : AppCompatActivity() {
     private lateinit var tvCategoryError: TextView
     private lateinit var tvPrivacyError: TextView
 
+    // 로그인 관련
+    private lateinit var tokenManager: TokenManager
+    private lateinit var imageRepository: ImageRepository
+    private lateinit var nonLoginPhotoManager: NonLoginPhotoManager
+    private lateinit var photoMetadataManager: PhotoMetadataManager
+
     private var selectedCategory: String? = null
     private var isPublic: Boolean? = null  // null: 미선택, true: 공개, false: 비공개
 
@@ -49,13 +77,43 @@ class PhotoSaveActivity : AppCompatActivity() {
     private var templateName: String? = null
 
     companion object {
+        private const val TAG = "PhotoSaveActivity"
         const val EXTRA_PHOTO_URI = "extra_photo_uri"
         const val EXTRA_TEMPLATE_NAME = "extra_template_name"
+
+        private const val TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss"
+        private const val FILE_PREFIX = "STAMPY_"
+        private const val FILE_EXTENSION = ".jpg"
+
+        fun generateFileName(): String {
+            val timestamp = SimpleDateFormat(TIMESTAMP_FORMAT, Locale.getDefault())
+                .format(Date())
+            return "$FILE_PREFIX$timestamp$FILE_EXTENSION"
+        }
+    }
+
+    // 로그인 결과 처리
+    private val loginLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // 로그인 성공 - 전체 공개 상태로 재설정하고 저장
+            Log.d(TAG, "로그인 성공 - 전체 공개로 저장 진행")
+            selectPrivacy(true)
+            savePhoto()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_save)
+
+        // 매니저 초기화
+        tokenManager = TokenManager(this)
+        RetrofitClient.initialize(tokenManager)
+        imageRepository = ImageRepository(tokenManager)
+        nonLoginPhotoManager = NonLoginPhotoManager(this)
+        photoMetadataManager = PhotoMetadataManager(this)
 
         // Intent로 전달받은 데이터
         photoUri = intent.getParcelableExtra(EXTRA_PHOTO_URI)
@@ -70,7 +128,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         // 상단바
         btnBackTouchArea = findViewById(R.id.btn_back_touch_area)
 
-        // 완료 버튼 - include의 id로 직접 찾기
+        // 완료 버튼
         btnComplete = findViewById(R.id.btn_complete)
         btnComplete?.text = "완료"
 
@@ -84,7 +142,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         categoryFood = findViewById(R.id.category_food)
         categoryEtc = findViewById(R.id.category_etc)
 
-        // 카테고리 FrameLayout (각각 id로 직접 찾기)
+        // 카테고리 FrameLayout
         categoryStudyFrame = findViewById(R.id.frame_study)
         categoryExerciseFrame = findViewById(R.id.frame_exercise)
         categoryFoodFrame = findViewById(R.id.frame_food)
@@ -108,14 +166,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         // 완료 버튼
         btnComplete?.setOnClickListener {
             if (validateInputs()) {
-                // TODO: 사진 저장 로직
-                showToast("사진이 저장되었습니다")
-
-                // 메인 화면으로 돌아가기 (모든 이전 Activity 제거)
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                startActivity(intent)
-                finish()
+                savePhoto()
             }
         }
 
@@ -139,13 +190,392 @@ class PhotoSaveActivity : AppCompatActivity() {
 
         // 공개 여부 태그
         tagPublic.setOnClickListener {
-            selectPrivacy(true)
-            hideError(tvPrivacyError)
+            // 비로그인 유저가 전체 공개 선택 시 로그인 요청
+            if (!tokenManager.isLoggedIn()) {
+                showLoginRequiredDialog()
+            } else {
+                selectPrivacy(true)
+                hideError(tvPrivacyError)
+            }
         }
         tagPrivate.setOnClickListener {
             selectPrivacy(false)
             hideError(tvPrivacyError)
         }
+    }
+
+    /**
+     * 로그인 필요 다이얼로그 표시
+     */
+    private fun showLoginRequiredDialog() {
+        DoubleButtonDialog(this)
+            .setTitle("로그인이 필요해요.")
+            .setDescription("지금 로그인할까요?")
+            .setCancelButtonText("취소")
+            .setConfirmButtonText("확인")
+            .setOnCancelListener {
+                Log.d(TAG, "로그인 취소")
+            }
+            .setOnConfirmListener {
+                Log.d(TAG, "로그인 화면으로 이동")
+                navigateToLogin()
+            }
+            .show()
+    }
+
+    /**
+     * 로그인 화면으로 이동
+     */
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        loginLauncher.launch(intent)
+    }
+
+    /**
+     * 사진 저장 로직
+     */
+    private fun savePhoto() {
+        val uri = photoUri ?: run {
+            showToast("사진 정보가 없습니다")
+            return
+        }
+
+        val category = selectedCategory ?: run {
+            showToast("카테고리를 선택해주세요")
+            return
+        }
+
+        val isLoggedIn = tokenManager.isLoggedIn()
+
+        // 비로그인 유저 - 20장 제한 체크
+        if (!isLoggedIn) {
+            if (!nonLoginPhotoManager.canSaveMorePhotos()) {
+                showToast("비로그인 상태에서는 최대 ${nonLoginPhotoManager.getMaxPhotos()}장까지 저장 가능합니다")
+                return
+            }
+        }
+
+        // 로딩 시작
+        btnComplete?.isEnabled = false
+        showToast("저장 중...")
+
+        lifecycleScope.launch {
+            try {
+                // 1. 템플릿 적용된 최종 이미지 생성
+                val finalBitmap = createFinalImage(uri) ?: run {
+                    showToast("이미지 생성 실패")
+                    btnComplete?.isEnabled = true
+                    return@launch
+                }
+
+                val fileName = generateFileName()
+                val categoryCode = mapCategoryToCode(category)
+                val visibility = if (isPublic == true) "PUBLIC" else "PRIVATE"
+
+                if (isLoggedIn) {
+                    // 로그인 유저: 갤러리 + 서버 저장
+                    savePhotoForLoggedInUser(finalBitmap, fileName, categoryCode, visibility)
+                } else {
+                    // 비로그인 유저: 로컬 + 갤러리 저장
+                    savePhotoForNonLoggedInUser(finalBitmap, fileName, categoryCode, visibility)
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "사진 저장 실패", e)
+                showToast("사진 저장 실패: ${e.message}")
+                btnComplete?.isEnabled = true
+            }
+        }
+    }
+
+    /**
+     * 비로그인 유저 - 사진 저장
+     * 로컬 + 갤러리
+     */
+    private suspend fun savePhotoForNonLoggedInUser(
+        bitmap: Bitmap,
+        fileName: String,
+        category: String,
+        visibility: String
+    ) {
+        Log.d(TAG, "비로그인 유저 저장: 로컬 + 갤러리")
+
+        // 1. 로컬에 저장
+        val localFile = saveToLocal(bitmap, fileName)
+        if (localFile == null) {
+            withContext(Dispatchers.Main) {
+                showToast("로컬 저장 실패")
+                btnComplete?.isEnabled = true
+            }
+            return
+        }
+
+        // 2. 갤러리에 저장
+        val galleryUri = saveToGallery(bitmap, fileName)
+        if (galleryUri == null) {
+            withContext(Dispatchers.Main) {
+                showToast("갤러리 저장 실패")
+                btnComplete?.isEnabled = true
+            }
+            return
+        }
+
+        // 3. 메타데이터 저장
+        val metadata = PhotoMetadata(
+            fileName = fileName,
+            category = category,
+            visibility = visibility,
+            createdAt = System.currentTimeMillis(),
+            templateName = templateName,
+            isServerUploaded = false
+        )
+        photoMetadataManager.saveMetadata(metadata)
+
+        // 4. 카운트 증가
+        nonLoginPhotoManager.incrementPhotoCount()
+
+        Log.d(TAG, "비로그인 저장 완료: ${nonLoginPhotoManager.getPhotoCount()}/${nonLoginPhotoManager.getMaxPhotos()}")
+
+        withContext(Dispatchers.Main) {
+            showToast("사진이 저장되었습니다")
+            navigateToMain()
+        }
+    }
+
+    /**
+     * 로그인 유저 - 사진 저장
+     * 갤러리 + 서버 (+ 전체공개시 커뮤니티)
+     */
+    private suspend fun savePhotoForLoggedInUser(
+        bitmap: Bitmap,
+        fileName: String,
+        category: String,
+        visibility: String
+    ) {
+        Log.d(TAG, "로그인 유저 저장: 갤러리 + 서버")
+
+        // 1. 갤러리에 저장
+        val galleryUri = saveToGallery(bitmap, fileName)
+        if (galleryUri == null) {
+            withContext(Dispatchers.Main) {
+                showToast("갤러리 저장 실패")
+                btnComplete?.isEnabled = true
+            }
+            return
+        }
+
+        // 2. 임시 파일 생성 (서버 업로드용)
+        val tempFile = saveTempFile(bitmap, fileName)
+        if (tempFile == null) {
+            withContext(Dispatchers.Main) {
+                showToast("임시 파일 생성 실패")
+                btnComplete?.isEnabled = true
+            }
+            return
+        }
+
+        // 3. 메타데이터 저장 (서버 업로드 전)
+        val metadata = PhotoMetadata(
+            fileName = fileName,
+            category = category,
+            visibility = visibility,
+            createdAt = System.currentTimeMillis(),
+            templateName = templateName,
+            isServerUploaded = false
+        )
+        photoMetadataManager.saveMetadata(metadata)
+
+        // 4. 서버 업로드
+        uploadToServer(tempFile, category, visibility, fileName)
+    }
+
+    /**
+     * 템플릿 적용된 최종 이미지 생성
+     */
+    private suspend fun createFinalImage(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
+        try {
+            // 원본 이미지 로드
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+
+            // 템플릿이 없으면 원본 반환
+            if (templateName.isNullOrEmpty()) {
+                return@withContext bitmap
+            }
+
+            // 템플릿 적용 (현재는 텍스트 오버레이만)
+            val resultBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
+            val canvas = Canvas(resultBitmap)
+
+            // 원본 이미지 그리기
+            canvas.drawBitmap(bitmap, 0f, 0f, null)
+
+            // TODO: 템플릿 실제 적용 로직 (추후 구현)
+            // 현재는 원본 그대로 반환
+
+            resultBitmap
+        } catch (e: Exception) {
+            Log.e(TAG, "이미지 생성 실패", e)
+            null
+        }
+    }
+
+    /**
+     * 로컬(앱 내부)에 저장 - 비로그인 유저만
+     */
+    private suspend fun saveToLocal(bitmap: Bitmap, fileName: String): File? = withContext(Dispatchers.IO) {
+        try {
+            val picturesDir = File(filesDir, "Pictures").apply {
+                if (!exists()) mkdirs()
+            }
+
+            val file = File(picturesDir, fileName)
+            FileOutputStream(file).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out)
+            }
+
+            Log.d(TAG, "로컬 저장 성공: ${file.absolutePath}")
+            file
+        } catch (e: Exception) {
+            Log.e(TAG, "로컬 저장 실패", e)
+            null
+        }
+    }
+
+    /**
+     * 임시 파일 저장 - 서버 업로드용 (로그인 유저)
+     */
+    private suspend fun saveTempFile(bitmap: Bitmap, fileName: String): File? = withContext(Dispatchers.IO) {
+        try {
+            val tempFile = File(cacheDir, fileName)
+            FileOutputStream(tempFile).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out)
+            }
+
+            Log.d(TAG, "임시 파일 생성 성공: ${tempFile.absolutePath}")
+            tempFile
+        } catch (e: Exception) {
+            Log.e(TAG, "임시 파일 생성 실패", e)
+            null
+        }
+    }
+
+    /**
+     * 갤러리(공용 저장소)에 저장 - 모든 유저
+     */
+    private suspend fun saveToGallery(bitmap: Bitmap, fileName: String): Uri? = withContext(Dispatchers.IO) {
+        try {
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Stampy")
+                    put(MediaStore.Images.Media.IS_PENDING, 1)
+                }
+            }
+
+            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+            if (uri != null) {
+                contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    contentValues.clear()
+                    contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                    contentResolver.update(uri, contentValues, null, null)
+                }
+
+                Log.d(TAG, "갤러리 저장 성공: $uri")
+                return@withContext uri
+            }
+
+            null
+        } catch (e: Exception) {
+            Log.e(TAG, "갤러리 저장 실패", e)
+            null
+        }
+    }
+
+    /**
+     * 서버에 업로드 (Swagger API 참고) - 로그인 유저만
+     */
+    private suspend fun uploadToServer(
+        file: File,
+        category: String,
+        visibility: String,
+        fileName: String
+    ) = withContext(Dispatchers.IO) {
+        try {
+            Log.d(TAG, "서버 업로드 시작: category=$category, visibility=$visibility")
+
+            val result = imageRepository.uploadImage(
+                imageFile = file,
+                category = category,
+                visibility = visibility
+            )
+
+            withContext(Dispatchers.Main) {
+                result.onSuccess { response ->
+                    Log.d(TAG, "서버 업로드 성공: imageId=${response.imageId}")
+
+                    // 메타데이터 업데이트
+                    photoMetadataManager.updateServerUploadStatus(fileName, true)
+
+                    // 임시 파일 삭제
+                    file.delete()
+
+                    // TODO: 전체 공개인 경우 커뮤니티 업로드 (추후 개발)
+                    if (visibility == "PUBLIC") {
+                        Log.d(TAG, "전체 공개 - 커뮤니티 업로드 예정 (TODO)")
+                        // uploadToCommunity(response.imageId)
+                    }
+
+                    showToast("사진이 저장되었습니다")
+                    navigateToMain()
+
+                }.onFailure { error ->
+                    Log.e(TAG, "서버 업로드 실패: ${error.message}", error)
+                    // 서버 업로드 실패해도 갤러리는 저장됨
+                    file.delete()
+                    showToast("갤러리 저장 완료 (서버 업로드 실패)")
+                    navigateToMain()
+                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Log.e(TAG, "서버 업로드 오류", e)
+                file.delete()
+                showToast("갤러리 저장 완료 (서버 업로드 실패)")
+                navigateToMain()
+            }
+        }
+    }
+
+    /**
+     * 카테고리 한글 → 영문 코드 변환
+     */
+    private fun mapCategoryToCode(category: String): String {
+        return when (category) {
+            "공부" -> "STUDY"
+            "운동" -> "EXERCISE"
+            "음식" -> "FOOD"
+            "기타" -> "ETC"
+            else -> "ETC"
+        }
+    }
+
+    /**
+     * 메인 화면으로 이동
+     */
+    private fun navigateToMain() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
     }
 
     /**

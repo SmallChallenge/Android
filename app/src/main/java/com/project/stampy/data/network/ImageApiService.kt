@@ -32,9 +32,14 @@ interface ImageApiService {
      * S3에 이미지 업로드 (Presigned URL 사용)
      */
     @PUT
+    @Headers(
+        "Accept: */*",
+        "Accept-Encoding: identity"  // gzip 압축 비활성화
+    )
     suspend fun uploadToS3(
         @Url url: String,
         @Header("Content-Type") contentType: String,
+        @Header("x-amz-acl") acl: String,
         @Body file: RequestBody
     ): Response<Unit>
 
