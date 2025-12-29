@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -45,7 +46,7 @@ class MyRecordsFragment : Fragment() {
     private lateinit var tvCategoryEtc: TextView
 
     private lateinit var rvPhotos: RecyclerView
-    private lateinit var tvEmptyState: TextView
+    private lateinit var emptyStateContainer: ConstraintLayout
     private lateinit var btnProfile: ImageView
 
     private lateinit var photoAdapter: PhotoGridAdapter
@@ -118,7 +119,7 @@ class MyRecordsFragment : Fragment() {
         tvCategoryEtc = view.findViewById(R.id.tv_category_etc)
 
         rvPhotos = view.findViewById(R.id.rv_photos)
-        tvEmptyState = view.findViewById(R.id.tv_empty_state)
+        emptyStateContainer = view.findViewById(R.id.empty_state_container)
         btnProfile = view.findViewById(R.id.btn_profile)
     }
 
@@ -299,12 +300,12 @@ class MyRecordsFragment : Fragment() {
 
     private fun showEmptyState() {
         rvPhotos.visibility = View.GONE
-        tvEmptyState.visibility = View.VISIBLE
+        emptyStateContainer.visibility = View.VISIBLE
     }
 
     private fun hideEmptyState() {
         rvPhotos.visibility = View.VISIBLE
-        tvEmptyState.visibility = View.GONE
+        emptyStateContainer.visibility = View.GONE
     }
 }
 
