@@ -396,34 +396,77 @@ class PhotoSaveActivity : AppCompatActivity() {
      */
     private suspend fun createFinalImage(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
         try {
-            // 1. 원본 이미지 로드
-            val originalBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-
-            // 2. EXIF 정보 읽어서 회전 처리
-            val rotatedBitmap = fixImageRotation(uri, originalBitmap)
-
-            // 3. 1:1 비율로 크롭 (정사각형)
-            val croppedBitmap = cropToSquare(rotatedBitmap)
-
-            // 4. 최대 크기 제한 (iOS와 동일하게, 메모리 절약)
-            val resizedBitmap = resizeIfNeeded(croppedBitmap, maxSize = 2048)
-
-            // 5. 템플릿 적용 (있는 경우)
-            val finalBitmap = if (!templateName.isNullOrEmpty()) {
-                applyTemplate(resizedBitmap)
-            } else {
-                resizedBitmap
+            // 화면에 보이는 그대로 캡처 (템플릿 포함)
+            val finalBitmap = withContext(Dispatchers.Main) {
+                captureViewAsBitmap()
             }
+
+            if (finalBitmap != null) {
+                // 1:1 크롭
+                val croppedBitmap = cropToSquare(finalBitmap)
+
+                // 최대 크기 제한
+                val resizedBitmap = resizeIfNeeded(croppedBitmap, maxSize = 2048)
+
+                // 메모리 정리
+                if (croppedBitmap != finalBitmap && croppedBitmap != resizedBitmap) {
+                    croppedBitmap.recycle()
+                }
+                if (finalBitmap != resizedBitmap) {
+                    finalBitmap.recycle()
+                }
+
+                return@withContext resizedBitmap
+            }
+
+            // 폴백: 화면 캡처 실패 시 원본 이미지 처리
+            Log.w(TAG, "화면 캡처 실패, 원본 이미지로 처리")
+            val originalBitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+            val rotatedBitmap = fixImageRotation(uri, originalBitmap)
+            val croppedBitmap = cropToSquare(rotatedBitmap)
+            val resizedBitmap = resizeIfNeeded(croppedBitmap, maxSize = 2048)
 
             // 메모리 정리
             if (rotatedBitmap != originalBitmap) originalBitmap.recycle()
-            if (croppedBitmap != rotatedBitmap) rotatedBitmap.recycle()
-            if (resizedBitmap != croppedBitmap && resizedBitmap != finalBitmap) resizedBitmap.recycle()
+            if (croppedBitmap != rotatedBitmap && croppedBitmap != resizedBitmap) croppedBitmap.recycle()
+            if (rotatedBitmap != resizedBitmap) rotatedBitmap.recycle()
 
-            finalBitmap
+            resizedBitmap
         } catch (e: Exception) {
             Log.e(TAG, "이미지 생성 실패", e)
             null
+        }
+    }
+
+    /**
+     * 화면에 보이는 뷰를 비트맵으로 캡처 (템플릿 포함)
+     * 반드시 Main 스레드에서 호출!
+     */
+    private fun captureViewAsBitmap(): Bitmap? {
+        try {
+            // ivPhoto와 tvTemplateOverlay를 포함하는 부모 뷰 찾기
+            val parentView = ivPhoto.parent as? View ?: return null
+
+            // 뷰가 그려지지 않았으면 null 반환
+            if (parentView.width == 0 || parentView.height == 0) {
+                Log.w(TAG, "뷰 크기가 0, 캡처 불가")
+                return null
+            }
+
+            // 비트맵 생성
+            val bitmap = Bitmap.createBitmap(
+                parentView.width,
+                parentView.height,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            parentView.draw(canvas)
+
+            Log.d(TAG, "화면 캡처 완료: ${parentView.width}x${parentView.height}")
+            return bitmap
+        } catch (e: Exception) {
+            Log.e(TAG, "화면 캡처 실패", e)
+            return null
         }
     }
 
@@ -496,19 +539,6 @@ class PhotoSaveActivity : AppCompatActivity() {
         val resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
         Log.d(TAG, "리사이즈 완료: ${width}x${height} -> ${newWidth}x${newHeight}")
         return resizedBitmap
-    }
-
-    /**
-     * 템플릿 적용 (추후 구현)
-     */
-    private fun applyTemplate(bitmap: Bitmap): Bitmap {
-        val resultBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
-        val canvas = Canvas(resultBitmap)
-        canvas.drawBitmap(bitmap, 0f, 0f, null)
-
-        // TODO: 템플릿 텍스트/이미지 오버레이
-
-        return resultBitmap
     }
 
     /**
