@@ -22,15 +22,18 @@ import kotlinx.coroutines.launch
 
 class TermsBottomSheetDialog : BottomSheetDialogFragment() {
 
+    // 레이아웃
     private lateinit var layoutAllAgree: LinearLayout
+
+    // 체크박스
     private lateinit var ivCheckAll: ImageView
-
-    private lateinit var btnCheckTerms: LinearLayout
     private lateinit var ivCheckTerms: ImageView
-    private lateinit var btnViewTerms: FrameLayout
-
-    private lateinit var btnCheckPrivacy: LinearLayout
     private lateinit var ivCheckPrivacy: ImageView
+
+    // 클릭 영역
+    private lateinit var btnCheckTerms: LinearLayout
+    private lateinit var btnViewTerms: FrameLayout
+    private lateinit var btnCheckPrivacy: LinearLayout
     private lateinit var btnViewPrivacy: FrameLayout
 
     private lateinit var tokenManager: TokenManager
@@ -53,6 +56,12 @@ class TermsBottomSheetDialog : BottomSheetDialogFragment() {
         return inflater.inflate(R.layout.bottom_sheet_terms, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // 투명 배경 테마 적용
+        setStyle(STYLE_NORMAL, R.style.TransparentBottomSheetDialogTheme)
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
 
@@ -63,7 +72,10 @@ class TermsBottomSheetDialog : BottomSheetDialogFragment() {
             bottomSheet?.let {
                 val behavior = BottomSheetBehavior.from(it)
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                behavior.isDraggable = false  // 드래그 비활성화
+                behavior.isDraggable = false
+
+                // 배경 투명 설정
+                it.setBackgroundColor(android.graphics.Color.TRANSPARENT)
             }
         }
 
@@ -83,40 +95,43 @@ class TermsBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun initViews(view: View) {
+        // 레이아웃
         layoutAllAgree = view.findViewById(R.id.layout_all_agree)
+
+        // 체크박스
         ivCheckAll = view.findViewById(R.id.iv_check_all)
-
-        btnCheckTerms = view.findViewById(R.id.btn_check_terms)
         ivCheckTerms = view.findViewById(R.id.iv_check_terms)
-        btnViewTerms = view.findViewById(R.id.btn_view_terms)
-
-        btnCheckPrivacy = view.findViewById(R.id.btn_check_privacy)
         ivCheckPrivacy = view.findViewById(R.id.iv_check_privacy)
+
+        // 클릭 영역
+        btnCheckTerms = view.findViewById(R.id.btn_check_terms)
+        btnViewTerms = view.findViewById(R.id.btn_view_terms)
+        btnCheckPrivacy = view.findViewById(R.id.btn_check_privacy)
         btnViewPrivacy = view.findViewById(R.id.btn_view_privacy)
     }
 
     private fun setupListeners() {
-        // 전체 동의
+        // 전체 동의 레이아웃 전체 클릭
         layoutAllAgree.setOnClickListener {
             toggleAllAgree()
         }
 
-        // 이용약관 체크
+        // 이용약관 - 체크박스 영역만 클릭
         btnCheckTerms.setOnClickListener {
             toggleTermsCheck()
         }
 
-        // 이용약관 보기
+        // 이용약관 보기 (화살표)
         btnViewTerms.setOnClickListener {
             openWebView(TERMS_URL)
         }
 
-        // 개인정보 체크
+        // 개인정보 - 체크박스 영역만 클릭
         btnCheckPrivacy.setOnClickListener {
             togglePrivacyCheck()
         }
 
-        // 개인정보 보기
+        // 개인정보 보기 (화살표)
         btnViewPrivacy.setOnClickListener {
             openWebView(PRIVACY_URL)
         }
