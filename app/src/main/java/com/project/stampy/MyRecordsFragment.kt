@@ -209,16 +209,16 @@ class MyRecordsFragment : Fragment() {
     fun loadPhotos() {
         // 로그인 상태에 따라 다르게 처리
         if (tokenManager.isLoggedIn()) {
-            loadServerPhotos()  // 로그인: 서버 사진
+            loadServerAndLocalPhotos()  // 로그인: 서버 사진 + 로컬 사진
         } else {
-            loadLocalPhotos()   // 비로그인: 로컬 사진
+            loadLocalPhotos()   // 비로그인: 로컬 사진만
         }
     }
 
     /**
-     * 서버에서 사진 로드 (로그인 사용자)
+     * 서버 + 로컬 사진 통합 로드 (로그인 사용자)
      */
-    private fun loadServerPhotos() {
+    private fun loadServerAndLocalPhotos() {
         // 카테고리 매핑
         val categoryCode = when (selectedCategory) {
             "공부" -> "STUDY"
@@ -230,6 +230,9 @@ class MyRecordsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
+                // 1. 서버 사진 로드
+                val serverPhotos = mutableListOf<Photo>()
+
                 imageRepository.getMyImages(
                     category = categoryCode,
                     page = 0,
@@ -237,31 +240,76 @@ class MyRecordsFragment : Fragment() {
                 ).onSuccess { response ->
                     Log.d("MyRecordsFragment", "서버 사진 ${response.images.size}개 로드됨")
 
-                    if (response.images.isEmpty()) {
-                        showEmptyState()
-                    } else {
-                        // ImageItem을 Photo로 변환
-                        val photos = response.images.map { imageItem ->
-                            // 더미 File 객체 (서버 URL만 사용)
-                            Photo(
-                                file = File(imageItem.imageId.toString()),
-                                category = selectedCategory,
-                                serverUrl = imageItem.accessUrl,
-                                imageId = imageItem.imageId
-                            )
-                        }
-
-                        photoAdapter.setPhotos(photos)
-                        hideEmptyState()
-                    }
+                    serverPhotos.addAll(response.images.map { imageItem ->
+                        Photo(
+                            file = File(imageItem.imageId.toString()),
+                            category = selectedCategory,
+                            serverUrl = imageItem.accessUrl,
+                            imageId = imageItem.imageId
+                        )
+                    })
                 }.onFailure { error ->
                     Log.e("MyRecordsFragment", "서버 사진 로드 실패", error)
-                    showEmptyState()
-                    showToast("사진을 불러올 수 없습니다")
                 }
+
+                // 2. 로컬 사진 로드
+                val localPhotos = loadLocalPhotosForLoggedInUser(categoryCode)
+
+                Log.d("MyRecordsFragment", "로컬 사진 ${localPhotos.size}개 로드됨")
+
+                // 3. 서버 사진 + 로컬 사진 합치기
+                val allPhotos = (serverPhotos + localPhotos)
+                    .sortedByDescending { it.file.lastModified() }
+
+                // 4. UI 업데이트
+                if (allPhotos.isEmpty()) {
+                    showEmptyState()
+                } else {
+                    photoAdapter.setPhotos(allPhotos)
+                    hideEmptyState()
+                }
+
+                Log.d("MyRecordsFragment", "전체 사진 ${allPhotos.size}개 표시 (서버: ${serverPhotos.size}, 로컬: ${localPhotos.size})")
             } catch (e: Exception) {
                 Log.e("MyRecordsFragment", "사진 로드 오류", e)
                 showEmptyState()
+            }
+        }
+    }
+
+    /**
+     * 로그인 사용자용 로컬 사진 로드
+     * (서버에 업로드되지 않은 비회원 시절 사진)
+     */
+    private fun loadLocalPhotosForLoggedInUser(categoryCode: String?): List<Photo> {
+        val picturesDir = File(requireContext().filesDir, "Pictures")
+
+        if (!picturesDir.exists() || !picturesDir.isDirectory) {
+            return emptyList()
+        }
+
+        // 1. 메타데이터 가져오기
+        val photoMetadataManager = PhotoMetadataManager(requireContext())
+
+        // 2. 선택된 카테고리에 맞는 메타데이터 필터링
+        val filteredMetadata = if (categoryCode == null) {
+            // 전체 카테고리
+            photoMetadataManager.getAllMetadata()
+        } else {
+            // 특정 카테고리
+            photoMetadataManager.getMetadataByCategory(categoryCode)
+        }
+
+        // 3. 서버에 업로드되지 않은 로컬 사진만 필터링
+        val localOnlyMetadata = filteredMetadata.filter { !it.isServerUploaded }
+
+        // 4. 메타데이터에 해당하는 실제 파일만 로드
+        return localOnlyMetadata.mapNotNull { metadata ->
+            val file = File(picturesDir, metadata.fileName)
+            if (file.exists()) {
+                Photo(file, category = selectedCategory)
+            } else {
+                null
             }
         }
     }
