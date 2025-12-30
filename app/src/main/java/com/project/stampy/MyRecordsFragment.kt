@@ -3,12 +3,16 @@ package com.project.stampy
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -16,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.project.stampy.data.local.NonLoginPhotoManager
 import com.project.stampy.data.local.PhotoMetadataManager
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.model.Photo
@@ -50,12 +55,27 @@ class MyRecordsFragment : Fragment() {
     private lateinit var emptyStateContainer: ConstraintLayout
     private lateinit var btnProfile: ImageView
 
+    // 18장 도달 배너
+    private lateinit var bannerPhotoLimit: View
+    private lateinit var btnCloseBanner: ImageView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var tvPhotoCount: TextView
+    private lateinit var tvBannerText: TextView
+
     private lateinit var photoAdapter: PhotoGridAdapter
     private var selectedCategory = "전체"
 
     // 서버 API 관련
     private lateinit var tokenManager: TokenManager
     private lateinit var imageRepository: ImageRepository
+    private lateinit var nonLoginPhotoManager: NonLoginPhotoManager
+
+    // 배너 닫힘 상태 저장
+    private var isBannerDismissed = false
+
+    companion object {
+        private const val PHOTO_LIMIT_BANNER_THRESHOLD = 18
+    }
 
     // 카테고리 뷰 맵
     private val categoryViews by lazy {
@@ -83,6 +103,7 @@ class MyRecordsFragment : Fragment() {
         tokenManager = TokenManager(requireContext())
         RetrofitClient.initialize(tokenManager)
         imageRepository = ImageRepository(tokenManager)
+        nonLoginPhotoManager = NonLoginPhotoManager(requireContext())
 
         // View 초기화
         initViews(view)
@@ -95,6 +116,9 @@ class MyRecordsFragment : Fragment() {
 
         // 프로필 버튼 클릭 리스너
         setupProfileButton()
+
+        // 배너 클릭 리스너
+        setupBannerListeners()
 
         // 사진 로드
         loadPhotos()
@@ -122,6 +146,47 @@ class MyRecordsFragment : Fragment() {
         rvPhotos = view.findViewById(R.id.rv_photos)
         emptyStateContainer = view.findViewById(R.id.empty_state_container)
         btnProfile = view.findViewById(R.id.btn_profile)
+
+        // 배너 뷰들
+        bannerPhotoLimit = view.findViewById(R.id.banner_photo_limit)
+        btnCloseBanner = bannerPhotoLimit.findViewById(R.id.btn_close_banner)
+        progressBar = bannerPhotoLimit.findViewById(R.id.progress_bar)
+        tvPhotoCount = bannerPhotoLimit.findViewById(R.id.tv_photo_count)
+        tvBannerText = bannerPhotoLimit.findViewById(R.id.tv_banner_text)
+
+        // 텍스트 볼드 처리 ("최대 20개")
+        setupBannerText()
+    }
+
+    /**
+     * 배너 텍스트 설정 ("최대 20개" 볼드 처리)
+     */
+    private fun setupBannerText() {
+        val fullText = "게스트는 기록을 최대 20개까지 남길 수 있습니다."
+        val boldText = "최대 20개"
+        val spannableString = SpannableString(fullText)
+
+        val startIndex = fullText.indexOf(boldText)
+        if (startIndex >= 0) {
+            spannableString.setSpan(
+                StyleSpan(android.graphics.Typeface.BOLD),
+                startIndex,
+                startIndex + boldText.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        tvBannerText.text = spannableString
+    }
+
+    /**
+     * 배너 클릭 리스너
+     */
+    private fun setupBannerListeners() {
+        btnCloseBanner.setOnClickListener {
+            hideBanner()
+            isBannerDismissed = true
+        }
     }
 
     private fun setupRecyclerView() {
@@ -213,6 +278,50 @@ class MyRecordsFragment : Fragment() {
         } else {
             loadLocalPhotos()   // 비로그인: 로컬 사진만
         }
+    }
+
+    /**
+     * 18장 도달 시 배너 표시
+     */
+    private fun updatePhotoLimitBanner(photoCount: Int) {
+        // 로그인 상태면 배너 숨김
+        if (tokenManager.isLoggedIn()) {
+            hideBanner()
+            return
+        }
+
+        // 배너가 이미 닫혔으면 숨김 유지
+        if (isBannerDismissed) {
+            hideBanner()
+            return
+        }
+
+        // 18장 이상이면 배너 표시
+        if (photoCount >= PHOTO_LIMIT_BANNER_THRESHOLD) {
+            showBanner(photoCount)
+        } else {
+            hideBanner()
+        }
+    }
+
+    /**
+     * 배너 표시
+     */
+    private fun showBanner(photoCount: Int) {
+        bannerPhotoLimit.visibility = View.VISIBLE
+
+        // 프로그레스 바 업데이트
+        progressBar.progress = photoCount
+
+        // 사진 개수 텍스트 업데이트
+        tvPhotoCount.text = "$photoCount/20"
+    }
+
+    /**
+     * 배너 숨김
+     */
+    private fun hideBanner() {
+        bannerPhotoLimit.visibility = View.GONE
     }
 
     /**
@@ -348,6 +457,7 @@ class MyRecordsFragment : Fragment() {
 
         if (!picturesDir.exists() || !picturesDir.isDirectory) {
             showEmptyState()
+            updatePhotoLimitBanner(0)  // 배너 업데이트
             return
         }
 
@@ -396,9 +506,13 @@ class MyRecordsFragment : Fragment() {
         } else {
             hideEmptyState()
             photoAdapter.setPhotos(photos)
-
-            Log.d("MyRecordsFragment", "비회원 로컬 사진 ${photos.size}개 로드됨 (카테고리: $selectedCategory)")
         }
+
+        // 배너 업데이트 (전체 사진 개수 기준)
+        val totalPhotoCount = nonLoginPhotoManager.getPhotoCount()
+        updatePhotoLimitBanner(totalPhotoCount)
+
+        Log.d("MyRecordsFragment", "비회원 로컬 사진 ${photos.size}개 로드됨 (전체: $totalPhotoCount)")
     }
 
     /**
