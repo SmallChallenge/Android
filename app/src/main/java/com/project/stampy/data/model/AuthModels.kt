@@ -39,7 +39,10 @@ data class SocialLoginResponse(
     val isNewUser: Boolean,
 
     @SerializedName("needNickname")
-    val needNickname: Boolean
+    val needNickname: Boolean,
+
+    @SerializedName("userStatus")
+    val userStatus: String  // "PENDING", "ACTIVE", "WITHDRAWN"
 )
 
 /**

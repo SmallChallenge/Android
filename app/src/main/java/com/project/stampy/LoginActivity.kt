@@ -289,6 +289,10 @@ class LoginActivity : AppCompatActivity() {
 
     /**
      * 소셜 로그인 API 호출
+     *
+     * 1. PENDING + needNickname=true → 약관 동의
+     * 2. ACTIVE + needNickname=true → 닉네임 설정 (약관 동의는 이미 완료됨)
+     * 3. ACTIVE + needNickname=false → 메인 화면
      */
     private fun performSocialLogin(socialType: String, accessToken: String) {
         Log.d(TAG, "Performing social login: $socialType")
@@ -301,11 +305,18 @@ class LoginActivity : AppCompatActivity() {
                     Log.d(TAG, "로그인 성공: ${response.nickname}, needNickname: ${response.needNickname}")
 
                     if (response.needNickname) {
-                        // 신규 가입자 → 약관 동의 필요
-                        Log.d(TAG, "신규 가입자 → 약관 동의 Bottom Sheet 표시")
-                        showTermsBottomSheet()
+                        // needNickname=true인 경우: userStatus 확인
+                        if (response.userStatus == "PENDING") {
+                            // PENDING: 약관 동의 필요
+                            Log.d(TAG, "신규 가입자 → 약관 동의 Bottom Sheet 표시")
+                            showTermsBottomSheet()
+                        } else {
+                            // ACTIVE: 약관 동의는 완료, 닉네임만 설정 필요
+                            Log.d(TAG, "약관 동의 완료, 닉네임 미설정 → 닉네임 설정으로 이동")
+                            navigateToNickname()
+                        }
                     } else {
-                        // 기존 가입자 → 바로 메인으로
+                        // 기존 가입자 (needNickname=false) → 메인으로
                         Log.d(TAG, "기존 가입자 → MainActivity로 이동")
                         navigateToMain()
                     }
