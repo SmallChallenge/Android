@@ -2,18 +2,22 @@ package com.project.stampy
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
+import com.project.stampy.ui.dialog.DoubleButtonDialog
+import com.project.stampy.ui.dialog.SingleButtonDialog
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
@@ -21,24 +25,29 @@ class MyPageActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
 
-    // 비로그인 상태 뷰
-    private lateinit var layoutGuest: LinearLayout
-    private lateinit var btnLogin: Button
+    // 프로필 라인
+    private lateinit var tvNickname: TextView
+    private lateinit var tvGuestRestriction: TextView
 
-    // 로그인 상태 뷰
-    private lateinit var layoutLoggedIn: LinearLayout
-    private lateinit var tvUserName: TextView
-    private lateinit var btnLogout: TextView
+    // 로그인 유도 공간 (비회원만)
+    private lateinit var layoutLoginPromotion: LinearLayout
+    private lateinit var btnLogin: MaterialButton
+    private lateinit var tvPublicFeature: TextView
 
-    // 공통 메뉴
-    private lateinit var tvAppVersion: TextView
-    private lateinit var tvWithdrawal: TextView
+    // 설정 메뉴
+    private lateinit var btnTerms: LinearLayout
+    private lateinit var btnPrivacy: LinearLayout
+    private lateinit var btnOpenSource: LinearLayout
+    private lateinit var btnLogout: LinearLayout
 
     private lateinit var tokenManager: TokenManager
     private lateinit var authRepository: AuthRepository
 
     companion object {
         private const val TAG = "MyPageActivity"
+        private const val TERMS_URL = "https://sage-hare-ff7.notion.site/2d5f2907580d80df9a21f95acd343d3f?source=copy_link"
+        private const val PRIVACY_URL = "https://sage-hare-ff7.notion.site/2d5f2907580d80eda745ccfbda543bc5?source=copy_link"
+        private const val OPEN_SOURCE_URL = "https://sage-hare-ff7.notion.site/2d8f2907580d80e4accee06ce4da69cd"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,30 +61,53 @@ class MyPageActivity : AppCompatActivity() {
 
         initViews()
         setupListeners()
+        setupPublicFeatureText()
         updateUI()
     }
 
     override fun onResume() {
         super.onResume()
-        // 화면이 다시 보일 때마다 UI 업데이트 (로그인 후 돌아왔을 때)
         updateUI()
     }
 
     private fun initViews() {
         btnBack = findViewById(R.id.btn_back)
 
-        // 비로그인 상태 (XML에서 layout_logged_out)
-        layoutGuest = findViewById(R.id.layout_logged_out)
-        btnLogin = findViewById(R.id.btn_login_signup)
+        // 프로필 라인
+        tvNickname = findViewById(R.id.tv_nickname)
+        tvGuestRestriction = findViewById(R.id.tv_guest_restriction)
 
-        // 로그인 상태 (XML에서 layout_logged_in)
-        layoutLoggedIn = findViewById(R.id.layout_logged_in)
-        tvUserName = findViewById(R.id.tv_user_name)
+        // 로그인 유도 공간
+        layoutLoginPromotion = findViewById(R.id.layout_login_promotion)
+        btnLogin = findViewById(R.id.btn_login)
+        tvPublicFeature = findViewById(R.id.tv_public_feature)
+
+        // 설정 메뉴
+        btnTerms = findViewById(R.id.btn_terms)
+        btnPrivacy = findViewById(R.id.btn_privacy)
+        btnOpenSource = findViewById(R.id.btn_open_source)
         btnLogout = findViewById(R.id.btn_logout)
+    }
 
-        // 공통 메뉴
-        tvAppVersion = findViewById(R.id.tv_app_version)
-        tvWithdrawal = findViewById(R.id.btn_delete_account)
+    /**
+     * "전체공개" 부분만 볼드 처리
+     */
+    private fun setupPublicFeatureText() {
+        val fullText = "✔️ 기록 전체공개 설정 가능"
+        val boldText = "전체공개"
+        val spannableString = SpannableString(fullText)
+
+        val startIndex = fullText.indexOf(boldText)
+        if (startIndex >= 0) {
+            spannableString.setSpan(
+                StyleSpan(android.graphics.Typeface.BOLD),
+                startIndex,
+                startIndex + boldText.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        tvPublicFeature.text = spannableString
     }
 
     private fun setupListeners() {
@@ -84,24 +116,29 @@ class MyPageActivity : AppCompatActivity() {
             finish()
         }
 
-        // 로그인/회원가입 버튼
+        // 로그인 버튼
         btnLogin.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            navigateToLogin()
         }
 
-        // 로그아웃 버튼
+        // 이용약관
+        btnTerms.setOnClickListener {
+            openWebView(TERMS_URL)
+        }
+
+        // 개인정보 처리방침
+        btnPrivacy.setOnClickListener {
+            openWebView(PRIVACY_URL)
+        }
+
+        // 오픈소스 라이센스
+        btnOpenSource.setOnClickListener {
+            openWebView(OPEN_SOURCE_URL)
+        }
+
+        // 로그아웃
         btnLogout.setOnClickListener {
             showLogoutDialog()
-        }
-
-        // 탈퇴하기
-        tvWithdrawal.setOnClickListener {
-            if (authRepository.isLoggedIn()) {
-                showWithdrawalDialog()
-            } else {
-                showToast("로그인이 필요합니다")
-            }
         }
     }
 
@@ -109,47 +146,72 @@ class MyPageActivity : AppCompatActivity() {
      * UI 업데이트 (로그인 상태에 따라)
      */
     private fun updateUI() {
-        val isLoggedIn = authRepository.isLoggedIn()
+        val isLoggedIn = tokenManager.isLoggedIn()
 
-        Log.d(TAG, "updateUI called - isLoggedIn: $isLoggedIn")
+        Log.d(TAG, "updateUI - isLoggedIn: $isLoggedIn")
 
         if (isLoggedIn) {
             // 로그인 상태
-            layoutGuest.visibility = View.GONE
-            layoutLoggedIn.visibility = View.VISIBLE
+            val nickname = tokenManager.getNickname() ?: "사용자"
+            tvNickname.text = nickname
+            tvGuestRestriction.visibility = View.GONE  // 제한 텍스트 숨김
+
+            // 로그인 유도 공간 숨김
+            layoutLoginPromotion.visibility = View.GONE
+            btnLogin.visibility = View.GONE
+
+            // 로그아웃 버튼 표시
             btnLogout.visibility = View.VISIBLE
 
-            // 사용자 이름 표시
-            val nickname = tokenManager.getNickname() ?: "사용자"
-            tvUserName.text = nickname
-
-            Log.d(TAG, "UI updated to LOGGED IN state - nickname: $nickname")
+            Log.d(TAG, "UI updated to LOGGED IN - nickname: $nickname")
         } else {
-            // 비로그인 상태
-            layoutGuest.visibility = View.VISIBLE
-            layoutLoggedIn.visibility = View.GONE
+            // 비로그인 상태 (게스트)
+            tvNickname.text = "게스트"
+            tvGuestRestriction.visibility = View.VISIBLE  // 제한 텍스트 표시
+
+            // 로그인 유도 공간 표시
+            layoutLoginPromotion.visibility = View.VISIBLE
+            btnLogin.visibility = View.VISIBLE
+
+            // 로그아웃 버튼 숨김
             btnLogout.visibility = View.GONE
 
-            Log.d(TAG, "UI updated to LOGGED OUT state")
+            Log.d(TAG, "UI updated to GUEST state")
         }
+    }
 
-        // 강제로 레이아웃 갱신
-        layoutGuest.invalidate()
-        layoutLoggedIn.invalidate()
-        btnLogout.invalidate()
+    /**
+     * 로그인 화면으로 이동
+     */
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+    }
+
+    /**
+     * WebView로 URL 열기
+     */
+    private fun openWebView(url: String) {
+        val intent = Intent(this, WebViewActivity::class.java)
+        intent.putExtra(WebViewActivity.EXTRA_URL, url)
+        startActivity(intent)
     }
 
     /**
      * 로그아웃 확인 다이얼로그
      */
     private fun showLogoutDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("로그아웃")
-            .setMessage("로그아웃 하시겠습니까?")
-            .setPositiveButton("확인") { _, _ ->
+        DoubleButtonDialog(this)
+            .setTitle("로그아웃하시겠습니까?")
+            .setDescription("로그아웃 후 작성한 기록은 백업되지 않으며,\n비로그인 상태 기록은 최대 20개로 제한됩니다.")
+            .setCancelButtonText("취소")
+            .setConfirmButtonText("로그아웃")
+            .setOnCancelListener {
+                Log.d(TAG, "로그아웃 취소")
+            }
+            .setOnConfirmListener {
                 performLogout()
             }
-            .setNegativeButton("취소", null)
             .show()
     }
 
@@ -165,65 +227,39 @@ class MyPageActivity : AppCompatActivity() {
 
                 result.onSuccess {
                     Log.d(TAG, "로그아웃 성공")
-                    showToast("로그아웃 되었습니다")
+
+                    // 내 기록 화면으로 이동
+                    navigateToMyRecords()
+
                 }.onFailure { error ->
                     Log.e(TAG, "로그아웃 실패: ${error.message}")
-                    // 실패해도 로컬 토큰은 이미 삭제됨
-                    showToast("로그아웃 되었습니다")
+
+                    // 실패 시 모달 표시
+                    showLogoutErrorDialog()
                 }
-
-                // UI 업데이트 (로컬 토큰이 삭제되었으므로 비로그인 상태로 표시)
-                updateUI()
-
             } catch (e: Exception) {
                 Log.e(TAG, "로그아웃 오류", e)
-                showToast("로그아웃 되었습니다")
-                updateUI()
+                showLogoutErrorDialog()
             }
         }
     }
 
     /**
-     * 회원탈퇴 확인 다이얼로그
+     * 로그아웃 실패 모달
      */
-    private fun showWithdrawalDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("회원탈퇴")
-            .setMessage("정말 탈퇴하시겠습니까?\n모든 데이터가 삭제됩니다.")
-            .setPositiveButton("탈퇴") { _, _ ->
-                performWithdrawal()
-            }
-            .setNegativeButton("취소", null)
+    private fun showLogoutErrorDialog() {
+        SingleButtonDialog(this)
+            .setTitle("로그아웃에 실패했어요.\n다시 시도해주세요.")
             .show()
     }
 
     /**
-     * 회원탈퇴 실행
+     * 내 기록 화면으로 이동
      */
-    private fun performWithdrawal() {
-        lifecycleScope.launch {
-            try {
-                Log.d(TAG, "회원탈퇴 시작")
-
-                val result = authRepository.withdrawal()
-
-                result.onSuccess {
-                    Log.d(TAG, "회원탈퇴 성공")
-                    showToast("회원탈퇴가 완료되었습니다")
-
-                    // 메인 화면(내 기록)으로 이동
-                    val intent = Intent(this@MyPageActivity, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    finish()
-                }.onFailure { error ->
-                    Log.e(TAG, "회원탈퇴 실패: ${error.message}")
-                    showToast("회원탈퇴 실패: ${error.message}")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "회원탈퇴 중 오류", e)
-                showToast("회원탈퇴 중 오류가 발생했습니다")
-            }
-        }
+    private fun navigateToMyRecords() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
     }
 }
