@@ -73,6 +73,12 @@
             android:screenOrientation="portrait"
             android:exported="false" />
 
+        <!-- MyInfoActivity -->
+        <activity
+            android:name=".MyInfoActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
         <!-- LoginActivity -->
         <activity
             android:name=".LoginActivity"

@@ -207,16 +207,45 @@ class AuthRepository(
     /**
      * 회원탈퇴
      */
-    suspend fun withdrawal(): Result<WithdrawalResponse> {
-        val token = "Bearer ${tokenManager.getAccessToken()}"
-        val refreshToken = tokenManager.getRefreshToken()
-            ?: return Result.failure(Exception("Refresh Token이 없습니다"))
+    suspend fun withdraw(): Result<WithdrawalResponse> {
+        var token = "Bearer ${tokenManager.getAccessToken()}"
+        var currentRefreshToken = tokenManager.getRefreshToken()
 
-        val request = WithdrawalRequest(refreshToken)
-        return safeApiCall { authApi.withdrawal(token, request) }.onSuccess {
-            // 로컬 토큰 삭제
+        if (currentRefreshToken == null) {
             tokenManager.clearTokens()
-            Log.d(TAG, "회원탈퇴 성공 - 로컬 토큰 삭제")
+            return Result.failure(Exception("Refresh Token이 없습니다"))
+        }
+
+        return try {
+            var request = WithdrawalRequest(currentRefreshToken)
+            var response = authApi.withdrawal(token, request)
+
+            // 토큰 만료(401, 403) 시 갱신 후 재시도
+            if (response.code() == 403 || response.code() == 401) {
+                val refreshResult = refreshToken()
+                if (refreshResult.isSuccess) {
+                    token = "Bearer ${tokenManager.getAccessToken()}"
+                    currentRefreshToken = tokenManager.getRefreshToken()!!
+                    request = WithdrawalRequest(currentRefreshToken)
+                    response = authApi.withdrawal(token, request)
+                } else {
+                    tokenManager.clearTokens()
+                    return Result.failure(Exception("토큰 갱신 실패"))
+                }
+            }
+
+            val result = if (response.isSuccessful) {
+                response.body()?.toResult() ?: Result.failure(Exception("응답 없음"))
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()}"))
+            }
+
+            // 성공 여부와 상관없이 탈퇴 시 로컬 데이터는 삭제
+            tokenManager.clearTokens()
+            result
+        } catch (e: Exception) {
+            tokenManager.clearTokens()
+            Result.failure(e)
         }
     }
 

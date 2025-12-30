@@ -116,9 +116,25 @@ class MyPageActivity : AppCompatActivity() {
             finish()
         }
 
+        // 프로필 레이아웃 클릭 시 (로그인 상태면 내 정보로 이동)
+        findViewById<LinearLayout>(R.id.layout_profile).setOnClickListener {
+            if (tokenManager.isLoggedIn()) {
+                val intent = Intent(this, MyInfoActivity::class.java)
+                startActivity(intent)
+            }
+        }
+
         // 로그인 버튼
         btnLogin.setOnClickListener {
             navigateToLogin()
+        }
+
+        // 내 정보 버튼
+        findViewById<LinearLayout>(R.id.layout_profile).setOnClickListener {
+            if (tokenManager.isLoggedIn()) {
+                val intent = Intent(this, MyInfoActivity::class.java)
+                startActivity(intent)
+            }
         }
 
         // 이용약관
@@ -147,6 +163,7 @@ class MyPageActivity : AppCompatActivity() {
      */
     private fun updateUI() {
         val isLoggedIn = tokenManager.isLoggedIn()
+        val ivArrow = findViewById<ImageView>(R.id.iv_arrow_info)
 
         Log.d(TAG, "updateUI - isLoggedIn: $isLoggedIn")
 
@@ -163,6 +180,9 @@ class MyPageActivity : AppCompatActivity() {
             // 로그아웃 버튼 표시
             btnLogout.visibility = View.VISIBLE
 
+            // 프로필 화살표 버튼 표시
+            ivArrow.visibility = View.VISIBLE
+
             Log.d(TAG, "UI updated to LOGGED IN - nickname: $nickname")
         } else {
             // 비로그인 상태 (게스트)
@@ -175,6 +195,8 @@ class MyPageActivity : AppCompatActivity() {
 
             // 로그아웃 버튼 숨김
             btnLogout.visibility = View.GONE
+            // 프로필 화살표 버튼 표시
+            ivArrow.visibility = View.GONE
 
             Log.d(TAG, "UI updated to GUEST state")
         }
