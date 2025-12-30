@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Stampy</string>
+    <string name="app_name">스탬픽</string>
 
     <!-- Google OAuth 클라이언트 ID -->
     <string name="google_client_id">18886173344-i69n30rhbvvusl76gvnpec54eckcrqvg.apps.googleusercontent.com</string>
