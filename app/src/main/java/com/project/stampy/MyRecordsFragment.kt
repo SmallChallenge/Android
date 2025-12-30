@@ -230,6 +230,8 @@ class MyRecordsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
+                val photoMetadataManager = PhotoMetadataManager(requireContext())
+
                 // 1. 서버 사진 로드
                 val serverPhotos = mutableListOf<Photo>()
 
@@ -241,11 +243,15 @@ class MyRecordsFragment : Fragment() {
                     Log.d("MyRecordsFragment", "서버 사진 ${response.images.size}개 로드됨")
 
                     serverPhotos.addAll(response.images.map { imageItem ->
+                        // 서버의 originalTakenAt을 timestamp로 변환
+                        val timestamp = parseIsoToTimestamp(imageItem.originalTakenAt)
+
                         Photo(
                             file = File(imageItem.imageId.toString()),
                             category = selectedCategory,
                             serverUrl = imageItem.accessUrl,
-                            imageId = imageItem.imageId
+                            imageId = imageItem.imageId,
+                            timestamp = timestamp
                         )
                     })
                 }.onFailure { error ->
@@ -253,13 +259,14 @@ class MyRecordsFragment : Fragment() {
                 }
 
                 // 2. 로컬 사진 로드
-                val localPhotos = loadLocalPhotosForLoggedInUser(categoryCode)
+                val localPhotos = loadLocalPhotosForLoggedInUser(categoryCode, photoMetadataManager)
 
                 Log.d("MyRecordsFragment", "로컬 사진 ${localPhotos.size}개 로드됨")
 
                 // 3. 서버 사진 + 로컬 사진 합치기
+                // timestamp 기준으로 최신순 정렬
                 val allPhotos = (serverPhotos + localPhotos)
-                    .sortedByDescending { it.file.lastModified() }
+                    .sortedByDescending { it.timestamp }
 
                 // 4. UI 업데이트
                 if (allPhotos.isEmpty()) {
@@ -278,20 +285,35 @@ class MyRecordsFragment : Fragment() {
     }
 
     /**
+     * ISO 8601 날짜 문자열을 timestamp(밀리초)로 변환
+     * 예: "2024-12-30T12:00:00" → 1735516800000
+     */
+    private fun parseIsoToTimestamp(isoString: String): Long {
+        return try {
+            val formatter = java.time.format.DateTimeFormatter.ISO_DATE_TIME
+            val dateTime = java.time.LocalDateTime.parse(isoString, formatter)
+            dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        } catch (e: Exception) {
+            Log.e("MyRecordsFragment", "날짜 파싱 실패: $isoString", e)
+            System.currentTimeMillis()  // 파싱 실패 시 현재 시간
+        }
+    }
+
+    /**
      * 로그인 사용자용 로컬 사진 로드
      * (서버에 업로드되지 않은 비회원 시절 사진)
      */
-    private fun loadLocalPhotosForLoggedInUser(categoryCode: String?): List<Photo> {
+    private fun loadLocalPhotosForLoggedInUser(
+        categoryCode: String?,
+        photoMetadataManager: PhotoMetadataManager
+    ): List<Photo> {
         val picturesDir = File(requireContext().filesDir, "Pictures")
 
         if (!picturesDir.exists() || !picturesDir.isDirectory) {
             return emptyList()
         }
 
-        // 1. 메타데이터 가져오기
-        val photoMetadataManager = PhotoMetadataManager(requireContext())
-
-        // 2. 선택된 카테고리에 맞는 메타데이터 필터링
+        // 1. 선택된 카테고리에 맞는 메타데이터 필터링
         val filteredMetadata = if (categoryCode == null) {
             // 전체 카테고리
             photoMetadataManager.getAllMetadata()
@@ -300,14 +322,18 @@ class MyRecordsFragment : Fragment() {
             photoMetadataManager.getMetadataByCategory(categoryCode)
         }
 
-        // 3. 서버에 업로드되지 않은 로컬 사진만 필터링
+        // 2. 서버에 업로드되지 않은 로컬 사진만 필터링
         val localOnlyMetadata = filteredMetadata.filter { !it.isServerUploaded }
 
-        // 4. 메타데이터에 해당하는 실제 파일만 로드
+        // 3. 메타데이터에 해당하는 실제 파일만 로드
         return localOnlyMetadata.mapNotNull { metadata ->
             val file = File(picturesDir, metadata.fileName)
             if (file.exists()) {
-                Photo(file, category = selectedCategory)
+                Photo(
+                    file = file,
+                    category = selectedCategory,
+                    timestamp = metadata.createdAt
+                )
             } else {
                 null
             }
@@ -349,17 +375,26 @@ class MyRecordsFragment : Fragment() {
         }
 
         // 3. 메타데이터에 해당하는 실제 파일만 로드
-        val photoFiles = filteredMetadata.mapNotNull { metadata ->
-            val file = File(picturesDir, metadata.fileName)
-            if (file.exists()) file else null
-        }.sortedByDescending { it.lastModified() }
+        val photos = filteredMetadata
+            .mapNotNull { metadata ->
+                val file = File(picturesDir, metadata.fileName)
+                if (file.exists()) {
+                    Photo(
+                        file = file,
+                        category = selectedCategory,
+                        timestamp = metadata.createdAt
+                    )
+                } else {
+                    null
+                }
+            }
+            .sortedByDescending { it.timestamp }  // 최신순 정렬
 
         // 4. UI 업데이트
-        if (photoFiles.isEmpty()) {
+        if (photos.isEmpty()) {
             showEmptyState()
         } else {
             hideEmptyState()
-            val photos = photoFiles.map { Photo(it, category = selectedCategory) }
             photoAdapter.setPhotos(photos)
 
             Log.d("MyRecordsFragment", "비회원 로컬 사진 ${photos.size}개 로드됨 (카테고리: $selectedCategory)")
