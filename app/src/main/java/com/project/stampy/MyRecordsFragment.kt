@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.project.stampy.data.local.PhotoMetadataManager
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.model.Photo
 import com.project.stampy.data.network.RetrofitClient
@@ -276,10 +277,36 @@ class MyRecordsFragment : Fragment() {
             return
         }
 
-        val photoFiles = picturesDir.listFiles { file ->
-            file.isFile && file.name.startsWith("STAMPY_") && file.extension == "jpg"
-        }?.sortedByDescending { it.lastModified() } ?: emptyList()
+        // 1. 메타데이터 가져오기
+        val photoMetadataManager = PhotoMetadataManager(requireContext())
 
+        // 2. 선택된 카테고리에 맞는 메타데이터 필터링
+        val filteredMetadata = if (selectedCategory == "전체") {
+            photoMetadataManager.getAllMetadata()
+        } else {
+            // 카테고리 한글 → 영문 변환
+            val categoryCode = when (selectedCategory) {
+                "공부" -> "STUDY"
+                "운동" -> "EXERCISE"
+                "음식" -> "FOOD"
+                "기타" -> "ETC"
+                else -> null
+            }
+
+            if (categoryCode != null) {
+                photoMetadataManager.getMetadataByCategory(categoryCode)
+            } else {
+                emptyList()
+            }
+        }
+
+        // 3. 메타데이터에 해당하는 실제 파일만 로드
+        val photoFiles = filteredMetadata.mapNotNull { metadata ->
+            val file = File(picturesDir, metadata.fileName)
+            if (file.exists()) file else null
+        }.sortedByDescending { it.lastModified() }
+
+        // 4. UI 업데이트
         if (photoFiles.isEmpty()) {
             showEmptyState()
         } else {
@@ -287,7 +314,7 @@ class MyRecordsFragment : Fragment() {
             val photos = photoFiles.map { Photo(it, category = selectedCategory) }
             photoAdapter.setPhotos(photos)
 
-            Log.d("MyRecordsFragment", "로컬 사진 ${photos.size}개 로드됨")
+            Log.d("MyRecordsFragment", "비회원 로컬 사진 ${photos.size}개 로드됨 (카테고리: $selectedCategory)")
         }
     }
 
