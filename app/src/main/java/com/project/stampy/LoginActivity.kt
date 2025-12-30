@@ -302,23 +302,27 @@ class LoginActivity : AppCompatActivity() {
                 val result = authRepository.socialLogin(socialType, accessToken)
 
                 result.onSuccess { response ->
-                    Log.d(TAG, "로그인 성공: ${response.nickname}, needNickname: ${response.needNickname}")
+                    Log.d(TAG, "로그인 성공: ${response.nickname}, status: ${response.userStatus}, needNickname: ${response.needNickname}")
 
-                    if (response.needNickname) {
-                        // needNickname=true인 경우: userStatus 확인
-                        if (response.userStatus == "PENDING") {
-                            // PENDING: 약관 동의 필요
-                            Log.d(TAG, "신규 가입자 → 약관 동의 Bottom Sheet 표시")
+                    // 수정된 로직: userStatus를 최우선으로 체크
+                    when {
+                        // 1. 상태가 PENDING이면 약관 동의가 최우선
+                        response.userStatus == "PENDING" -> {
+                            Log.d(TAG, "상태가 PENDING → 약관 동의 Bottom Sheet 표시")
                             showTermsBottomSheet()
-                        } else {
-                            // ACTIVE: 약관 동의는 완료, 닉네임만 설정 필요
+                        }
+
+                        // 2. 상태는 ACTIVE인데 닉네임이 설정되지 않았다면 닉네임 설정으로 보냄
+                        response.needNickname -> {
                             Log.d(TAG, "약관 동의 완료, 닉네임 미설정 → 닉네임 설정으로 이동")
                             navigateToNickname()
                         }
-                    } else {
-                        // 기존 가입자 (needNickname=false) → 메인으로
-                        Log.d(TAG, "기존 가입자 → MainActivity로 이동")
-                        navigateToMain()
+
+                        // 3. 상태가 ACTIVE이고 닉네임도 있다면 메인으로 보냄
+                        else -> {
+                            Log.d(TAG, "기존 가입자 → MainActivity로 이동")
+                            navigateToMain()
+                        }
                     }
                 }.onFailure { error ->
                     Log.e(TAG, "로그인 실패: ${error.message}", error)
