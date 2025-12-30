@@ -18,6 +18,15 @@ interface AuthApiService {
     ): Response<ApiResponse<SocialLoginResponse>>
 
     /**
+     * 약관 동의
+     */
+    @POST("/api/v1/auth/terms-agreement")
+    suspend fun agreeTerms(
+        @Header("Authorization") token: String,
+        @Body request: TermsAgreementRequest
+    ): Response<ApiResponse<TermsAgreementResponse>>
+
+    /**
      * 토큰 갱신
      */
     @POST("/api/v1/auth/refresh")
@@ -46,7 +55,7 @@ interface AuthApiService {
     /**
      * 회원탈퇴
      */
-    @POST("/api/v1/auth/withdrawal")
+    @POST("/api/v1/auth/cancel-registration")
     suspend fun withdrawal(
         @Header("Authorization") token: String,
         @Body request: WithdrawalRequest

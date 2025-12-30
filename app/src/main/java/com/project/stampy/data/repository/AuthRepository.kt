@@ -41,6 +41,10 @@ class AuthRepository(
 
     /**
      * 소셜 로그인
+     *
+     * 신규/기존 가입자 모두 토큰 저장
+     * - 신규 가입자(needNickname=true): 약관 동의 후 ACTIVE
+     * - 기존 가입자(needNickname=false): 바로 메인으로
      */
     suspend fun socialLogin(
         socialType: String,
@@ -48,20 +52,52 @@ class AuthRepository(
     ): Result<SocialLoginResponse> {
         val request = SocialLoginRequest(socialType, accessToken)
         return safeApiCall { authApi.socialLogin(request) }.onSuccess { data ->
-            // 토큰 저장
+
+            // 무조건 토큰 저장 (약관 동의 API에 필요)
             tokenManager.saveAccessToken(data.accessToken)
             tokenManager.saveRefreshToken(data.refreshToken)
             tokenManager.saveUserId(data.userId)
 
-            // needNickname이 false면 이미 닉네임이 있음
-            if (!data.needNickname && data.nickname != null) {
-                tokenManager.saveNickname(data.nickname)
-                Log.d(TAG, "소셜 로그인 성공 - 닉네임: ${data.nickname}")
+            if (data.needNickname) {
+                // 신규 가입자: 약관 동의 필요
+                Log.d(TAG, "소셜 로그인 성공 - 신규 가입자 (약관 동의 필요)")
+                Log.d(TAG, "userId: ${data.userId}, needNickname: true")
             } else {
-                Log.d(TAG, "소셜 로그인 성공 - 닉네임 설정 필요")
+                // 기존 가입자: 닉네임도 저장
+                if (data.nickname != null) {
+                    tokenManager.saveNickname(data.nickname)
+                }
+                Log.d(TAG, "소셜 로그인 성공 - 기존 가입자")
+                Log.d(TAG, "userId: ${data.userId}, nickname: ${data.nickname}")
             }
+        }
+    }
 
-            Log.d(TAG, "userId: ${data.userId}, needNickname: ${data.needNickname}")
+    /**
+     * 약관 동의
+     *
+     * POST /api/v1/auth/terms-agreement
+     *
+     * PENDING 상태 사용자가 약관 동의하여 ACTIVE로 전환
+     */
+    suspend fun agreeTerms(
+        agreedToPrivacyPolicy: Boolean = true,
+        agreedToTermsOfService: Boolean = true,
+        agreedToMarketing: Boolean = false
+    ): Result<TermsAgreementResponse> {
+        val token = "Bearer ${tokenManager.getAccessToken()}"
+
+        val request = TermsAgreementRequest(
+            agreedToPrivacyPolicy = agreedToPrivacyPolicy,
+            agreedToTermsOfService = agreedToTermsOfService,
+            agreedToMarketing = agreedToMarketing,
+            allRequiredTermsAgreed = agreedToPrivacyPolicy && agreedToTermsOfService
+        )
+
+        return safeApiCall<TermsAgreementResponse> {
+            authApi.agreeTerms(token, request)
+        }.onSuccess { data ->
+            Log.d(TAG, "약관 동의 성공 - userStatus: ${data.userStatus}")
         }
     }
 

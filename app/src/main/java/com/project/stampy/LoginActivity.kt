@@ -301,12 +301,12 @@ class LoginActivity : AppCompatActivity() {
                     Log.d(TAG, "로그인 성공: ${response.nickname}, needNickname: ${response.needNickname}")
 
                     if (response.needNickname) {
-                        // 닉네임 설정 필요 → NicknameActivity로 이동
-                        Log.d(TAG, "Navigating to NicknameActivity")
-                        navigateToNickname()
+                        // 신규 가입자 → 약관 동의 필요
+                        Log.d(TAG, "신규 가입자 → 약관 동의 Bottom Sheet 표시")
+                        showTermsBottomSheet()
                     } else {
-                        // 이미 닉네임 있음 → MainActivity로 이동
-                        Log.d(TAG, "Navigating to MainActivity")
+                        // 기존 가입자 → 바로 메인으로
+                        Log.d(TAG, "기존 가입자 → MainActivity로 이동")
                         navigateToMain()
                     }
                 }.onFailure { error ->
@@ -318,6 +318,14 @@ class LoginActivity : AppCompatActivity() {
                 showLoginFailedDialog()
             }
         }
+    }
+
+    /**
+     * 약관 동의 Bottom Sheet 표시
+     */
+    private fun showTermsBottomSheet() {
+        val bottomSheet = TermsBottomSheetDialog()
+        bottomSheet.show(supportFragmentManager, "TermsBottomSheet")
     }
 
     /**
