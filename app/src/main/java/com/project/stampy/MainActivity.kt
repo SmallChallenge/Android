@@ -36,7 +36,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // 상태바 검정색으로 설정(themes에서 설정했지만 혹시 모르니 보험..)
-        window.statusBarColor = Color.parseColor("#121212")
+        window.statusBarColor = Color.parseColor("#171717")
+
+        // ActionBar 숨기기(themes에서 설정했지만 혹시 모르니 보험..)
+        supportActionBar?.hide()
 
         // 초기화
         tokenManager = TokenManager(this)

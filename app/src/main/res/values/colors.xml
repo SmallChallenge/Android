@@ -27,7 +27,7 @@
     <color name="gray_100">#F0F0F0</color>
     <color name="gray_50">#FFFFFF</color> <!-- 메인 텍스트, 메인 아이콘 -->
 
-    <color name="navigationBar">#121212</color>
+    <color name="navigationBar">#171717</color>
 
     <!-- Semantic Colors -->
     <color name="background_primary">@color/gray_primary</color>
