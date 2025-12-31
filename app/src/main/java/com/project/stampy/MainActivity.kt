@@ -3,6 +3,7 @@ package com.project.stampy
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
@@ -33,6 +34,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // 상태바 검정색으로 설정(themes에서 설정했지만 혹시 모르니 보험..)
+        window.statusBarColor = Color.parseColor("#121212")
 
         // 초기화
         tokenManager = TokenManager(this)

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Stampy" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- 상태바 투명 -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 상태바 검정색 -->
+        <item name="android:statusBarColor">@color/navigationBar</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- 시스템 네비게이션 바 색상 설정 -->
