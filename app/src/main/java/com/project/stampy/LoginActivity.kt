@@ -231,19 +231,26 @@ class LoginActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        Log.d(TAG, "onActivityResult: requestCode=$requestCode, resultCode=$resultCode")
-
-        when (requestCode) {
-            RC_GOOGLE_SIGN_IN -> {
-                handleGoogleSignInResult(GoogleSignIn.getSignedInAccountFromIntent(data))
-            }
-            REQUEST_CODE_NICKNAME -> {
-                if (resultCode == RESULT_CANCELED) {
-                    // 닫기 버튼을 눌렀을 때 - LoginActivity도 종료
-                    Log.d(TAG, "NicknameActivity closed, finishing LoginActivity")
-                    finish()
+        if (requestCode == REQUEST_CODE_NICKNAME) {
+            when (resultCode) {
+                RESULT_OK -> {
+                    // 닉네임 설정 완료
+                    Log.d(TAG, "닉네임 설정 완료")
+                    navigateToMain()
                 }
-                // RESULT_OK인 경우는 정상 완료 (이미 MainActivity로 이동함)
+                RESULT_CANCELED -> {
+                    val fromClose = data?.getBooleanExtra("FROM_CLOSE", false) ?: false
+
+                    if (fromClose) {
+                        // 닫기 버튼: 로그인 플로우 전체 취소
+                        Log.d(TAG, "닉네임 설정 취소 - LoginActivity 종료")
+                        finish()
+                    } else {
+                        // 뒤로가기 버튼: LoginActivity 유지
+                        Log.d(TAG, "닉네임 페이지에서 뒤로가기 - LoginActivity 유지")
+                        // 아무것도 안 함 (LoginActivity 화면 유지)
+                    }
+                }
             }
         }
     }
@@ -304,7 +311,6 @@ class LoginActivity : AppCompatActivity() {
                 result.onSuccess { response ->
                     Log.d(TAG, "로그인 성공: ${response.nickname}, status: ${response.userStatus}, needNickname: ${response.needNickname}")
 
-                    // 수정된 로직: userStatus를 최우선으로 체크
                     when {
                         // 1. 상태가 PENDING이면 약관 동의가 최우선
                         response.userStatus == "PENDING" -> {
@@ -312,15 +318,16 @@ class LoginActivity : AppCompatActivity() {
                             showTermsBottomSheet()
                         }
 
-                        // 2. 상태는 ACTIVE인데 닉네임이 설정되지 않았다면 닉네임 설정으로 보냄
-                        response.needNickname -> {
-                            Log.d(TAG, "약관 동의 완료, 닉네임 미설정 → 닉네임 설정으로 이동")
+                        // 2. 닉네임이 null이거나 비어있으면 닉네임 설정
+                        //    (needNickname 플래그 대신 실제 닉네임 값으로 판단)
+                        response.nickname.isNullOrEmpty() -> {
+                            Log.d(TAG, "닉네임 없음 (nickname=${response.nickname}) → 닉네임 설정으로 이동")
                             navigateToNickname()
                         }
 
-                        // 3. 상태가 ACTIVE이고 닉네임도 있다면 메인으로 보냄
+                        // 3. 상태가 ACTIVE이고 닉네임도 있다면 메인으로
                         else -> {
-                            Log.d(TAG, "기존 가입자 → MainActivity로 이동")
+                            Log.d(TAG, "기존 가입자 (닉네임: ${response.nickname}) → MainActivity로 이동")
                             navigateToMain()
                         }
                     }

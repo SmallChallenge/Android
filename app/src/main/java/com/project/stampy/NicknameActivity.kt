@@ -104,22 +104,25 @@ class NicknameActivity : AppCompatActivity() {
     private fun setupBackPressHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                navigateToMyPage()
+                // 뒤로가기: 토큰 삭제하고 LoginActivity로 돌아가기
+                tokenManager.clearTokens()
+                setResult(RESULT_CANCELED) // fromClose = false (기본값)
+                finish()
             }
         })
     }
 
     private fun setupListeners() {
-        // 뒤로가기 버튼 - 로그인 페이지로
+        // 뒤로가기 버튼
         btnBackTouchArea.setOnClickListener {
-            navigateToLogin()
+            tokenManager.clearTokens()
+            setResult(RESULT_CANCELED) // fromClose = false
+            finish()
         }
 
-        // 닫기 버튼 - 그냥 finish() (LoginActivity와 함께 스택에서 제거됨)
+        // 닫기 버튼
         btnCloseTouchArea.setOnClickListener {
-            // LoginActivity의 결과로 취소 전달
-            setResult(RESULT_CANCELED)
-            finish()
+            cancelLoginFlow()
         }
 
         layoutInput.setOnClickListener {
@@ -349,19 +352,13 @@ class NicknameActivity : AppCompatActivity() {
     }
 
     /**
-     * 로그인 페이지로 이동 (뒤로가기)
+     * 로그인 플로우 전체 취소 (닫기 버튼)
      */
-    private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        startActivity(intent)
-        finish()
-    }
-
-    private fun navigateToMyPage() {
-        val intent = Intent(this, MyPageActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        startActivity(intent)
+    private fun cancelLoginFlow() {
+        tokenManager.clearTokens()
+        val intent = Intent()
+        intent.putExtra("FROM_CLOSE", true) // 닫기 버튼임을 표시
+        setResult(RESULT_CANCELED, intent)
         finish()
     }
 }
