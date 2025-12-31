@@ -231,24 +231,34 @@ class LoginActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == REQUEST_CODE_NICKNAME) {
-            when (resultCode) {
-                RESULT_OK -> {
-                    // 닉네임 설정 완료
-                    Log.d(TAG, "닉네임 설정 완료")
-                    navigateToMain()
-                }
-                RESULT_CANCELED -> {
-                    val fromClose = data?.getBooleanExtra("FROM_CLOSE", false) ?: false
+        Log.d(TAG, "onActivityResult: requestCode=$requestCode, resultCode=$resultCode")
 
-                    if (fromClose) {
-                        // 닫기 버튼: 로그인 플로우 전체 취소
-                        Log.d(TAG, "닉네임 설정 취소 - LoginActivity 종료")
-                        finish()
-                    } else {
-                        // 뒤로가기 버튼: LoginActivity 유지
-                        Log.d(TAG, "닉네임 페이지에서 뒤로가기 - LoginActivity 유지")
-                        // 아무것도 안 함 (LoginActivity 화면 유지)
+        when (requestCode) {
+            RC_GOOGLE_SIGN_IN -> {
+                // 구글 로그인 결과 처리
+                val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+                handleGoogleSignInResult(task)
+            }
+
+            REQUEST_CODE_NICKNAME -> {
+                when (resultCode) {
+                    RESULT_OK -> {
+                        // 닉네임 설정 완료
+                        Log.d(TAG, "닉네임 설정 완료")
+                        navigateToMain()
+                    }
+                    RESULT_CANCELED -> {
+                        val fromClose = data?.getBooleanExtra("FROM_CLOSE", false) ?: false
+
+                        if (fromClose) {
+                            // 닫기 버튼: 로그인 플로우 전체 취소
+                            Log.d(TAG, "닉네임 설정 취소 - LoginActivity 종료")
+                            finish()
+                        } else {
+                            // 뒤로가기 버튼: LoginActivity 유지
+                            Log.d(TAG, "닉네임 페이지에서 뒤로가기 - LoginActivity 유지")
+                            // 아무것도 안 함 (LoginActivity 화면 유지)
+                        }
                     }
                 }
             }
