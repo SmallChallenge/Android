@@ -1,7 +1,17 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     kotlin("kapt")
+}
+
+// local.properties 읽기
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
 }
 
 android {
@@ -16,15 +26,32 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 카카오 앱 키를 BuildConfig에 추가
+        buildConfigField("String", "KAKAO_APP_KEY", "\"${localProperties.getProperty("KAKAO_APP_KEY")}\"")
+
+        buildConfigField("String", "BASE_URL", "\"https://api.stampy.kr/\"")
+
+        // manifestPlaceholders에도 추가 (AndroidManifest.xml에서 사용)
+        manifestPlaceholders["KAKAO_APP_KEY"] = localProperties.getProperty("KAKAO_APP_KEY")
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(localProperties.getProperty("RELEASE_STORE_FILE") ?: "")
+            storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD")
+            keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+            keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+        }
     }
 
     buildTypes {
         debug {
-            // 디버그 빌드에서 BuildConfig 생성
-            buildConfigField("String", "BASE_URL", "\"https://api.stampy.kr/\"")
+
         }
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")  // 서명 설정 적용
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

@@ -38,7 +38,7 @@
         <!-- 카카오 SDK 초기화 -->
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="cdcf8640c0483fccee4f1d8d51811081" />
+            android:value="${KAKAO_APP_KEY}" />
 
         <activity
             android:name=".MainActivity"

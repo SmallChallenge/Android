@@ -1,1 +1,11 @@
-/build
+# Keystore files
+*.keystore
+*.jks
+*.key
+release-key.keystore
+
+# Local configuration
+local.properties
+
+# 임시: StampyApplication.kt는 나중에 수정 필요
+# TODO: BuildConfig 문제 해결 후 하드코딩 제거
