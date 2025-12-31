@@ -70,6 +70,8 @@ class MyRecordsFragment : Fragment() {
     private lateinit var imageRepository: ImageRepository
     private lateinit var nonLoginPhotoManager: NonLoginPhotoManager
 
+    private lateinit var photoMetadataManager: PhotoMetadataManager
+
     // 배너 닫힘 상태 저장
     private var isBannerDismissed = false
 
@@ -104,6 +106,7 @@ class MyRecordsFragment : Fragment() {
         RetrofitClient.initialize(tokenManager)
         imageRepository = ImageRepository(tokenManager)
         nonLoginPhotoManager = NonLoginPhotoManager(requireContext())
+        photoMetadataManager = PhotoMetadataManager(requireContext())
 
         // View 초기화
         initViews(view)
@@ -202,8 +205,7 @@ class MyRecordsFragment : Fragment() {
 
         // 사진 클릭 리스너
         photoAdapter.setOnPhotoClickListener { photo ->
-            // TODO: 사진 상세보기 화면으로 이동
-            showToast("사진 클릭: ${photo.file.name}")
+            navigateToPhotoDetail(photo)
         }
     }
 
@@ -530,6 +532,43 @@ class MyRecordsFragment : Fragment() {
     private fun hideEmptyState() {
         rvPhotos.visibility = View.VISIBLE
         emptyStateContainer.visibility = View.GONE
+    }
+
+    /**
+     * 사진 상세 화면으로 이동
+     */
+    private fun navigateToPhotoDetail(photo: Photo) {
+        val intent = Intent(requireContext(), PhotoDetailActivity::class.java)
+
+        // 파일 정보
+        intent.putExtra(PhotoDetailActivity.EXTRA_PHOTO_FILE, photo.file)
+
+        // 서버 URL (로그인 사용자의 서버 사진)
+        photo.serverUrl?.let {
+            intent.putExtra(PhotoDetailActivity.EXTRA_PHOTO_URL, it)
+        }
+
+        // 이미지 ID (로그인 사용자의 서버 사진)
+        photo.imageId?.let {
+            intent.putExtra(PhotoDetailActivity.EXTRA_IMAGE_ID, it)
+        }
+
+        // 카테고리 (한글 → 영문 변환)
+        val categoryCode = when (photo.category) {
+            "공부" -> "STUDY"
+            "운동" -> "EXERCISE"
+            "음식" -> "FOOD"
+            "기타" -> "ETC"
+            else -> "ETC"
+        }
+        intent.putExtra(PhotoDetailActivity.EXTRA_CATEGORY, categoryCode)
+
+        // 공개 여부 (메타데이터에서 조회)
+        val metadata = photoMetadataManager.getMetadataByFileName(photo.file.name)
+        val visibility = metadata?.visibility ?: "PRIVATE"
+        intent.putExtra(PhotoDetailActivity.EXTRA_VISIBILITY, visibility)
+
+        startActivity(intent)
     }
 }
 

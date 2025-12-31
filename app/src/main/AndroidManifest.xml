@@ -67,6 +67,9 @@
             android:screenOrientation="portrait"
             android:exported="false" />
 
+        <!-- PhotoDetailActivity -->
+        <activity android:name=".PhotoDetailActivity" />
+
         <!-- MyPageActivity -->
         <activity
             android:name=".MyPageActivity"
