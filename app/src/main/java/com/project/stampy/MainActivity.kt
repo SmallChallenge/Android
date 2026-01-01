@@ -1,6 +1,5 @@
 package com.project.stampy
 
-import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -8,14 +7,16 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.project.stampy.data.local.NonLoginPhotoManager
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.ui.dialog.DoubleButtonDialog
 import com.project.stampy.utils.showToast
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,11 +28,25 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tokenManager: TokenManager
     private lateinit var nonLoginPhotoManager: NonLoginPhotoManager
 
+    // 스플래시 화면 유지 플래그
+    private var keepSplashScreen = true
+
     companion object {
         private const val TAG = "MainActivity"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 스플래시 스크린 설치 (super.onCreate 전에 호출)
+        val splashScreen = installSplashScreen()
+
+        // 스플래시 화면을 1초 동안 유지
+        splashScreen.setKeepOnScreenCondition { keepSplashScreen }
+
+        lifecycleScope.launch {
+            delay(500) // ( 100 = 0.1초, 1500 = 1.5초, 2000 = 2초)
+            keepSplashScreen = false
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 

@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 스플래시 화면 테마 -->
+    <style name="Theme.Stampy.Splash" parent="Theme.SplashScreen">
+        <!-- 배경색 -->
+        <item name="windowSplashScreenBackground">@color/gray_primary</item>
+
+        <!-- 중앙 로고 아이콘 (크기 조절된 버전) -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+
+        <!-- 애니메이션 지속 시간 -->
+        <item name="windowSplashScreenAnimationDuration">500</item>
+
+        <!-- 스플래시 후 적용될 테마 -->
+        <item name="postSplashScreenTheme">@style/Theme.Stampy</item>
+    </style>
+
     <style name="Theme.Stampy" parent="Theme.Material3.Dark.NoActionBar">
         <!-- 상태바 검정색 -->
         <item name="android:statusBarColor">@color/navigationBar</item>
