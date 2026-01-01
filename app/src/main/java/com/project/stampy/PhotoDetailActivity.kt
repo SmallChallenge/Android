@@ -443,29 +443,38 @@ class PhotoDetailActivity : AppCompatActivity() {
 
     /**
      * 서버 이미지 다운로드 후 공유
+     * Glide의 디스크 캐시를 활용하여 중복 다운로드 방지
      */
     private suspend fun downloadAndShareImage(url: String) {
         withContext(Dispatchers.IO) {
             try {
-                // Glide를 사용하여 이미지 다운로드
-                val bitmap = Glide.with(this@PhotoDetailActivity)
-                    .asBitmap()
+                // Glide 캐시에서 파일 가져오기 (있으면 재사용, 없으면 다운로드)
+                val file = Glide.with(this@PhotoDetailActivity)
+                    .asFile()
                     .load(url)
                     .submit()
                     .get()
 
-                // 임시 파일로 저장
-                val tempFile = File(cacheDir, "share_${System.currentTimeMillis()}.jpg")
-                val outputStream = tempFile.outputStream()
-                bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, outputStream)
-                outputStream.close()
+                // Glide 캐시 파일을 임시 파일로 복사 (FileProvider는 캐시 디렉토리 직접 접근 불가)
+                val tempFile = File(cacheDir, "share_temp_${System.currentTimeMillis()}.jpg")
+                file.copyTo(tempFile, overwrite = true)
 
                 // 공유
                 withContext(Dispatchers.Main) {
                     shareLocalFile(tempFile)
+
+                    // 공유 후 임시 파일 삭제 예약 (5초 후)
+                    tempFile.deleteOnExit()
+                    lifecycleScope.launch {
+                        kotlinx.coroutines.delay(5000)
+                        if (tempFile.exists()) {
+                            tempFile.delete()
+                            Log.d(TAG, "임시 공유 파일 삭제: ${tempFile.name}")
+                        }
+                    }
                 }
 
-                Log.d(TAG, "서버 이미지 다운로드 후 공유: $url")
+                Log.d(TAG, "서버 이미지 공유 (Glide 캐시 활용): $url")
             } catch (e: Exception) {
                 Log.e(TAG, "서버 이미지 다운로드 실패", e)
                 withContext(Dispatchers.Main) {
