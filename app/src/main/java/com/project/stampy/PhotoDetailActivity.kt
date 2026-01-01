@@ -21,7 +21,9 @@ import com.project.stampy.data.repository.ImageRepository
 import com.project.stampy.ui.components.TagView
 import com.project.stampy.ui.dialog.DoubleButtonDialog
 import com.project.stampy.utils.showToast
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class PhotoDetailActivity : AppCompatActivity() {
@@ -392,22 +394,34 @@ class PhotoDetailActivity : AppCompatActivity() {
      * 사진 공유하기
      */
     private fun sharePhoto() {
+        lifecycleScope.launch {
+            try {
+                if (photoFile != null && photoFile!!.exists()) {
+                    // 로컬 파일이 있는 경우
+                    shareLocalFile(photoFile!!)
+                } else if (photoUrl != null) {
+                    // 서버 이미지 URL만 있는 경우 - 다운로드 후 공유
+                    downloadAndShareImage(photoUrl!!)
+                } else {
+                    showToast("공유할 사진을 찾을 수 없습니다")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "사진 공유 오류", e)
+                showToast("공유에 실패했어요. 다시 시도해 주세요.")
+            }
+        }
+    }
+
+    /**
+     * 로컬 파일 공유
+     */
+    private fun shareLocalFile(file: File) {
         try {
-            val fileToShare = photoFile ?: run {
-                showToast("공유할 사진을 찾을 수 없습니다")
-                return
-            }
-
-            if (!fileToShare.exists()) {
-                showToast("공유할 사진을 찾을 수 없습니다")
-                return
-            }
-
             // FileProvider를 사용하여 URI 생성
             val uri = FileProvider.getUriForFile(
                 this,
                 "${packageName}.fileprovider",
-                fileToShare
+                file
             )
 
             // 공유 Intent 생성
@@ -420,10 +434,44 @@ class PhotoDetailActivity : AppCompatActivity() {
             // 공유 시트 표시
             startActivity(Intent.createChooser(shareIntent, "사진 공유하기"))
 
-            Log.d(TAG, "사진 공유: ${fileToShare.name}")
+            Log.d(TAG, "로컬 파일 공유: ${file.name}")
         } catch (e: Exception) {
-            Log.e(TAG, "사진 공유 오류", e)
+            Log.e(TAG, "로컬 파일 공유 오류", e)
             showToast("공유에 실패했어요. 다시 시도해 주세요.")
+        }
+    }
+
+    /**
+     * 서버 이미지 다운로드 후 공유
+     */
+    private suspend fun downloadAndShareImage(url: String) {
+        withContext(Dispatchers.IO) {
+            try {
+                // Glide를 사용하여 이미지 다운로드
+                val bitmap = Glide.with(this@PhotoDetailActivity)
+                    .asBitmap()
+                    .load(url)
+                    .submit()
+                    .get()
+
+                // 임시 파일로 저장
+                val tempFile = File(cacheDir, "share_${System.currentTimeMillis()}.jpg")
+                val outputStream = tempFile.outputStream()
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, outputStream)
+                outputStream.close()
+
+                // 공유
+                withContext(Dispatchers.Main) {
+                    shareLocalFile(tempFile)
+                }
+
+                Log.d(TAG, "서버 이미지 다운로드 후 공유: $url")
+            } catch (e: Exception) {
+                Log.e(TAG, "서버 이미지 다운로드 실패", e)
+                withContext(Dispatchers.Main) {
+                    showToast("공유에 실패했어요. 다시 시도해 주세요.")
+                }
+            }
         }
     }
 }
