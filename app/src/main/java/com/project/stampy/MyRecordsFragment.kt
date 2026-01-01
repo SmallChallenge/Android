@@ -450,10 +450,20 @@ class MyRecordsFragment : Fragment() {
         return localOnlyMetadata.mapNotNull { metadata ->
             val file = File(picturesDir, metadata.fileName)
             if (file.exists()) {
+                // 메타데이터의 실제 카테고리를 한글로 변환
+                val categoryKorean = when (metadata.category) {
+                    "STUDY" -> "공부"
+                    "EXERCISE" -> "운동"
+                    "FOOD" -> "음식"
+                    "ETC" -> "기타"
+                    else -> "기타"
+                }
+
                 Photo(
                     file = file,
-                    category = selectedCategory,
-                    timestamp = metadata.createdAt
+                    category = categoryKorean,  //메타데이터의 실제 카테고리 사용
+                    timestamp = metadata.createdAt,
+                    visibility = metadata.visibility
                 )
             } else {
                 null
@@ -501,10 +511,20 @@ class MyRecordsFragment : Fragment() {
             .mapNotNull { metadata ->
                 val file = File(picturesDir, metadata.fileName)
                 if (file.exists()) {
+                    // 메타데이터의 실제 카테고리를 한글로 변환
+                    val categoryKorean = when (metadata.category) {
+                        "STUDY" -> "공부"
+                        "EXERCISE" -> "운동"
+                        "FOOD" -> "음식"
+                        "ETC" -> "기타"
+                        else -> "기타"
+                    }
+
                     Photo(
                         file = file,
-                        category = selectedCategory,
-                        timestamp = metadata.createdAt
+                        category = categoryKorean,  //메타데이터의 실제 카테고리 사용
+                        timestamp = metadata.createdAt,
+                        visibility = metadata.visibility
                     )
                 } else {
                     null

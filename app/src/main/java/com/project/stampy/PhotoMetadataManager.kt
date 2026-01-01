@@ -36,11 +36,17 @@ class PhotoMetadataManager(context: Context) {
     }
 
     /**
-     * 메타데이터 저장
+     * 메타데이터 저장 (중복 시 업데이트)
      */
     fun saveMetadata(metadata: PhotoMetadata) {
         val currentList = getAllMetadata().toMutableList()
+
+        // 같은 파일명이 있으면 제거 (업데이트 위해)
+        currentList.removeAll { it.fileName == metadata.fileName }
+
+        // 새 메타데이터 추가
         currentList.add(metadata)
+
         saveAllMetadata(currentList)
         Log.d(TAG, "메타데이터 저장: ${metadata.fileName}, 카테고리: ${metadata.category}")
     }

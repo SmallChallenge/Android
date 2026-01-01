@@ -288,7 +288,7 @@ class PhotoDetailActivity : AppCompatActivity() {
             visibility?.let { putExtra(PhotoUpdateActivity.EXTRA_VISIBILITY, it) }
         }
         startActivity(intent)
-        finish()  // 현재 상세 화면 종료
+        finish()  // 현재 상세 화면 종료(수정 후 업데이트 된 새로운 상세 화면이 열림)
     }
 
     /**
