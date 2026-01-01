@@ -124,17 +124,20 @@ class PhotoDetailActivity : AppCompatActivity() {
         // 비로그인 사용자일 경우 경고 메시지 표시 및 버튼 위치 조정
         if (!tokenManager.isLoggedIn()) {
             warningContainer.visibility = View.VISIBLE
-            // 공유하기 버튼을 경고 메시지 20dp 아래로 이동
-            val params = btnShare.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
-            params.topMargin = 20
-            btnShare.layoutParams = params
         } else {
             warningContainer.visibility = View.GONE
             // 공유하기 버튼을 카테고리 아이콘 40dp 아래로 이동
-            val params = btnShare.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
-            params.topToBottom = R.id.category_container
-            params.topMargin = 40
-            btnShare.layoutParams = params
+            val constraintLayout = btnShare.parent as androidx.constraintlayout.widget.ConstraintLayout
+            val constraintSet = androidx.constraintlayout.widget.ConstraintSet()
+            constraintSet.clone(constraintLayout)
+            constraintSet.connect(
+                R.id.btn_share,
+                androidx.constraintlayout.widget.ConstraintSet.TOP,
+                R.id.category_container,
+                androidx.constraintlayout.widget.ConstraintSet.BOTTOM,
+                40
+            )
+            constraintSet.applyTo(constraintLayout)
         }
     }
 
