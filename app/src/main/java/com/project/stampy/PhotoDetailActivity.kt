@@ -166,7 +166,7 @@ class PhotoDetailActivity : AppCompatActivity() {
         // 기록 수정
         menuEdit.setOnClickListener {
             hidePopover()
-            navigateToEditPhoto()
+            navigateToPhotoUpdate()
         }
 
         // 기록 삭제
@@ -279,9 +279,16 @@ class PhotoDetailActivity : AppCompatActivity() {
     /**
      * 사진 수정 화면으로 이동
      */
-    private fun navigateToEditPhoto() {
-        // TODO: 사진 수정 화면 구현 후 연결
-        showToast("사진 수정 기능은 추후 구현 예정입니다")
+    private fun navigateToPhotoUpdate() {
+        val intent = Intent(this, PhotoUpdateActivity::class.java).apply {
+            photoFile?.let { putExtra(PhotoUpdateActivity.EXTRA_PHOTO_FILE, it) }
+            photoUrl?.let { putExtra(PhotoUpdateActivity.EXTRA_PHOTO_URL, it) }
+            imageId?.let { putExtra(PhotoUpdateActivity.EXTRA_IMAGE_ID, it) }
+            category?.let { putExtra(PhotoUpdateActivity.EXTRA_CATEGORY, it) }
+            visibility?.let { putExtra(PhotoUpdateActivity.EXTRA_VISIBILITY, it) }
+        }
+        startActivity(intent)
+        finish()  // 현재 상세 화면 종료
     }
 
     /**

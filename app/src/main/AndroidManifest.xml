@@ -68,7 +68,17 @@
             android:exported="false" />
 
         <!-- PhotoDetailActivity -->
-        <activity android:name=".PhotoDetailActivity" />
+        <activity
+            android:name=".PhotoDetailActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- PhotoUpdateActivity -->
+        <activity
+            android:name=".PhotoUpdateActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
 
         <!-- MyPageActivity -->
         <activity
