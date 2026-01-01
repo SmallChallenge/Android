@@ -553,18 +553,14 @@ class MyRecordsFragment : Fragment() {
             intent.putExtra(PhotoDetailActivity.EXTRA_IMAGE_ID, it)
         }
 
-        // 카테고리 (한글 → 영문 변환)
-        val categoryCode = when (photo.category) {
-            "공부" -> "STUDY"
-            "운동" -> "EXERCISE"
-            "음식" -> "FOOD"
-            "기타" -> "ETC"
-            else -> "ETC"
-        }
+        // 메타데이터에서 실제 저장된 카테고리와 공개 여부 조회
+        val metadata = photoMetadataManager.getMetadataByFileName(photo.file.name)
+
+        // 카테고리 (메타데이터에서 가져오거나, 없으면 기본값 ETC)
+        val categoryCode = metadata?.category ?: "ETC"
         intent.putExtra(PhotoDetailActivity.EXTRA_CATEGORY, categoryCode)
 
         // 공개 여부 (메타데이터에서 조회)
-        val metadata = photoMetadataManager.getMetadataByFileName(photo.file.name)
         val visibility = metadata?.visibility ?: "PRIVATE"
         intent.putExtra(PhotoDetailActivity.EXTRA_VISIBILITY, visibility)
 

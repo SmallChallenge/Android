@@ -179,6 +179,7 @@
                 android:text="카테고리"
                 android:textSize="14sp"
                 android:textColor="@color/gray_400"
+                android:textStyle="bold"
                 android:fontFamily="@font/pretendard_regular"
                 app:layout_constraintTop_toBottomOf="@id/iv_photo"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -209,6 +210,7 @@
                     android:layout_marginStart="8dp"
                     android:text="공부"
                     android:textSize="14sp"
+                    android:textStyle="bold"
                     android:textColor="@color/gray_50"
                     android:fontFamily="@font/pretendard_regular" />
             </LinearLayout>
@@ -222,6 +224,7 @@
                 android:text="공개 여부"
                 android:textSize="14sp"
                 android:textColor="@color/gray_400"
+                android:textStyle="bold"
                 android:fontFamily="@font/pretendard_regular"
                 app:layout_constraintTop_toTopOf="@id/tv_category_label"
                 app:layout_constraintStart_toEndOf="@id/tv_category_label" />
@@ -246,6 +249,7 @@
                 android:layout_marginEnd="20dp"
                 android:orientation="horizontal"
                 android:gravity="center"
+                android:background="@drawable/bg_tag_pressed"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/category_container"
                 app:layout_constraintStart_toStartOf="parent"
@@ -275,6 +279,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:text="공유하기"
+                android:textStyle="bold"
                 android:textAppearance="@style/TextAppearance.App.Button.Large"
                 android:textColor="@color/gray_300"
                 android:background="@drawable/bg_button_share"
