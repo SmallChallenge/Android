@@ -357,12 +357,22 @@ class MyRecordsFragment : Fragment() {
                         // 서버의 originalTakenAt을 timestamp로 변환
                         val timestamp = parseIsoToTimestamp(imageItem.originalTakenAt)
 
+                        // 서버에서 받은 카테고리를 한글로 변환
+                        val categoryKorean = when (imageItem.category) {
+                            "STUDY" -> "공부"
+                            "EXERCISE" -> "운동"
+                            "FOOD" -> "음식"
+                            "ETC" -> "기타"
+                            else -> "기타"
+                        }
+
                         Photo(
                             file = File(imageItem.imageId.toString()),
-                            category = selectedCategory,
+                            category = categoryKorean,
                             serverUrl = imageItem.accessUrl,
                             imageId = imageItem.imageId,
-                            timestamp = timestamp
+                            timestamp = timestamp,
+                            visibility = imageItem.visibility
                         )
                     })
                 }.onFailure { error ->
@@ -540,29 +550,49 @@ class MyRecordsFragment : Fragment() {
     private fun navigateToPhotoDetail(photo: Photo) {
         val intent = Intent(requireContext(), PhotoDetailActivity::class.java)
 
-        // 파일 정보
-        intent.putExtra(PhotoDetailActivity.EXTRA_PHOTO_FILE, photo.file)
+        // 서버 사진인 경우
+        if (photo.imageId != null && photo.serverUrl != null) {
+            intent.putExtra(PhotoDetailActivity.EXTRA_PHOTO_URL, photo.serverUrl)
+            intent.putExtra(PhotoDetailActivity.EXTRA_IMAGE_ID, photo.imageId)
 
-        // 서버 URL (로그인 사용자의 서버 사진)
-        photo.serverUrl?.let {
-            intent.putExtra(PhotoDetailActivity.EXTRA_PHOTO_URL, it)
+            // 서버 사진의 카테고리를 한글→영문으로 변환해서 전달
+            val categoryCode = when (photo.category) {
+                "공부" -> "STUDY"
+                "운동" -> "EXERCISE"
+                "음식" -> "FOOD"
+                "기타" -> "ETC"
+                else -> "ETC"
+            }
+            intent.putExtra(PhotoDetailActivity.EXTRA_CATEGORY, categoryCode)
+
+            // 서버 사진의 공개 여부 전달 (이미 "PUBLIC" 또는 "PRIVATE" 형식)
+            photo.visibility?.let { vis ->
+                intent.putExtra(PhotoDetailActivity.EXTRA_VISIBILITY, vis)
+            }
         }
+        // 로컬 사진인 경우
+        else if (photo.file.exists()) {
+            intent.putExtra(PhotoDetailActivity.EXTRA_PHOTO_FILE, photo.file)
 
-        // 이미지 ID (로그인 사용자의 서버 사진)
-        photo.imageId?.let {
-            intent.putExtra(PhotoDetailActivity.EXTRA_IMAGE_ID, it)
+            // 메타데이터에서 카테고리 조회
+            val metadata = photoMetadataManager.getMetadataByFileName(photo.file.name)
+
+            if (metadata != null) {
+                intent.putExtra(PhotoDetailActivity.EXTRA_CATEGORY, metadata.category)
+                intent.putExtra(PhotoDetailActivity.EXTRA_VISIBILITY, metadata.visibility)
+            } else {
+                // 메타데이터가 없으면 Photo 객체의 카테고리 사용
+                val categoryCode = when (photo.category) {
+                    "공부" -> "STUDY"
+                    "운동" -> "EXERCISE"
+                    "음식" -> "FOOD"
+                    "기타" -> "ETC"
+                    else -> "ETC"
+                }
+                intent.putExtra(PhotoDetailActivity.EXTRA_CATEGORY, categoryCode)
+                intent.putExtra(PhotoDetailActivity.EXTRA_VISIBILITY, "PRIVATE")
+            }
         }
-
-        // 메타데이터에서 실제 저장된 카테고리와 공개 여부 조회
-        val metadata = photoMetadataManager.getMetadataByFileName(photo.file.name)
-
-        // 카테고리 (메타데이터에서 가져오거나, 없으면 기본값 ETC)
-        val categoryCode = metadata?.category ?: "ETC"
-        intent.putExtra(PhotoDetailActivity.EXTRA_CATEGORY, categoryCode)
-
-        // 공개 여부 (메타데이터에서 조회)
-        val visibility = metadata?.visibility ?: "PRIVATE"
-        intent.putExtra(PhotoDetailActivity.EXTRA_VISIBILITY, visibility)
 
         startActivity(intent)
     }
