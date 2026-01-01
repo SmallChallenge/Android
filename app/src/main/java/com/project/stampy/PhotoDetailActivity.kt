@@ -121,8 +121,10 @@ class PhotoDetailActivity : AppCompatActivity() {
         // 공유하기 버튼
         btnShare = findViewById(R.id.btn_share)
 
-        // 비로그인 사용자일 경우 경고 메시지 표시 및 버튼 위치 조정
-        if (!tokenManager.isLoggedIn()) {
+        // 로컬 사진(로그인 전에 올린 사진)일 경우 경고 메시지 표시
+        val isLocalPhoto = imageId == null  // 서버 imageId가 없으면 로컬 사진
+
+        if (isLocalPhoto) {
             warningContainer.visibility = View.VISIBLE
         } else {
             warningContainer.visibility = View.GONE
