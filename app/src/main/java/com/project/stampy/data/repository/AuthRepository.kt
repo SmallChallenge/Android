@@ -205,9 +205,59 @@ class AuthRepository(
     }
 
     /**
-     * 회원탈퇴
+     * 가입 취소 (PENDING 상태 전용)
+     *
+     * 약관 동의 전에 뒤로가기/닫기 버튼으로 나가는 경우
+     * POST /api/v1/auth/cancel-registration
+     * Body 없음 - Authorization 헤더만 전송
      */
-    suspend fun withdraw(): Result<WithdrawalResponse> {
+    suspend fun cancelRegistration(): Result<CancelRegistrationResponse> {
+        var token = "Bearer ${tokenManager.getAccessToken()}"
+
+        return try {
+            var response = authApi.cancelRegistration(token)
+
+            Log.d(TAG, "가입 취소 응답 코드: ${response.code()}")
+
+            // 토큰 만료(401, 403) 시 갱신 후 재시도
+            if (response.code() == 403 || response.code() == 401) {
+                val refreshResult = refreshToken()
+                if (refreshResult.isSuccess) {
+                    token = "Bearer ${tokenManager.getAccessToken()}"
+                    response = authApi.cancelRegistration(token)
+                } else {
+                    tokenManager.clearTokens()
+                    return Result.failure(Exception("토큰 갱신 실패"))
+                }
+            }
+
+            val result = if (response.isSuccessful) {
+                Log.d(TAG, "가입 취소 성공")
+                response.body()?.toResult() ?: Result.failure(Exception("응답 없음"))
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e(TAG, "가입 취소 실패 (${response.code()}): $errorBody")
+                Result.failure(Exception("서버 오류: ${response.code()}"))
+            }
+
+            // 성공 여부와 상관없이 로컬 데이터는 삭제
+            tokenManager.clearTokens()
+            result
+        } catch (e: Exception) {
+            Log.e(TAG, "가입 취소 API 호출 실패: ${e.message}")
+            tokenManager.clearTokens()
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 회원탈퇴 (ACTIVE 상태 전용)
+     *
+     * 정식 가입 완료 후 회원탈퇴
+     * POST /api/v1/auth/withdrawal
+     * Authorization 헤더 + refreshToken Body 필요
+     */
+    suspend fun withdrawal(): Result<WithdrawalResponse> {
         var token = "Bearer ${tokenManager.getAccessToken()}"
         var currentRefreshToken = tokenManager.getRefreshToken()
 
@@ -219,6 +269,8 @@ class AuthRepository(
         return try {
             var request = WithdrawalRequest(currentRefreshToken)
             var response = authApi.withdrawal(token, request)
+
+            Log.d(TAG, "회원탈퇴 응답 코드: ${response.code()}")
 
             // 토큰 만료(401, 403) 시 갱신 후 재시도
             if (response.code() == 403 || response.code() == 401) {
@@ -235,8 +287,11 @@ class AuthRepository(
             }
 
             val result = if (response.isSuccessful) {
+                Log.d(TAG, "회원탈퇴 성공")
                 response.body()?.toResult() ?: Result.failure(Exception("응답 없음"))
             } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e(TAG, "회원탈퇴 실패 (${response.code()}): $errorBody")
                 Result.failure(Exception("서버 오류: ${response.code()}"))
             }
 
@@ -244,6 +299,7 @@ class AuthRepository(
             tokenManager.clearTokens()
             result
         } catch (e: Exception) {
+            Log.e(TAG, "회원탈퇴 API 호출 실패: ${e.message}")
             tokenManager.clearTokens()
             Result.failure(e)
         }

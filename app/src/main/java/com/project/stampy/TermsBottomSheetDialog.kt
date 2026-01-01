@@ -1,6 +1,7 @@
 package com.project.stampy
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -17,8 +18,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
-import com.project.stampy.utils.showToast
+import com.project.stampy.ui.dialog.SingleButtonDialog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TermsBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -60,6 +64,9 @@ class TermsBottomSheetDialog : BottomSheetDialogFragment() {
         super.onCreate(savedInstanceState)
         // 투명 배경 테마 적용
         setStyle(STYLE_NORMAL, R.style.TransparentBottomSheetDialogTheme)
+
+        // 뒤로가기 버튼 비활성화 (onCancel로 처리)
+        isCancelable = true
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -134,6 +141,37 @@ class TermsBottomSheetDialog : BottomSheetDialogFragment() {
         // 개인정보 보기 (화살표)
         btnViewPrivacy.setOnClickListener {
             openWebView(PRIVACY_URL)
+        }
+    }
+
+    /**
+     * 뒤로가기 버튼 처리 - 가입 취소
+     */
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        Log.d(TAG, "뒤로가기 버튼 - 가입 취소 처리")
+        performCancelRegistration()
+    }
+
+    /**
+     * 가입 취소 API 호출 (PENDING 상태에서 나가기)
+     */
+    private fun performCancelRegistration() {
+        GlobalScope.launch(Dispatchers.Main) {
+            Log.d(TAG, "가입 취소 시도")
+
+            val result = authRepository.cancelRegistration()
+
+            result.onSuccess {
+                Log.d(TAG, "가입 취소 성공")
+            }.onFailure { error ->
+                Log.e(TAG, "가입 취소 실패: ${error.message}")
+            }
+
+            // 성공/실패 관계없이 LoginActivity 종료
+            withContext(Dispatchers.Main) {
+                activity?.finish()
+            }
         }
     }
 
@@ -236,13 +274,22 @@ class TermsBottomSheetDialog : BottomSheetDialogFragment() {
 
                 }.onFailure { error ->
                     Log.e(TAG, "약관 동의 실패: ${error.message}")
-                    showToast("약관 동의에 실패했습니다")
+                    showErrorDialog()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "약관 동의 오류", e)
-                showToast("오류가 발생했습니다")
+                showErrorDialog()
             }
         }
+    }
+
+    /**
+     * 에러 다이얼로그 표시
+     */
+    private fun showErrorDialog() {
+        SingleButtonDialog(requireContext())
+            .setTitle("약관 동의에 실패했어요.\n다시 시도해주세요.")
+            .show()
     }
 
     /**

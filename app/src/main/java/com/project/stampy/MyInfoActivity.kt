@@ -68,7 +68,7 @@ class MyInfoActivity : AppCompatActivity() {
 
     private fun performWithdraw() {
         lifecycleScope.launch {
-            val result = authRepository.withdraw()
+            val result = authRepository.withdrawal()  // ACTIVE 상태에서 회원탈퇴
 
             result.onSuccess {
                 // 성공 시 로그인 화면으로

@@ -124,6 +124,17 @@ data class LogoutResponse(
 )
 
 /**
+ * 가입 취소 응답 (cancel-registration)
+ */
+data class CancelRegistrationResponse(
+    @SerializedName("userId")
+    val userId: Long,
+
+    @SerializedName("deletedAt")
+    val deletedAt: String
+)
+
+/**
  * 회원탈퇴 요청
  */
 data class WithdrawalRequest(

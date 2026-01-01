@@ -307,7 +307,7 @@ class LoginActivity : AppCompatActivity() {
     /**
      * 소셜 로그인 API 호출
      *
-     * 1. PENDING + needNickname=true → 약관 동의
+     * 1. PENDING → 약관 동의
      * 2. ACTIVE + needNickname=true → 닉네임 설정 (약관 동의는 이미 완료됨)
      * 3. ACTIVE + needNickname=false → 메인 화면
      */

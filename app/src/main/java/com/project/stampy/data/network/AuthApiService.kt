@@ -53,9 +53,20 @@ interface AuthApiService {
     ): Response<ApiResponse<LogoutResponse>>
 
     /**
-     * 회원탈퇴
+     * 가입 취소 (PENDING 상태에서만 사용)
+     * 약관 동의 전에 나가는 경우
+     * Body 없음 - Authorization 헤더만 필요
      */
     @POST("/api/v1/auth/cancel-registration")
+    suspend fun cancelRegistration(
+        @Header("Authorization") token: String
+    ): Response<ApiResponse<CancelRegistrationResponse>>
+
+    /**
+     * 회원탈퇴 (ACTIVE 상태에서 사용)
+     * Authorization 헤더 + refreshToken Body 필요
+     */
+    @POST("/api/v1/auth/withdrawal")
     suspend fun withdrawal(
         @Header("Authorization") token: String,
         @Body request: WithdrawalRequest
