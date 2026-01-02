@@ -68,70 +68,75 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 이미지 (1:1 정사각형, 라운드, 양옆 20dp) -->
-    <ImageView
-        android:id="@+id/iv_feed_image"
+    <!-- 이미지 컨테이너 (팝오버를 위한 상위 레이아웃) -->
+    <FrameLayout
+        android:id="@+id/image_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="12dp"
-        android:scaleType="centerCrop"
-        android:background="@drawable/bg_photo_rounded"
-        android:clipToOutline="true"
         app:layout_constraintTop_toBottomOf="@id/user_info_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintDimensionRatio="1:1" />
+        app:layout_constraintDimensionRatio="1:1">
 
-    <!-- 팝오버 메뉴 (이미지 위에 겹침) -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/popover_menu"
-        android:layout_width="180dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/bg_popover"
-        android:visibility="gone"
-        android:elevation="8dp"
-        app:layout_constraintTop_toBottomOf="@id/user_info_container"
-        app:layout_constraintEnd_toEndOf="parent">
+        <!-- 이미지 (1:1 정사각형, 라운드) -->
+        <ImageView
+            android:id="@+id/iv_feed_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_photo_rounded"
+            android:clipToOutline="true" />
 
-        <!-- 신고하기 -->
-        <LinearLayout
-            android:id="@+id/menu_report"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+        <!-- 팝오버 메뉴 (이미지 위에 겹침) -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/popover_menu"
+            android:layout_width="180dp"
+            android:layout_height="56dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="20dp"
+            android:visibility="gone"
+            android:elevation="8dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/gray_600">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="신고하기"
-                android:textSize="14sp"
-                android:textColor="@color/gray_300"
-                android:fontFamily="@font/pretendard_semibold" />
+            <!-- 신고하기 -->
+            <LinearLayout
+                android:id="@+id/menu_report"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_warning"
-                app:tint="@color/gray_300" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="신고하기"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_300"
+                    android:fontFamily="@font/pretendard_semibold"
+                    android:textStyle="bold"/>
 
-        </LinearLayout>
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_warning"
+                    app:tint="@color/gray_300" />
+            </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+    </FrameLayout>
 
     <!-- 하단 액션 영역 -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -142,7 +147,7 @@
         android:paddingEnd="20dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        app:layout_constraintTop_toBottomOf="@id/iv_feed_image"
+        app:layout_constraintTop_toBottomOf="@id/image_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

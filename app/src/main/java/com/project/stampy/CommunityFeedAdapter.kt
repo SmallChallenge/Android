@@ -7,7 +7,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -84,7 +84,7 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
         private val ivProfile: ImageView = itemView.findViewById(R.id.iv_profile)
         private val tvNickname: TextView = itemView.findViewById(R.id.tv_nickname)
         private val btnMenu: FrameLayout = itemView.findViewById(R.id.btn_menu)
-        private val popoverMenu: ConstraintLayout = itemView.findViewById(R.id.popover_menu)
+        private val popoverMenu: CardView = itemView.findViewById(R.id.popover_menu)
         private val menuReport: LinearLayout = itemView.findViewById(R.id.menu_report)
         private val ivFeedImage: ImageView = itemView.findViewById(R.id.iv_feed_image)
         private val btnLike: FrameLayout = itemView.findViewById(R.id.btn_like)
