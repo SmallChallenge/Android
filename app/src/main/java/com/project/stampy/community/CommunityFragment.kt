@@ -193,10 +193,9 @@ class CommunityFragment : Fragment() {
      */
     private fun showReportDialog(feed: FeedItem) {
         DoubleButtonDialog(requireContext())
-            .setTitle("게시물 신고")
-            .setDescription("이 게시물을 신고하시겠습니까?\n부적절한 이미지나 스팸성 컨텐츠를 신고해주세요.")
+            .setTitle("부적절한 게시물인가요?")
             .setCancelButtonText("취소")
-            .setConfirmButtonText("신고하기")
+            .setConfirmButtonText("신고")
             .setOnCancelListener {
                 // 취소 시 아무 동작 없음
             }

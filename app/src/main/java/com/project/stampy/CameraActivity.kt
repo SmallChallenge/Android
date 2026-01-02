@@ -429,7 +429,7 @@ class CameraActivity : AppCompatActivity() {
                 if (allGalleryPermissionsGranted()) {
                     switchToGalleryMode()
                 } else {
-                    showToast("촬영한 사진을 갤러리에 저장하기 위해 \n앨범 접근 권한을 허용해 주세요.")
+                    showToast("사진에 타임스탬프를 적용하기 위해 \n앨범 권한을 허용해주세요.")
                 }
             }
         }

@@ -280,14 +280,14 @@
                 android:layout_marginTop="12dp">
 
                 <!-- 전체 공개 태그 -->
-                <com.project.stampy.ui.components.TagView
+                <com.project.stampy.etc.TagView
                     android:id="@+id/tag_public"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="전체 공개" />
 
                 <!-- 비공개 태그 -->
-                <com.project.stampy.ui.components.TagView
+                <com.project.stampy.etc.TagView
                     android:id="@+id/tag_private"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

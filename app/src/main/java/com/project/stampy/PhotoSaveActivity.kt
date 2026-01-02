@@ -619,7 +619,7 @@ class PhotoSaveActivity : AppCompatActivity() {
                 put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Stampic")  // "Stampic"앨범명(폴더명)으로 저장
+                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/스탬픽")  // "스탬픽"앨범명(폴더명)으로 저장
                     put(MediaStore.Images.Media.IS_PENDING, 1)
                 }
             }
@@ -753,7 +753,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         }
 
         if (shouldShowToast) {
-            showToast("필수 항목을 선택해 주세요")
+            showToast("필수 항목을 선택해 주세요.")
         }
 
         return isValid
