@@ -104,10 +104,9 @@ class PhotoSaveActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
-            // 로그인 성공 - 전체 공개 상태로 재설정하고 저장
-            Log.d(TAG, "로그인 성공 - 전체 공개로 저장 진행")
+            // 로그인 성공 - 전체 공개 상태로만 설정
+            Log.d(TAG, "로그인 성공 - 전체 공개 상태로 설정")
             selectPrivacy(true)
-            savePhoto()
         }
     }
 
@@ -256,7 +255,9 @@ class PhotoSaveActivity : AppCompatActivity() {
      * 로그인 화면으로 이동
      */
     private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
+        val intent = Intent(this, LoginActivity::class.java).apply {
+            putExtra(LoginActivity.EXTRA_RETURN_TO_PHOTO_SAVE, true)
+        }
         loginLauncher.launch(intent)
     }
 

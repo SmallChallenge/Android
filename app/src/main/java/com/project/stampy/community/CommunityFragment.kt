@@ -213,7 +213,7 @@ class CommunityFragment : Fragment() {
             communityRepository.reportPost(feed.imageId)
                 .onSuccess { response ->
                     Log.d(TAG, "신고 성공: imageId=${feed.imageId}, reportedAt=${response.reportedAt}")
-                    showToast("신고가 접수되었습니다")
+                    showToast("신고가 접수되었어요.")
                 }
                 .onFailure { error ->
                     Log.e(TAG, "신고 실패: ${error.message}", error)

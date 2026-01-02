@@ -135,12 +135,21 @@ class PhotoUpdateActivity : AppCompatActivity() {
         tvCategoryError = findViewById(R.id.tv_category_error)
         tvPrivacyError = findViewById(R.id.tv_privacy_error)
 
-        // 비로그인 유저 UI 설정
-        if (!tokenManager.isLoggedIn()) {
+        // UI 설정: 로컬 사진이거나 비로그인 유저인 경우
+        val isLocalPhoto = imageId == null  // 서버 imageId가 없으면 로컬 사진
+
+        if (isLocalPhoto) {
+            // 로컬 사진: 로그인 여부와 관계없이 비공개만 가능
+            tagPublic.visibility = View.GONE
+            warningLoginRequired.visibility = View.VISIBLE
+            tvPrivacyGuide.visibility = View.GONE
+        } else if (!tokenManager.isLoggedIn()) {
+            // 비로그인 유저 (서버 사진은 볼 수 없지만 방어 코드)
             tagPublic.visibility = View.GONE
             warningLoginRequired.visibility = View.VISIBLE
             tvPrivacyGuide.visibility = View.GONE
         } else {
+            // 로그인 유저 + 서버 사진: 전체 공개 가능
             tagPublic.visibility = View.VISIBLE
             warningLoginRequired.visibility = View.GONE
             tvPrivacyGuide.visibility = View.VISIBLE

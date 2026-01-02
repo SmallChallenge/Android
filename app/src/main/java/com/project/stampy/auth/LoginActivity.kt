@@ -48,6 +48,9 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var tokenManager: TokenManager
     private lateinit var authRepository: AuthRepository
 
+    // 사진 저장 화면에서 왔는지 여부
+    private var shouldReturnToPhotoSave = false
+
     // 커뮤니티에서 왔는지 여부
     private var shouldReturnToCommunity = false
 
@@ -57,6 +60,9 @@ class LoginActivity : AppCompatActivity() {
         private const val REQUEST_CODE_NICKNAME = 1001
         private const val TERMS_URL = "https://placid-aurora-3ad.notion.site/2b54e8ebd8b080c1a8bdd9267b94dc3e?source=copy_link"
 
+        // 사진 저장 화면에서 왔는지 확인하는 Extra
+        const val EXTRA_RETURN_TO_PHOTO_SAVE = "extra_return_to_photo_save"
+
         // 커뮤니티에서 왔는지 확인하는 Extra
         const val EXTRA_RETURN_TO_COMMUNITY = "extra_return_to_community"
     }
@@ -64,6 +70,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        // 사진 저장 화면에서 왔는지 확인
+        shouldReturnToPhotoSave = intent.getBooleanExtra(EXTRA_RETURN_TO_PHOTO_SAVE, false)
+        Log.d(TAG, "shouldReturnToPhotoSave: $shouldReturnToPhotoSave")
 
         // 커뮤니티에서 왔는지 확인
         shouldReturnToCommunity = intent.getBooleanExtra(EXTRA_RETURN_TO_COMMUNITY, false)
@@ -394,20 +404,32 @@ class LoginActivity : AppCompatActivity() {
      * 메인 화면으로 이동
      */
     private fun navigateToMain() {
-        if (shouldReturnToCommunity) {
+        when {
+            // 사진 저장 화면에서 왔으면 그냥 닫기 (PhotoSaveActivity로 돌아감)
+            shouldReturnToPhotoSave -> {
+                Log.d(TAG, "사진 저장 화면으로 돌아가기")
+                setResult(RESULT_OK)
+                finish()
+            }
+
             // 커뮤니티에서 왔으면 커뮤니티 탭으로 이동
-            Log.d(TAG, "커뮤니티 탭으로 이동")
-            startActivity(Intent(this, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                putExtra(MainActivity.EXTRA_NAVIGATE_TO_COMMUNITY, true)
-            })
-        } else {
+            shouldReturnToCommunity -> {
+                Log.d(TAG, "커뮤니티 탭으로 이동")
+                startActivity(Intent(this, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    putExtra(MainActivity.EXTRA_NAVIGATE_TO_COMMUNITY, true)
+                })
+                finish()
+            }
+
             // 일반 로그인이면 내기록 탭으로 이동
-            Log.d(TAG, "내기록 탭으로 이동")
-            startActivity(Intent(this, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            })
+            else -> {
+                Log.d(TAG, "내기록 탭으로 이동")
+                startActivity(Intent(this, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+                finish()
+            }
         }
-        finish()
     }
 }

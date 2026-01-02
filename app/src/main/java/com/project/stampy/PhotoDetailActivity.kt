@@ -264,6 +264,10 @@ class PhotoDetailActivity : AppCompatActivity() {
      * 공개 여부 UI 설정
      */
     private fun setVisibilityUI(visibility: String) {
+        // 클릭 비활성화 및 항상 선택 상태 유지
+        tagVisibility.isClickable = false
+        tagVisibility.isFocusable = false
+
         when (visibility) {
             "PUBLIC" -> {
                 tagVisibility.text = "전체 공개"
