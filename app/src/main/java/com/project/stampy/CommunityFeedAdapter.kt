@@ -157,12 +157,19 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
          * 좋아요 UI 업데이트
          */
         private fun updateLikeUI(isLiked: Boolean) {
-            val color = if (isLiked) {
-                ContextCompat.getColor(itemView.context, R.color.neon_primary)
+            if (isLiked) {
+                // 좋아요 O: 채워진 하트 + neon_300 색상
+                ivLike.setImageResource(R.drawable.ic_heart_filled)
+                ivLike.setColorFilter(
+                    ContextCompat.getColor(itemView.context, R.color.neon_primary)
+                )
             } else {
-                ContextCompat.getColor(itemView.context, R.color.white)
+                // 좋아요 X: 빈 하트 + 흰색
+                ivLike.setImageResource(R.drawable.ic_heart)
+                ivLike.setColorFilter(
+                    ContextCompat.getColor(itemView.context, R.color.white)
+                )
             }
-            ivLike.setColorFilter(color)
         }
     }
 }
