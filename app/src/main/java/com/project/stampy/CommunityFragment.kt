@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,7 @@ import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.model.FeedItem
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.CommunityRepository
+import com.project.stampy.ui.dialog.DoubleButtonDialog
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
@@ -68,7 +70,6 @@ class CommunityFragment : Fragment() {
         loadCommunityPosts()
     }
 
-    // Fragment가 다시 보일 때 데이터 새로고침
     override fun onResume() {
         super.onResume()
         // 이미 데이터가 로드된 상태라면 새로고침
@@ -110,9 +111,7 @@ class CommunityFragment : Fragment() {
 
         // 메뉴 클릭 리스너 (신고하기)
         communityAdapter.setOnMenuClickListener { feed ->
-            showToast("신고 기능은 준비 중입니다")
-            Log.d(TAG, "신고하기 클릭: imageId=${feed.imageId}")
-            // TODO: 신고 기능 구현
+            showReportDialog(feed)
         }
 
         // 스크롤 리스너 (페이징)
@@ -134,6 +133,49 @@ class CommunityFragment : Fragment() {
                 }
             }
         })
+    }
+
+    /**
+     * 신고 확인 다이얼로그 표시
+     */
+    private fun showReportDialog(feed: FeedItem) {
+        DoubleButtonDialog(requireContext())
+            .setTitle("부적절한 게시물인가요?")
+            .setCancelButtonText("취소")
+            .setConfirmButtonText("신고")
+            .setOnCancelListener {
+                // 취소 시 아무 동작 없음
+            }
+            .setOnConfirmListener {
+                reportPost(feed)
+            }
+            .show()
+    }
+
+    /**
+     * 게시물 신고
+     */
+    private fun reportPost(feed: FeedItem) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            communityRepository.reportPost(feed.imageId)
+                .onSuccess { response ->
+                    Log.d(TAG, "신고 성공: imageId=${feed.imageId}, reportedAt=${response.reportedAt}")
+                    showToast("신고가 접수되었습니다")
+                }
+                .onFailure { error ->
+                    Log.e(TAG, "신고 실패", error)
+
+                    // 에러 메시지 파싱
+                    val errorMessage = when {
+                        error.message?.contains("동작 신고") == true ||
+                                error.message?.contains("already") == true ->
+                            "이미 신고한 게시물입니다"
+                        else -> "신고에 실패했습니다. 다시 시도해주세요"
+                    }
+
+                    showToast(errorMessage)
+                }
+        }
     }
 
     /**
@@ -236,7 +278,7 @@ class CommunityFragment : Fragment() {
             // 서버 요청
             communityRepository.toggleLike(feed.imageId)
                 .onSuccess { response ->
-                    Log.d(TAG, "좋아요 토글 성공: imageId=${feed.imageId}, isLiked=${response.isLiked}, 서버 응답=$response")
+                    Log.d(TAG, "좋아요 토글 성공: imageId=${feed.imageId}, isLiked=${response.isLiked}")
 
                     // 서버 응답으로 최종 업데이트
                     communityAdapter.updateLikeStatus(

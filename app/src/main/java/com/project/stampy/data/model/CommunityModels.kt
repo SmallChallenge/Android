@@ -60,3 +60,14 @@ data class LikeToggleResponse(
     @SerializedName("liked")
     val isLiked: Boolean
 )
+
+/**
+ * 신고 응답
+ */
+data class ReportResponse(
+    @SerializedName("imageId")
+    val imageId: Long,
+
+    @SerializedName("reportedAt")
+    val reportedAt: String
+)

@@ -66,4 +66,14 @@ class CommunityRepository(
             communityApi.toggleLike(token, imageId)
         }
     }
+
+    /**
+     * 게시물 신고
+     */
+    suspend fun reportPost(imageId: Long): Result<ReportResponse> {
+        val token = "Bearer ${tokenManager.getAccessToken()}"
+        return safeApiCall {
+            communityApi.reportPost(token, imageId)
+        }
+    }
 }

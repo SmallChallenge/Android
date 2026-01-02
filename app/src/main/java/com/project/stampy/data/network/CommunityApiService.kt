@@ -30,4 +30,13 @@ interface CommunityApiService {
         @Header("Authorization") token: String,
         @Path("imageId") imageId: Long
     ): Response<ApiResponse<LikeToggleResponse>>
+
+    /**
+     * 게시물 신고
+     */
+    @POST("/api/v1/community/{imageId}/report")
+    suspend fun reportPost(
+        @Header("Authorization") token: String,
+        @Path("imageId") imageId: Long
+    ): Response<ApiResponse<ReportResponse>>
 }
