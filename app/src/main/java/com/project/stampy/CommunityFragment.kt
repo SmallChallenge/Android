@@ -98,10 +98,11 @@ class CommunityFragment : Fragment() {
             toggleLike(feed)
         }
 
-        // 메뉴 클릭 리스너 (추후 구현)
+        // 메뉴 클릭 리스너 (신고하기)
         communityAdapter.setOnMenuClickListener { feed ->
-            // TODO: 메뉴 팝업 표시
-            Log.d(TAG, "메뉴 클릭: ${feed.imageId}")
+            showToast("신고 기능은 준비 중입니다")
+            Log.d(TAG, "신고하기 클릭: imageId=${feed.imageId}")
+            // TODO: 신고 기능 구현
         }
 
         // 스크롤 리스너 (페이징)
@@ -207,19 +208,44 @@ class CommunityFragment : Fragment() {
      */
     private fun toggleLike(feed: FeedItem) {
         viewLifecycleOwner.lifecycleScope.launch {
+            // 낙관적 업데이트 (즉시 UI 변경)
+            val newIsLiked = !feed.isLiked
+            val newLikeCount = if (newIsLiked) feed.likeCount + 1 else feed.likeCount - 1
+
+            communityAdapter.updateLikeStatus(
+                imageId = feed.imageId,
+                isLiked = newIsLiked,
+                likeCount = newLikeCount
+            )
+
+            // 서버 요청
             communityRepository.toggleLike(feed.imageId)
                 .onSuccess { response ->
-                    Log.d(TAG, "좋아요 토글 성공: imageId=${response.imageId}, isLiked=${response.isLiked}, count=${response.likeCount}")
+                    Log.d(TAG, "좋아요 토글 성공: imageId=${feed.imageId}, isLiked=${response.isLiked}")
 
-                    // 어댑터 업데이트
+                    // 서버 응답으로 최종 업데이트
+                    val finalLikeCount = if (response.isLiked) {
+                        if (feed.isLiked) feed.likeCount else feed.likeCount + 1
+                    } else {
+                        if (feed.isLiked) feed.likeCount - 1 else feed.likeCount
+                    }
+
                     communityAdapter.updateLikeStatus(
-                        imageId = response.imageId,
+                        imageId = feed.imageId,
                         isLiked = response.isLiked,
-                        likeCount = response.likeCount
+                        likeCount = finalLikeCount
                     )
                 }
                 .onFailure { error ->
                     Log.e(TAG, "좋아요 토글 실패", error)
+
+                    // 실패 시 원래 상태로 복원
+                    communityAdapter.updateLikeStatus(
+                        imageId = feed.imageId,
+                        isLiked = feed.isLiked,
+                        likeCount = feed.likeCount
+                    )
+
                     showToast("좋아요에 실패했어요")
                 }
         }

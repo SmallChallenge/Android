@@ -25,7 +25,7 @@ interface CommunityApiService {
     /**
      * 좋아요 토글
      */
-    @POST("/api/v1/community/images/{imageId}/like")
+    @POST("/api/v1/community/{imageId}/like")
     suspend fun toggleLike(
         @Header("Authorization") token: String,
         @Path("imageId") imageId: Long

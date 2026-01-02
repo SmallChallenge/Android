@@ -3,14 +3,15 @@ package com.project.stampy
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.project.stampy.data.model.FeedItem
-import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * 커뮤니티 피드 어댑터
@@ -82,8 +83,11 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
     inner class FeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val ivProfile: ImageView = itemView.findViewById(R.id.iv_profile)
         private val tvNickname: TextView = itemView.findViewById(R.id.tv_nickname)
-        private val btnMenu: ImageView = itemView.findViewById(R.id.btn_menu)
+        private val btnMenu: FrameLayout = itemView.findViewById(R.id.btn_menu)
+        private val popoverMenu: ConstraintLayout = itemView.findViewById(R.id.popover_menu)
+        private val menuReport: LinearLayout = itemView.findViewById(R.id.menu_report)
         private val ivFeedImage: ImageView = itemView.findViewById(R.id.iv_feed_image)
+        private val btnLike: FrameLayout = itemView.findViewById(R.id.btn_like)
         private val ivLike: ImageView = itemView.findViewById(R.id.iv_like)
         private val tvLikeCount: TextView = itemView.findViewById(R.id.tv_like_count)
 
@@ -92,15 +96,7 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
             tvNickname.text = feed.nickname
 
             // 프로필 이미지
-            if (feed.profileImageUrl.isNotEmpty()) {
-                Glide.with(itemView.context)
-                    .load(feed.profileImageUrl)
-                    .circleCrop()
-                    .placeholder(R.drawable.ic_profile)
-                    .into(ivProfile)
-            } else {
-                ivProfile.setImageResource(R.drawable.ic_profile)
-            }
+            ivProfile.setImageResource(R.drawable.ic_my_profile)
 
             // 피드 이미지
             Glide.with(itemView.context)
@@ -112,15 +108,49 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
             updateLikeUI(feed.isLiked)
             tvLikeCount.text = feed.likeCount.toString()
 
-            // 좋아요 클릭
-            ivLike.setOnClickListener {
-                onLikeClickListener?.invoke(feed, adapterPosition)
+            // 팝오버 초기화 (닫힌 상태)
+            popoverMenu.visibility = View.GONE
+
+            // 메뉴 버튼 클릭 (팝오버 토글)
+            btnMenu.setOnClickListener {
+                togglePopover()
             }
 
-            // 메뉴 클릭
-            btnMenu.setOnClickListener {
+            // 신고하기 클릭
+            menuReport.setOnClickListener {
+                hidePopover()
                 onMenuClickListener?.invoke(feed)
             }
+
+            // 좋아요 버튼 클릭
+            btnLike.setOnClickListener {
+                onLikeClickListener?.invoke(feed, adapterPosition)
+            }
+        }
+
+        /**
+         * 팝오버 토글
+         */
+        private fun togglePopover() {
+            if (popoverMenu.visibility == View.VISIBLE) {
+                hidePopover()
+            } else {
+                showPopover()
+            }
+        }
+
+        /**
+         * 팝오버 표시
+         */
+        private fun showPopover() {
+            popoverMenu.visibility = View.VISIBLE
+        }
+
+        /**
+         * 팝오버 숨김
+         */
+        private fun hidePopover() {
+            popoverMenu.visibility = View.GONE
         }
 
         /**

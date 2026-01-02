@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background_primary"
-    android:paddingBottom="32dp">
+    android:paddingBottom="10dp">
 
     <!-- 상단 유저 정보 영역 -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -13,9 +13,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="12dp"
+        android:paddingEnd="10dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -23,9 +22,9 @@
         <!-- 프로필 이미지 -->
         <ImageView
             android:id="@+id/iv_profile"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_profile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_my_profile"
             android:scaleType="centerCrop"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -38,25 +37,82 @@
             android:layout_height="wrap_content"
             android:text="홍길동"
             android:textColor="@color/text_primary"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:fontFamily="@font/pretendard_semibold"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="12dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_profile"
             app:layout_constraintEnd_toStartOf="@id/btn_menu" />
 
-        <!-- 메뉴 버튼 (점 3개) -->
-        <ImageView
+        <!-- 메뉴 버튼 (점 3개) - 터치 영역 44dp -->
+        <FrameLayout
             android:id="@+id/btn_menu"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_more_vertical"
-            android:padding="4dp"
-            app:tint="@color/text_primary"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_more_vertical"
+                app:tint="@color/text_primary" />
+        </FrameLayout>
+
+        <!-- 팝오버 메뉴 (초기에는 숨김) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/popover_menu"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_popover"
+            android:visibility="gone"
+            android:elevation="8dp"
+            app:layout_constraintTop_toBottomOf="@id/btn_menu"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- 신고하기 -->
+            <LinearLayout
+                android:id="@+id/menu_report"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="신고하기"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_300"
+                    android:fontFamily="@font/pretendard_semibold"
+                    android:layout_marginEnd="12dp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_warning"
+                    app:tint="@color/gray_300" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -65,6 +121,7 @@
         android:id="@+id/iv_feed_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="12dp"
         android:scaleType="centerCrop"
         android:background="@color/gray_primary"
         app:layout_constraintTop_toBottomOf="@id/user_info_container"
@@ -79,21 +136,32 @@
         android:layout_height="wrap_content"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:paddingTop="12dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
         app:layout_constraintTop_toBottomOf="@id/iv_feed_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 좋아요 아이콘 -->
-        <ImageView
-            android:id="@+id/iv_like"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_heart"
-            app:tint="@color/white"
+        <!-- 좋아요 버튼 (터치 영역 44dp) -->
+        <FrameLayout
+            android:id="@+id/btn_like"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:id="@+id/iv_like"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_heart"
+                app:tint="@color/white" />
+        </FrameLayout>
 
         <!-- 좋아요 수 -->
         <TextView
@@ -104,10 +172,10 @@
             android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:fontFamily="@font/pretendard_regular"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="-4dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/iv_like" />
+            app:layout_constraintStart_toEndOf="@id/btn_like" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

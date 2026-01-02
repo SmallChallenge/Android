@@ -57,12 +57,6 @@ data class SliceInfo(
  * 좋아요 토글 응답
  */
 data class LikeToggleResponse(
-    @SerializedName("imageId")
-    val imageId: Long,
-
-    @SerializedName("isLiked")
-    val isLiked: Boolean,
-
-    @SerializedName("likeCount")
-    val likeCount: Int
+    @SerializedName("liked")
+    val isLiked: Boolean
 )
