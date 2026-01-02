@@ -54,6 +54,9 @@ class LoginActivity : AppCompatActivity() {
     // 커뮤니티에서 왔는지 여부
     private var shouldReturnToCommunity = false
 
+    // 회원탈퇴 후 진입했는지 여부
+    private var isFromWithdrawal = false
+
     companion object {
         private const val TAG = "LoginActivity"
         private const val RC_GOOGLE_SIGN_IN = 9001
@@ -65,6 +68,9 @@ class LoginActivity : AppCompatActivity() {
 
         // 커뮤니티에서 왔는지 확인하는 Extra
         const val EXTRA_RETURN_TO_COMMUNITY = "extra_return_to_community"
+
+        // 회원탈퇴 후 진입했는지 확인하는 Extra
+        const val EXTRA_FROM_WITHDRAWAL = "extra_from_withdrawal"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,6 +84,10 @@ class LoginActivity : AppCompatActivity() {
         // 커뮤니티에서 왔는지 확인
         shouldReturnToCommunity = intent.getBooleanExtra(EXTRA_RETURN_TO_COMMUNITY, false)
         Log.d(TAG, "shouldReturnToCommunity: $shouldReturnToCommunity")
+
+        // 회원탈퇴 후 진입했는지 확인
+        isFromWithdrawal = intent.getBooleanExtra(EXTRA_FROM_WITHDRAWAL, false)
+        Log.d(TAG, "isFromWithdrawal: $isFromWithdrawal")
 
         // TokenManager 및 Repository 초기화
         tokenManager = TokenManager(this)
@@ -126,9 +136,15 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        // 닫기 버튼 - 로그인 페이지 닫기
+        // 닫기 버튼 - 회원탈퇴 후라면 MainActivity로, 아니면 그냥 닫기
         btnCloseTouchArea.setOnClickListener {
-            finish()
+            if (isFromWithdrawal) {
+                // 회원탈퇴 후라면 MainActivity의 내기록 탭으로 이동
+                navigateToMainAfterWithdrawal()
+            } else {
+                // 일반적인 경우 그냥 닫기
+                finish()
+            }
         }
 
         btnKakaoLogin.setOnClickListener { signInWithKakao() }
@@ -422,6 +438,12 @@ class LoginActivity : AppCompatActivity() {
                 finish()
             }
 
+            // 회원탈퇴 후라면 내기록 탭으로 이동
+            isFromWithdrawal -> {
+                Log.d(TAG, "회원탈퇴 후 재로그인 - 내기록 탭으로 이동")
+                navigateToMainAfterWithdrawal()
+            }
+
             // 일반 로그인이면 내기록 탭으로 이동
             else -> {
                 Log.d(TAG, "내기록 탭으로 이동")
@@ -430,6 +452,26 @@ class LoginActivity : AppCompatActivity() {
                 })
                 finish()
             }
+        }
+    }
+
+    /**
+     * 회원탈퇴 후 MainActivity의 내기록 탭으로 이동
+     */
+    private fun navigateToMainAfterWithdrawal() {
+        Log.d(TAG, "회원탈퇴 후 내기록 화면으로 이동")
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
+        finish()
+    }
+
+    override fun onBackPressed() {
+        // 회원탈퇴 후라면 뒤로가기도 MainActivity로
+        if (isFromWithdrawal) {
+            navigateToMainAfterWithdrawal()
+        } else {
+            super.onBackPressed()
         }
     }
 }

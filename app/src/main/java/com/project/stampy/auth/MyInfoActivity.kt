@@ -96,9 +96,10 @@ class MyInfoActivity : AppCompatActivity() {
             val result = authRepository.withdrawal()  // ACTIVE 상태에서 회원탈퇴
 
             result.onSuccess {
-                // 성공 시 로그인 화면으로
+                // 성공 시 로그인 화면으로 (탈퇴 후임을 표시)
                 val intent = Intent(this@MyInfoActivity, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                intent.putExtra(LoginActivity.EXTRA_FROM_WITHDRAWAL, true)  // 탈퇴 후 진입임을 표시
                 startActivity(intent)
                 finish()
             }.onFailure {
