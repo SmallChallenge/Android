@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background_primary"
-    android:paddingBottom="10dp">
+    android:paddingBottom="10dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <!-- 상단 유저 정보 영역 -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,7 +67,6 @@
                 android:src="@drawable/ic_more_vertical"
                 app:tint="@color/text_primary" />
         </FrameLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- 이미지 컨테이너 (팝오버를 위한 상위 레이아웃) -->
@@ -76,6 +77,8 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="12dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/user_info_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -96,10 +99,9 @@
             android:layout_width="180dp"
             android:layout_height="56dp"
             android:layout_gravity="top|end"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginTop="-12dp"
             android:visibility="gone"
-            android:elevation="8dp"
+            android:translationZ="50dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="8dp"
             app:cardBackgroundColor="@color/gray_600">
@@ -111,8 +113,6 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground">
@@ -121,8 +121,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginStart="24dp"
                     android:text="신고하기"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textColor="@color/gray_300"
                     android:fontFamily="@font/pretendard_semibold"
                     android:textStyle="bold"/>
@@ -130,12 +131,11 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/ic_warning"
+                    android:layout_marginEnd="24dp"
+                    android:src="@drawable/ic_report"
                     app:tint="@color/gray_300" />
             </LinearLayout>
-
         </androidx.cardview.widget.CardView>
-
     </FrameLayout>
 
     <!-- 하단 액션 영역 -->
@@ -185,7 +185,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_like" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
