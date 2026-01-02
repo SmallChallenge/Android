@@ -1,5 +1,6 @@
 package com.project.stampy.data.repository
 
+import com.google.gson.Gson
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.model.*
 import com.project.stampy.data.network.CommunityApiService
@@ -15,6 +16,8 @@ class CommunityRepository(
     private val communityApi: CommunityApiService =
         RetrofitClient.createService(CommunityApiService::class.java)
 
+    private val gson = Gson()
+
     /**
      * 공통 API 호출 처리
      */
@@ -27,7 +30,19 @@ class CommunityRepository(
                 response.body()?.toResult()
                     ?: Result.failure(Exception("응답 없음"))
             } else {
-                Result.failure(Exception("서버 오류: ${response.code()}"))
+                // 에러 응답 파싱
+                val errorBody = response.errorBody()?.string()
+                val errorMessage = try {
+                    if (errorBody != null) {
+                        val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
+                        errorResponse.message ?: "서버 오류: ${response.code()}"
+                    } else {
+                        "서버 오류: ${response.code()}"
+                    }
+                } catch (e: Exception) {
+                    "서버 오류: ${response.code()}"
+                }
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Result.failure(e)

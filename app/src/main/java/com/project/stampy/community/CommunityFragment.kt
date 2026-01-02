@@ -216,17 +216,28 @@ class CommunityFragment : Fragment() {
                     showToast("신고가 접수되었습니다")
                 }
                 .onFailure { error ->
-                    Log.e(TAG, "신고 실패", error)
+                    Log.e(TAG, "신고 실패: ${error.message}", error)
 
-                    // 에러 메시지 파싱
-                    val errorMessage = when {
-                        error.message?.contains("동작 신고") == true ||
-                                error.message?.contains("already") == true ->
+                    val errorMsg = error.message ?: ""
+
+                    // 에러 메시지 처리
+                    val toastMessage = when {
+                        // 자신의 게시물 신고 시도 (메시지에 "자신" 포함)
+                        errorMsg.contains("SELF_REPORT_NOT_ALLOWED") ||
+                                errorMsg.contains("자신의 게시물") ->
+                            "본인 게시물은 신고할 수 없어요."
+
+                        // 이미 신고한 게시물
+                        errorMsg.contains("DUPLICATE_REPORT") ||
+                                errorMsg.contains("이미") ->
                             "이미 신고한 게시물입니다"
-                        else -> "신고에 실패했습니다. 다시 시도해주세요"
+
+                        // 기타 에러
+                        else ->
+                            "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
                     }
 
-                    showToast(errorMessage)
+                    showToast(toastMessage)
                 }
         }
     }
