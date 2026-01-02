@@ -88,18 +88,6 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="16dp">
 
-                <!-- All -->
-                <TextView
-                    android:id="@+id/btn_category_all"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="All"
-                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
-                    android:textColor="@color/gray_50"
-                    android:background="@drawable/bg_category_selected"
-                    android:clickable="true"
-                    android:focusable="true" />
-
                 <!-- Basic -->
                 <TextView
                     android:id="@+id/btn_category_Basic"
@@ -108,7 +96,6 @@
                     android:text="Basic"
                     android:textAppearance="@style/TextAppearance.App.Button2.Large"
                     android:textColor="@color/gray_500"
-                    android:layout_marginStart="16dp"
                     android:clickable="true"
                     android:focusable="true" />
 

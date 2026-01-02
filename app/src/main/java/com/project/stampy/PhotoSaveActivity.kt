@@ -88,7 +88,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         const val EXTRA_TEMPLATE_NAME = "extra_template_name"
 
         private const val TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss"
-        private const val FILE_PREFIX = "STAMPY_"
+        private const val FILE_PREFIX = "STAMPIC_"  // "Stampic" 파일명으로 저장
         private const val FILE_EXTENSION = ".jpg"
 
         fun generateFileName(): String {
@@ -364,7 +364,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         Log.d(TAG, "비로그인 저장 완료: ${nonLoginPhotoManager.getPhotoCount()}/${nonLoginPhotoManager.getMaxPhotos()}")
 
         withContext(Dispatchers.Main) {
-            showToast("사진이 저장되었습니다")
+            showToast("저장이 완료되었어요.")
             navigateToMain()
         }
     }
@@ -618,7 +618,7 @@ class PhotoSaveActivity : AppCompatActivity() {
                 put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Stampy")
+                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Stampic")  // "Stampic"앨범명(폴더명)으로 저장
                     put(MediaStore.Images.Media.IS_PENDING, 1)
                 }
             }
@@ -682,7 +682,7 @@ class PhotoSaveActivity : AppCompatActivity() {
                         // uploadToCommunity(response.imageId)
                     }
 
-                    showToast("사진이 저장되었습니다")
+                    showToast("저장이 완료되었어요.")
                     navigateToMain()
 
                 }.onFailure { error ->
@@ -731,11 +731,13 @@ class PhotoSaveActivity : AppCompatActivity() {
      */
     private fun validateInputs(): Boolean {
         var isValid = true
+        var shouldShowToast = false
 
         // 카테고리 검증
         if (selectedCategory == null) {
             showError(tvCategoryError)
             isValid = false
+            shouldShowToast = true
         } else {
             hideError(tvCategoryError)
         }
@@ -744,8 +746,13 @@ class PhotoSaveActivity : AppCompatActivity() {
         if (isPublic == null) {
             showError(tvPrivacyError)
             isValid = false
+            shouldShowToast = true
         } else {
             hideError(tvPrivacyError)
+        }
+
+        if (shouldShowToast) {
+            showToast("필수 항목을 선택해 주세요")
         }
 
         return isValid

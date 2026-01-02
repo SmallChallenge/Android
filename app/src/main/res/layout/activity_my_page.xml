@@ -151,11 +151,11 @@
                 android:background="@drawable/bg_login_promotion"
                 android:visibility="visible">
 
-                <!-- 로그인하고 기록을 계속 이어가세요✨ -->
+                <!-- 로그인하고 기록을 계속 이어가세요 ✨ -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="로그인하고 기록을 계속 이어가세요✨"
+                    android:text="로그인하고 기록을 계속 이어가세요 ✨"
                     android:textColor="@color/gray_300"
                     android:textSize="16sp"
                     android:fontFamily="@font/pretendard_semibold"
@@ -352,6 +352,7 @@
                         android:text="1.0.0"
                         android:textColor="@color/gray_500"
                         android:textSize="14sp"
+                        android:paddingEnd="8dp"
                         android:fontFamily="@font/pretendard_regular" />
                 </LinearLayout>
 

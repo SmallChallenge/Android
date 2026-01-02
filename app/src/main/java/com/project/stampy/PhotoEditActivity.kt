@@ -26,7 +26,6 @@ class PhotoEditActivity : AppCompatActivity() {
     private lateinit var tvTemplateOverlay: TextView
 
     // 카테고리
-    private lateinit var btnCategoryAll: TextView
     private lateinit var btnCategoryBasic: TextView
     private lateinit var btnCategoryMoody: TextView
     private lateinit var btnCategoryActive: TextView
@@ -44,7 +43,7 @@ class PhotoEditActivity : AppCompatActivity() {
 
     private var selectedTemplate: FrameLayout? = null
 
-    private var selectedCategory = "전체"
+    private var selectedCategory = "Basic"
     private var photoUri: Uri? = null
 
     companion object {
@@ -63,6 +62,8 @@ class PhotoEditActivity : AppCompatActivity() {
         initViews()
         setupListeners()
         loadPhoto()
+
+        activateCategoryButton(btnCategoryBasic)    // 기본 선택
     }
 
     private fun initViews() {
@@ -78,7 +79,6 @@ class PhotoEditActivity : AppCompatActivity() {
         tvTemplateOverlay = findViewById(R.id.tv_template_overlay)
 
         // 카테고리
-        btnCategoryAll = findViewById(R.id.btn_category_all)
         btnCategoryBasic = findViewById(R.id.btn_category_Basic)
         btnCategoryMoody = findViewById(R.id.btn_category_Moody)
         btnCategoryActive = findViewById(R.id.btn_category_Active)
@@ -130,7 +130,6 @@ class PhotoEditActivity : AppCompatActivity() {
         } ?: Log.e(TAG, "btnNext is null!")
 
         // 카테고리 선택
-        btnCategoryAll.setOnClickListener { selectCategory("All", btnCategoryAll) }
         btnCategoryBasic.setOnClickListener { selectCategory("Basic", btnCategoryBasic) }
         btnCategoryMoody.setOnClickListener { selectCategory("Moody", btnCategoryMoody) }
         btnCategoryActive.setOnClickListener { selectCategory("Active", btnCategoryActive) }
@@ -172,7 +171,6 @@ class PhotoEditActivity : AppCompatActivity() {
         selectedCategory = category
 
         // 모든 버튼 초기화
-        resetCategoryButton(btnCategoryAll)
         resetCategoryButton(btnCategoryBasic)
         resetCategoryButton(btnCategoryMoody)
         resetCategoryButton(btnCategoryActive)
