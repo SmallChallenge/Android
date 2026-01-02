@@ -421,7 +421,7 @@ class CameraActivity : AppCompatActivity() {
                 if (allCameraPermissionsGranted()) {
                     startCamera()
                 } else {
-                    showToast("카메라 권한이 필요합니다")
+                    showToast("사진 촬영을 위해 \n카메라 접근 권한을 허용해 주세요.")
                     finish()
                 }
             }
@@ -429,7 +429,7 @@ class CameraActivity : AppCompatActivity() {
                 if (allGalleryPermissionsGranted()) {
                     switchToGalleryMode()
                 } else {
-                    showToast("갤러리 권한이 필요합니다")
+                    showToast("촬영한 사진을 갤러리에 저장하기 위해 \n앨범 접근 권한을 허용해 주세요.")
                 }
             }
         }

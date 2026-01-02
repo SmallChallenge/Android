@@ -80,8 +80,8 @@
         <TextView
             android:id="@+id/tv_subtitle"
             android:layout_width="281dp"
-            android:layout_height="28dp"
-            android:text="STAMPY에서 사용할 닉네임을 입력해주세요."
+            android:layout_height="wrap_content"
+            android:text="STAMPIC에서 사용할 닉네임을 입력해주세요."
             android:textAppearance="@style/TextAppearance.App.Body1"
             android:textColor="@color/text_secondary"
             android:gravity="center"

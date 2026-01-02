@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera()
             } else {
-                showToast("카메라 권한이 필요합니다")
+                showToast("사진 촬영을 위해 \n카메라 접근 권한을 허용해 주세요.")
             }
         }
     }
