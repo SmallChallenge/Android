@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
-import com.project.stampy.ui.dialog.DoubleButtonDialog
+import com.project.stampy.etc.DoubleButtonDialog
 import com.project.stampy.utils.showToast
 
 class PhotoEditActivity : AppCompatActivity() {

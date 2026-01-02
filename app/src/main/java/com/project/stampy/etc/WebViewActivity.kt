@@ -1,10 +1,11 @@
-package com.project.stampy
+package com.project.stampy.etc
 
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.project.stampy.R
 
 /**
  * 인앱 브라우저 (WebView)

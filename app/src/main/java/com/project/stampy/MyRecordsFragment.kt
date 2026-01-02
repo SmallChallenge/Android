@@ -20,13 +20,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.project.stampy.auth.MyPageActivity
 import com.project.stampy.data.local.NonLoginPhotoManager
 import com.project.stampy.data.local.PhotoMetadataManager
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.model.Photo
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.ImageRepository
-import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 import java.io.File
 

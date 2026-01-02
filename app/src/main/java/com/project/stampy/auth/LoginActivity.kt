@@ -1,4 +1,4 @@
-package com.project.stampy
+package com.project.stampy.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -27,10 +27,13 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
+import com.project.stampy.MainActivity
+import com.project.stampy.R
+import com.project.stampy.etc.WebViewActivity
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
-import com.project.stampy.ui.dialog.SingleButtonDialog
+import com.project.stampy.etc.SingleButtonDialog
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 

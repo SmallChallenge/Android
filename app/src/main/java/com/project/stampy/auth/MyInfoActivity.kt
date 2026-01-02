@@ -1,18 +1,18 @@
-package com.project.stampy
+package com.project.stampy.auth
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.project.stampy.R
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
-import com.project.stampy.ui.dialog.DoubleButtonDialog
-import com.project.stampy.ui.dialog.SingleButtonDialog
+import com.project.stampy.etc.DoubleButtonDialog
+import com.project.stampy.etc.SingleButtonDialog
 import kotlinx.coroutines.launch
 
 class MyInfoActivity : AppCompatActivity() {

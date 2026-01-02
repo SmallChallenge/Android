@@ -1,4 +1,4 @@
-package com.project.stampy
+package com.project.stampy.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -18,10 +18,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
+import com.project.stampy.MainActivity
+import com.project.stampy.R
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
-import com.project.stampy.ui.dialog.SingleButtonDialog
+import com.project.stampy.etc.SingleButtonDialog
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
@@ -212,7 +214,9 @@ class NicknameActivity : AppCompatActivity() {
             viewUnderline.setBackgroundColor(
                 ContextCompat.getColor(this, R.color.neon_primary)
             )
-            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.neon_primary)
+            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this,
+                R.color.neon_primary
+            )
             btnComplete.setTextColor(
                 ContextCompat.getColor(this, R.color.button_text_active)
             )
@@ -221,7 +225,9 @@ class NicknameActivity : AppCompatActivity() {
             viewUnderline.setBackgroundColor(
                 ContextCompat.getColor(this, R.color.gray_700)
             )
-            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.button_inactive)
+            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this,
+                R.color.button_inactive
+            )
             btnComplete.setTextColor(
                 ContextCompat.getColor(this, R.color.button_text_inactive)
             )

@@ -18,8 +18,8 @@ import com.project.stampy.data.local.PhotoMetadataManager
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.ImageRepository
-import com.project.stampy.ui.components.TagView
-import com.project.stampy.ui.dialog.DoubleButtonDialog
+import com.project.stampy.etc.TagView
+import com.project.stampy.etc.DoubleButtonDialog
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

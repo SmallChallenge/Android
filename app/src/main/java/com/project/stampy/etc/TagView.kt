@@ -1,8 +1,7 @@
-package com.project.stampy.ui.components
+package com.project.stampy.etc
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.project.stampy.R
@@ -17,7 +16,7 @@ import com.project.stampy.R
  *
  * 사용법:
  * ```xml
- * <com.project.stampy.ui.components.TagView
+ * <com.project.stampy.etc.TagView
  *     android:id="@+id/tag_public"
  *     android:layout_width="wrap_content"
  *     android:layout_height="wrap_content"

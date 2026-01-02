@@ -11,9 +11,11 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.project.stampy.auth.LoginActivity
+import com.project.stampy.community.CommunityFragment
 import com.project.stampy.data.local.NonLoginPhotoManager
 import com.project.stampy.data.local.TokenManager
-import com.project.stampy.ui.dialog.DoubleButtonDialog
+import com.project.stampy.etc.DoubleButtonDialog
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

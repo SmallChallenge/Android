@@ -1,4 +1,4 @@
-package com.project.stampy.ui.dialog
+package com.project.stampy.etc
 
 import android.app.Dialog
 import android.content.Context

@@ -1,4 +1,4 @@
-package com.project.stampy
+package com.project.stampy.auth
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -15,10 +15,12 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.project.stampy.R
+import com.project.stampy.etc.WebViewActivity
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
-import com.project.stampy.ui.dialog.SingleButtonDialog
+import com.project.stampy.etc.SingleButtonDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

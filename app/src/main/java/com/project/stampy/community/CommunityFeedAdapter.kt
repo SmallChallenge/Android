@@ -1,4 +1,4 @@
-package com.project.stampy
+package com.project.stampy.community
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +11,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.project.stampy.R
 import com.project.stampy.data.model.FeedItem
 
 /**

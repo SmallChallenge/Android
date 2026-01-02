@@ -1,4 +1,4 @@
-package com.project.stampy
+package com.project.stampy.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,12 +13,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
+import com.project.stampy.MainActivity
+import com.project.stampy.R
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
-import com.project.stampy.ui.dialog.DoubleButtonDialog
-import com.project.stampy.ui.dialog.SingleButtonDialog
-import com.project.stampy.utils.showToast
+import com.project.stampy.etc.DoubleButtonDialog
+import com.project.stampy.etc.SingleButtonDialog
+import com.project.stampy.etc.WebViewActivity
 import kotlinx.coroutines.launch
 
 class MyPageActivity : AppCompatActivity() {

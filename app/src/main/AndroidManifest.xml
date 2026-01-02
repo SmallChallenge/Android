@@ -83,30 +83,30 @@
 
         <!-- MyPageActivity -->
         <activity
-            android:name=".MyPageActivity"
+            android:name=".auth.MyPageActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
 
         <!-- MyInfoActivity -->
         <activity
-            android:name=".MyInfoActivity"
+            android:name=".auth.MyInfoActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
 
         <!-- LoginActivity -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".auth.LoginActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
 
         <!-- WebViewActivity -->
         <activity
-            android:name=".WebViewActivity"
+            android:name=".etc.WebViewActivity"
             android:exported="false" />
 
         <!-- NicknameActivity -->
         <activity
-            android:name=".NicknameActivity"
+            android:name=".auth.NicknameActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />

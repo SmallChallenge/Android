@@ -1,4 +1,4 @@
-package com.project.stampy
+package com.project.stampy.community
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,11 +13,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.project.stampy.auth.LoginActivity
+import com.project.stampy.auth.MyPageActivity
+import com.project.stampy.R
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.model.FeedItem
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.CommunityRepository
-import com.project.stampy.ui.dialog.DoubleButtonDialog
+import com.project.stampy.etc.DoubleButtonDialog
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
