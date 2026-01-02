@@ -37,9 +37,13 @@ class NicknameActivity : AppCompatActivity() {
     private lateinit var btnComplete: MaterialButton
     private lateinit var btnBackTouchArea: FrameLayout
     private lateinit var btnCloseTouchArea: FrameLayout
+    private lateinit var tvTitle: TextView
 
     private lateinit var tokenManager: TokenManager
     private lateinit var authRepository: AuthRepository
+
+    private var isEditMode = false
+    private var currentNickname: String? = null
 
     companion object {
         private const val TAG = "NicknameActivity"
@@ -48,6 +52,10 @@ class NicknameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nickname)
+
+        // 모드 확인 (신규 가입 or 수정)
+        isEditMode = intent.getStringExtra("MODE") == "EDIT"
+        currentNickname = intent.getStringExtra("CURRENT_NICKNAME")
 
         // TokenManager 및 Repository 초기화
         tokenManager = TokenManager(this)
@@ -61,6 +69,13 @@ class NicknameActivity : AppCompatActivity() {
 
         // 아이콘 색상 변경 (흰색)
         setIconColors()
+
+        // 수정 모드일 경우 현재 닉네임 표시
+        if (isEditMode && currentNickname != null) {
+            etNickname.setText(currentNickname)
+            etNickname.setSelection(currentNickname!!.length) // 커서를 끝으로
+            validateNickname(currentNickname!!)
+        }
 
         // 초기 포커스 (커서 깜빡임)
         etNickname.post {
@@ -95,6 +110,12 @@ class NicknameActivity : AppCompatActivity() {
         btnComplete = findViewById(R.id.btn_complete)
         btnBackTouchArea = findViewById(R.id.btn_back_touch_area)
         btnCloseTouchArea = findViewById(R.id.btn_close_touch_area)
+        tvTitle = findViewById(R.id.tv_title)
+
+        if (isEditMode) {
+            // 수정 모드일 경우 닫기 버튼 숨김
+            btnCloseTouchArea.visibility = View.GONE
+        }
 
         // 버튼 텍스트 설정
         btnComplete.text = "확인"
@@ -106,10 +127,15 @@ class NicknameActivity : AppCompatActivity() {
     private fun setupBackPressHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // 뒤로가기: 토큰 삭제하고 LoginActivity로 돌아가기
-                tokenManager.clearTokens()
-                setResult(RESULT_CANCELED) // fromClose = false (기본값)
-                finish()
+                if (isEditMode) {
+                    // 수정 모드: 그냥 종료
+                    finish()
+                } else {
+                    // 신규 가입 모드: 토큰 삭제하고 LoginActivity로 돌아가기
+                    tokenManager.clearTokens()
+                    setResult(RESULT_CANCELED)
+                    finish()
+                }
             }
         })
     }
@@ -117,12 +143,16 @@ class NicknameActivity : AppCompatActivity() {
     private fun setupListeners() {
         // 뒤로가기 버튼
         btnBackTouchArea.setOnClickListener {
-            tokenManager.clearTokens()
-            setResult(RESULT_CANCELED) // fromClose = false
-            finish()
+            if (isEditMode) {
+                finish()
+            } else {
+                tokenManager.clearTokens()
+                setResult(RESULT_CANCELED)
+                finish()
+            }
         }
 
-        // 닫기 버튼
+        // 닫기 버튼 (신규 가입 모드에만 표시)
         btnCloseTouchArea.setOnClickListener {
             cancelLoginFlow()
         }
@@ -174,6 +204,11 @@ class NicknameActivity : AppCompatActivity() {
         when {
             // 빈 값
             nickname.isEmpty() -> {
+                btnComplete.isEnabled = false
+                updateColors(false)
+            }
+            // 현재 닉네임과 동일 (수정 모드인 경우)
+            isEditMode && nickname == currentNickname -> {
                 btnComplete.isEnabled = false
                 updateColors(false)
             }
@@ -269,8 +304,6 @@ class NicknameActivity : AppCompatActivity() {
         val contentParams = layoutContent.layoutParams as ConstraintLayout.LayoutParams
         contentParams.topMargin = -(keyboardHeight / 4)
         layoutContent.layoutParams = contentParams
-
-        // 확인 버튼은 원래대로 (하단 40dp 고정 - 안 움직임)
     }
 
     private fun onKeyboardHidden() {
@@ -280,9 +313,6 @@ class NicknameActivity : AppCompatActivity() {
         val contentParams = layoutContent.layoutParams as ConstraintLayout.LayoutParams
         contentParams.topMargin = 0
         layoutContent.layoutParams = contentParams
-
-        // 버튼도 원래 위치로
-        // 아무것도 안 함
     }
 
     /**
@@ -306,8 +336,14 @@ class NicknameActivity : AppCompatActivity() {
                 result.onSuccess { response ->
                     Log.d(TAG, "닉네임 설정 성공: ${response.nickname}")
 
-                    // 메인 화면으로 이동하면서 환영 메시지 전달
-                    navigateToMain(response.nickname ?: nickname)
+                    if (isEditMode) {
+                        // 수정 모드: 이전 화면으로 돌아가기
+                        setResult(RESULT_OK)
+                        finish()
+                    } else {
+                        // 신규 가입 모드: 메인 화면으로 이동하면서 환영 메시지 전달
+                        navigateToMain(response.nickname ?: nickname)
+                    }
                 }.onFailure { error ->
                     Log.e(TAG, "닉네임 설정 실패: ${error.message}")
 
@@ -324,23 +360,40 @@ class NicknameActivity : AppCompatActivity() {
                         btnComplete.isEnabled = false
                         updateColors(false)
                     } else {
-                        // 기타 에러 - 회원가입 실패 모달
-                        showSignUpFailedDialog()
+                        // 기타 에러
+                        if (isEditMode) {
+                            showSaveFailedDialog()
+                        } else {
+                            showSignUpFailedDialog()
+                        }
                     }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "닉네임 설정 오류", e)
-                showSignUpFailedDialog()
+                if (isEditMode) {
+                    showSaveFailedDialog()
+                } else {
+                    showSignUpFailedDialog()
+                }
             }
         }
     }
 
     /**
-     * 회원가입 실패 모달 표시
+     * 저장 실패 모달 표시 (수정 모드)
+     */
+    private fun showSaveFailedDialog() {
+        SingleButtonDialog(this)
+            .setTitle("저장에 실패했어요.\n다시 시도해주세요.")
+            .show()
+    }
+
+    /**
+     * 회원가입 실패 모달 표시 (신규 가입 모드)
      */
     private fun showSignUpFailedDialog() {
         SingleButtonDialog(this)
-            .setTitle("회원가입에 실패했어요. \n다시 시도해주세요.")
+            .setTitle("회원가입에 실패했어요.\n다시 시도해주세요.")
             .show()
     }
 

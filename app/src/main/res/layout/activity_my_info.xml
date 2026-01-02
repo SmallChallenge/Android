@@ -78,21 +78,25 @@
             </FrameLayout>
 
             <LinearLayout
+                android:id="@+id/layout_nickname"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingStart="20dp"
-                android:paddingEnd="12dp">
+                android:paddingEnd="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground">
 
                 <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="닉네임"
-                android:textColor="@color/gray_300"
-                android:textSize="14sp"
-                android:fontFamily="@font/pretendard_semibold" />
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="닉네임"
+                    android:textColor="@color/gray_300"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/pretendard_semibold" />
 
                 <TextView
                     android:id="@+id/tv_nickname_value"
