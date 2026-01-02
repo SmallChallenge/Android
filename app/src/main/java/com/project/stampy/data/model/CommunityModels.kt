@@ -29,7 +29,7 @@ data class FeedItem(
     @SerializedName("profileImageUrl")
     val profileImageUrl: String,
 
-    @SerializedName("isLiked")
+    @SerializedName("liked")
     val isLiked: Boolean,
 
     @SerializedName("likeCount")

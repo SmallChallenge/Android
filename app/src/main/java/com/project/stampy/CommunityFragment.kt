@@ -68,6 +68,16 @@ class CommunityFragment : Fragment() {
         loadCommunityPosts()
     }
 
+    // Fragment가 다시 보일 때 데이터 새로고침
+    override fun onResume() {
+        super.onResume()
+        // 이미 데이터가 로드된 상태라면 새로고침
+        if (communityAdapter.itemCount > 0) {
+            Log.d(TAG, "onResume: 커뮤니티 데이터 새로고침")
+            refreshCommunity()
+        }
+    }
+
     private fun initViews(view: View) {
         rvCommunity = view.findViewById(R.id.rv_community)
         emptyStateContainer = view.findViewById(R.id.empty_state_container)
@@ -140,13 +150,18 @@ class CommunityFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             communityRepository.getCommunityFeeds(
-                category = null, // 전체 카테고리
+                category = null,
                 lastPublishedAt = null,
                 lastImageId = null,
                 size = 20,
                 sort = "LATEST"
             ).onSuccess { response ->
                 Log.d(TAG, "커뮤니티 피드 ${response.feeds.size}개 로드됨")
+
+                // 디버깅: 좋아요 상태 로그
+                response.feeds.forEach { feed ->
+                    Log.d(TAG, "imageId=${feed.imageId}, liked=${feed.isLiked}, likeCount=${feed.likeCount}")
+                }
 
                 if (response.feeds.isEmpty()) {
                     showEmptyState()
@@ -221,19 +236,13 @@ class CommunityFragment : Fragment() {
             // 서버 요청
             communityRepository.toggleLike(feed.imageId)
                 .onSuccess { response ->
-                    Log.d(TAG, "좋아요 토글 성공: imageId=${feed.imageId}, isLiked=${response.isLiked}")
+                    Log.d(TAG, "좋아요 토글 성공: imageId=${feed.imageId}, isLiked=${response.isLiked}, 서버 응답=$response")
 
                     // 서버 응답으로 최종 업데이트
-                    val finalLikeCount = if (response.isLiked) {
-                        if (feed.isLiked) feed.likeCount else feed.likeCount + 1
-                    } else {
-                        if (feed.isLiked) feed.likeCount - 1 else feed.likeCount
-                    }
-
                     communityAdapter.updateLikeStatus(
                         imageId = feed.imageId,
                         isLiked = response.isLiked,
-                        likeCount = finalLikeCount
+                        likeCount = newLikeCount
                     )
                 }
                 .onFailure { error ->
