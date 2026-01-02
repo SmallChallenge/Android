@@ -64,9 +64,9 @@ interface ImageApiService {
     ): Response<ApiResponse<ImageDetailResponse>>
 
     /**
-     * 이미지 수정
+     * 이미지 수정 (PUT 방식으로 수정!)
      */
-    @PATCH("/api/v1/images/{imageId}")
+    @PUT("/api/v1/images/{imageId}")
     suspend fun updateImage(
         @Header("Authorization") token: String,
         @Path("imageId") imageId: Long,
