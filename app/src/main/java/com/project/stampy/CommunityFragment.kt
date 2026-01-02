@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +36,17 @@ class CommunityFragment : Fragment() {
     private var hasNext = true
     private var lastPublishedAt: String? = null
     private var lastImageId: Long? = null
+
+    // 로그인 결과 처리
+    private val loginLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            // 로그인 성공 - 커뮤니티 새로고침
+            Log.d(TAG, "로그인 성공 - 커뮤니티 새로고침")
+            refreshCommunity()
+        }
+    }
 
     companion object {
         private const val TAG = "CommunityFragment"
@@ -106,12 +117,22 @@ class CommunityFragment : Fragment() {
 
         // 좋아요 클릭 리스너
         communityAdapter.setOnLikeClickListener { feed, position ->
-            toggleLike(feed)
+            // 비로그인 상태 체크
+            if (!tokenManager.isLoggedIn()) {
+                showLoginRequiredDialog()
+            } else {
+                toggleLike(feed)
+            }
         }
 
         // 메뉴 클릭 리스너 (신고하기)
         communityAdapter.setOnMenuClickListener { feed ->
-            showReportDialog(feed)
+            // 비로그인 상태 체크
+            if (!tokenManager.isLoggedIn()) {
+                showLoginRequiredDialog()
+            } else {
+                showReportDialog(feed)
+            }
         }
 
         // 스크롤 리스너 (페이징)
@@ -136,13 +157,43 @@ class CommunityFragment : Fragment() {
     }
 
     /**
+     * 로그인 필요 다이얼로그 표시
+     */
+    private fun showLoginRequiredDialog() {
+        DoubleButtonDialog(requireContext())
+            .setTitle("로그인이 필요해요.")
+            .setCancelButtonText("취소")
+            .setConfirmButtonText("로그인")
+            .setOnCancelListener {
+                Log.d(TAG, "로그인 취소")
+            }
+            .setOnConfirmListener {
+                Log.d(TAG, "로그인 화면으로 이동")
+                navigateToLogin()
+            }
+            .show()
+    }
+
+    /**
+     * 로그인 화면으로 이동
+     */
+    private fun navigateToLogin() {
+        val intent = Intent(requireContext(), LoginActivity::class.java).apply {
+            // 커뮤니티에서 왔다는 정보 전달
+            putExtra(LoginActivity.EXTRA_RETURN_TO_COMMUNITY, true)
+        }
+        loginLauncher.launch(intent)
+    }
+
+    /**
      * 신고 확인 다이얼로그 표시
      */
     private fun showReportDialog(feed: FeedItem) {
         DoubleButtonDialog(requireContext())
-            .setTitle("부적절한 게시물인가요?")
+            .setTitle("게시물 신고")
+            .setDescription("이 게시물을 신고하시겠습니까?\n부적절한 이미지나 스팸성 컨텐츠를 신고해주세요.")
             .setCancelButtonText("취소")
-            .setConfirmButtonText("신고")
+            .setConfirmButtonText("신고하기")
             .setOnCancelListener {
                 // 취소 시 아무 동작 없음
             }

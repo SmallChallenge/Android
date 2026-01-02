@@ -33,6 +33,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+
+        // 커뮤니티 탭으로 이동할지 여부
+        const val EXTRA_NAVIGATE_TO_COMMUNITY = "extra_navigate_to_community"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,10 +66,21 @@ class MainActivity : AppCompatActivity() {
         bottomNav = findViewById(R.id.bottom_navigation)
         fabAdd = findViewById(R.id.fab_add)
 
-        // 앱 시작시 내 기록 프래그먼트를 기본으로 표시
+        // Intent 확인하여 커뮤니티 탭으로 이동할지 결정
+        val shouldNavigateToCommunity = intent.getBooleanExtra(EXTRA_NAVIGATE_TO_COMMUNITY, false)
+
+        // 앱 시작시 기본 프래그먼트 설정
         if (savedInstanceState == null) {
-            loadFragment(MyRecordsFragment())
-            bottomNav.selectedItemId = R.id.navigation_storage
+            if (shouldNavigateToCommunity) {
+                // 커뮤니티 탭으로 이동
+                Log.d(TAG, "커뮤니티 탭으로 이동")
+                loadFragment(CommunityFragment())
+                bottomNav.selectedItemId = R.id.navigation_community
+            } else {
+                // 내 기록 프래그먼트를 기본으로 표시
+                loadFragment(MyRecordsFragment())
+                bottomNav.selectedItemId = R.id.navigation_storage
+            }
         }
 
         // 하단 네비게이션 리스너
@@ -89,6 +103,18 @@ class MainActivity : AppCompatActivity() {
 
         // 플로팅 액션 버튼 클릭 리스너 (비회원 20장 제한 체크)
         setupFabListener()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        // 새로운 Intent 확인하여 커뮤니티 탭으로 이동
+        if (intent?.getBooleanExtra(EXTRA_NAVIGATE_TO_COMMUNITY, false) == true) {
+            Log.d(TAG, "onNewIntent: 커뮤니티 탭으로 이동")
+            loadFragment(CommunityFragment())
+            bottomNav.selectedItemId = R.id.navigation_community
+        }
     }
 
     /**
@@ -176,6 +202,8 @@ class MainActivity : AppCompatActivity() {
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
         if (currentFragment is MyRecordsFragment) {
             currentFragment.refreshPhotos()
+        } else if (currentFragment is CommunityFragment) {
+            currentFragment.refreshCommunity()
         }
     }
 }

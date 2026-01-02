@@ -45,16 +45,26 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var tokenManager: TokenManager
     private lateinit var authRepository: AuthRepository
 
+    // 커뮤니티에서 왔는지 여부
+    private var shouldReturnToCommunity = false
+
     companion object {
         private const val TAG = "LoginActivity"
         private const val RC_GOOGLE_SIGN_IN = 9001
         private const val REQUEST_CODE_NICKNAME = 1001
         private const val TERMS_URL = "https://placid-aurora-3ad.notion.site/2b54e8ebd8b080c1a8bdd9267b94dc3e?source=copy_link"
+
+        // 커뮤니티에서 왔는지 확인하는 Extra
+        const val EXTRA_RETURN_TO_COMMUNITY = "extra_return_to_community"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        // 커뮤니티에서 왔는지 확인
+        shouldReturnToCommunity = intent.getBooleanExtra(EXTRA_RETURN_TO_COMMUNITY, false)
+        Log.d(TAG, "shouldReturnToCommunity: $shouldReturnToCommunity")
 
         // TokenManager 및 Repository 초기화
         tokenManager = TokenManager(this)
@@ -381,9 +391,20 @@ class LoginActivity : AppCompatActivity() {
      * 메인 화면으로 이동
      */
     private fun navigateToMain() {
-        startActivity(Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        })
+        if (shouldReturnToCommunity) {
+            // 커뮤니티에서 왔으면 커뮤니티 탭으로 이동
+            Log.d(TAG, "커뮤니티 탭으로 이동")
+            startActivity(Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                putExtra(MainActivity.EXTRA_NAVIGATE_TO_COMMUNITY, true)
+            })
+        } else {
+            // 일반 로그인이면 내기록 탭으로 이동
+            Log.d(TAG, "내기록 탭으로 이동")
+            startActivity(Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+        }
         finish()
     }
 }
