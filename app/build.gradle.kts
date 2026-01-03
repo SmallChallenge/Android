@@ -25,6 +25,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        vectorDrawables.useSupportLibrary = true
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // 카카오 앱 키를 BuildConfig에 추가

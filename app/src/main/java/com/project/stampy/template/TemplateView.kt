@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.res.ResourcesCompat
 import com.project.stampy.R
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,6 +41,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
         // 템플릿별 데이터 바인딩
         when (template.id) {
             "basic_1" -> bindBasic1Template(showLogo)
+            "moody_1" -> bindMoody1Template(showLogo)
             // TODO: 다른 템플릿 추가
         }
     }
@@ -49,12 +51,15 @@ class TemplateView(context: Context) : FrameLayout(context) {
      */
     private fun bindBasic1Template(showLogo: Boolean) {
         templateRootView?.let { root ->
+            // Pretendard Medium 폰트 로드
+            val pretendardMedium = ResourcesCompat.getFont(context, R.font.pretendard_medium)
+
             // === 시간 설정 ===
             val tvTime = root.findViewById<TextView>(R.id.tv_time)
             val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
             tvTime?.apply {
                 text = currentTime
-                // 디자인 가이드 55 (375 기준) → 기기에 맞춰 가변
+                typeface = pretendardMedium
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 55f))
                 // 행간 100%
                 setLineSpacing(0f, 1.0f)
@@ -62,10 +67,10 @@ class TemplateView(context: Context) : FrameLayout(context) {
 
                 // 텍스트 그림자: x=0, y=0, 흐림=5px, #000000 45%
                 setShadowLayer(
-                    DesignUtils.dpToPx(context, 5f),  // 블러 반경 5px
-                    0f,  // x 오프셋 0
-                    0f,  // y 오프셋 0
-                    0x73000000.toInt()  // #000000 45% (0x73 = 115 = 45% of 255)
+                    DesignUtils.dpToPx(context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
                 )
             }
 
@@ -74,6 +79,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             val currentDate = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(Date())
             tvDateStampic?.apply {
                 text = "$currentDate • Stampic"
+                typeface = pretendardMedium
                 // 디자인 가이드 15 (375 기준) → 기기에 맞춰 가변
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 15f))
                 // 행간 100%
@@ -139,12 +145,106 @@ class TemplateView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * Moody 1 템플릿 데이터 바인딩
+     */
+    private fun bindMoody1Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // movesans 폰트 로드
+            val movesansFont = try {
+                ResourcesCompat.getFont(context, R.font.movesans)
+            } catch (e: Exception) {
+                null  // 폰트 로드 실패 시 null (시스템 기본 폰트 사용)
+            }
+
+            // === 날짜 설정 (E, d MMM) ===
+            val tvDate = root.findViewById<TextView>(R.id.tv_date)
+            val dateFormat = SimpleDateFormat("E, d MMM", Locale.US)
+            val currentDate = dateFormat.format(Date()).uppercase(Locale.US)
+            tvDate?.apply {
+                text = currentDate
+                movesansFont?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 30f))
+                setLineSpacing(0f, 1.0f)
+                setShadowLayer(
+                    DesignUtils.dpToPx(context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === 시간 설정 (a hh:mm, Locale: US) ===
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val timeFormat = SimpleDateFormat("a hh:mm", Locale.US)
+            val currentTime = timeFormat.format(Date()).uppercase(Locale.US)
+            tvTime?.apply {
+                text = currentTime
+                movesansFont?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 16f))
+                setLineSpacing(0f, 1.0f)
+                setShadowLayer(
+                    DesignUtils.dpToPx(context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === Stampic 로고 이미지 ===
+            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+            ivStampicLogo?.apply {
+                visibility = if (showLogo) View.VISIBLE else View.GONE
+
+                // 로고 크기를 기기에 맞춰 조정
+                layoutParams = layoutParams?.apply {
+                    val logoSize = DesignUtils.dpToPxInt(context, 48f)
+                    width = logoSize
+                    height = logoSize
+                }
+            }
+
+            // === 여백 조정 ===
+            adjustMoody1Margins(root)
+        }
+    }
+
+    /**
+     * Moody 1 템플릿 여백 조정
+     */
+    private fun adjustMoody1Margins(root: View) {
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+
+        (tvDate?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 24f)
+        }
+
+        (tvTime?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 4f)
+        }
+
+        (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+        }
+
+        tvDate?.requestLayout()
+        tvTime?.requestLayout()
+        ivStampicLogo?.requestLayout()
+    }
+
+    /**
      * 로고 표시 상태 변경
      */
     fun setLogoVisibility(visible: Boolean) {
         templateRootView?.let { root ->
+            // Basic 템플릿의 ImageView 로고
             val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
             ivLogo?.visibility = if (visible) View.VISIBLE else View.GONE
+
+            // Moody 템플릿의 ImageView 로고
+            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+            ivStampicLogo?.visibility = if (visible) View.VISIBLE else View.GONE
         }
     }
 

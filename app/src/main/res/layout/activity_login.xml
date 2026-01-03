@@ -45,9 +45,10 @@
         android:layout_width="233dp"
         android:layout_height="72dp"
         android:text="자랑하고 싶은 나의 하루,\n스탬피로 기록하세요!"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/gray_50"
         android:textSize="24sp"
         android:fontFamily="@font/pretendard_semibold"
+        app:fontFamily="@font/pretendard_semibold"
         android:gravity="center"
         android:lineSpacingExtra="8dp"
         android:layout_marginTop="45dp"
@@ -85,9 +86,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="카카오로 계속하기"
-                android:textColor="#3C1E1E"
+                android:textColor="@color/gray_primary"
                 android:textSize="16sp"
                 android:fontFamily="@font/pretendard_semibold"
+                app:fontFamily="@font/pretendard_semibold"
                 android:layout_marginStart="8dp" />
 
         </LinearLayout>
@@ -123,9 +125,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Google로 계속하기"
-                android:textColor="#3C1E1E"
+                android:textColor="@color/gray_primary"
                 android:textSize="16sp"
                 android:fontFamily="@font/pretendard_semibold"
+                app:fontFamily="@font/pretendard_semibold"
                 android:layout_marginStart="8dp" />
 
         </LinearLayout>
