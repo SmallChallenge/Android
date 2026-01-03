@@ -5,16 +5,16 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="700"
-        android:font="@font/suit_bold"
+        android:font="@font/suite_bold"
         app:fontStyle="normal"
         app:fontWeight="700"
-        app:font="@font/suit_bold" />
+        app:font="@font/suite_bold" />
 
     <font
         android:fontStyle="normal"
         android:fontWeight="800"
-        android:font="@font/suit_extrabold"
+        android:font="@font/suite_extrabold"
         app:fontStyle="normal"
         app:fontWeight="800"
-        app:font="@font/suit_extrabold" />
+        app:font="@font/suite_extrabold" />
 </font-family>

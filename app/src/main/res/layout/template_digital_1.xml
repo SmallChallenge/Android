@@ -12,7 +12,8 @@
         android:id="@+id/iv_stampic_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/stampic"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/stampic_tem"
         android:contentDescription="Stampic Logo"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,13 +24,12 @@
         android:id="@+id/time_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
         android:orientation="horizontal"
-        android:gravity="center"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <!-- 시간 첫째 자리 -->
         <TextView
@@ -38,12 +38,11 @@
             android:layout_height="60dp"
             android:gravity="center"
             android:textColor="@color/white"
-            android:fontFamily="@font/suit_extrabold"
-            app:fontFamily="@font/suit_extrabold"
+            android:fontFamily="@font/suite_extrabold"
             android:includeFontPadding="false"
             android:letterSpacing="-0.02"
             android:background="@drawable/bg_digital_time_box"
-            tools:text="1" />
+            tools:text="0" />
 
         <!-- 시간 둘째 자리 -->
         <TextView
@@ -53,12 +52,11 @@
             android:layout_marginStart="6dp"
             android:gravity="center"
             android:textColor="@color/white"
-            android:fontFamily="@font/suit_extrabold"
-            app:fontFamily="@font/suit_extrabold"
+            android:fontFamily="@font/suite_extrabold"
             android:includeFontPadding="false"
             android:letterSpacing="-0.02"
             android:background="@drawable/bg_digital_time_box"
-            tools:text="0" />
+            tools:text="4" />
 
         <!-- 콜론 (:) -->
         <TextView
@@ -69,11 +67,9 @@
             android:layout_marginEnd="6dp"
             android:text=":"
             android:textColor="@color/white"
-            android:fontFamily="@font/suit_extrabold"
-            app:fontFamily="@font/suit_extrabold"
+            android:fontFamily="@font/suite_extrabold"
             android:includeFontPadding="false"
-            android:letterSpacing="-0.02"
-            tools:textSize="50sp" />
+            android:letterSpacing="-0.02" />
 
         <!-- 분 첫째 자리 -->
         <TextView
@@ -82,12 +78,11 @@
             android:layout_height="60dp"
             android:gravity="center"
             android:textColor="@color/white"
-            android:fontFamily="@font/suit_extrabold"
-            app:fontFamily="@font/suit_extrabold"
+            android:fontFamily="@font/suite_extrabold"
             android:includeFontPadding="false"
             android:letterSpacing="-0.02"
             android:background="@drawable/bg_digital_time_box"
-            tools:text="3" />
+            tools:text="0" />
 
         <!-- 분 둘째 자리 -->
         <TextView
@@ -97,24 +92,22 @@
             android:layout_marginStart="6dp"
             android:gravity="center"
             android:textColor="@color/white"
-            android:fontFamily="@font/suit_extrabold"
-            app:fontFamily="@font/suit_extrabold"
+            android:fontFamily="@font/suite_extrabold"
             android:includeFontPadding="false"
             android:letterSpacing="-0.02"
             android:background="@drawable/bg_digital_time_box"
-            tools:text="9" />
+            tools:text="0" />
 
     </LinearLayout>
 
     <!-- 날짜 표시 (중앙 하단, 아래 여백 16px) -->
-    <!-- 형식: YYYY.MM.DD -->
     <TextView
         android:id="@+id/tv_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:textColor="@color/white"
-        android:fontFamily="@font/suit_bold"
-        app:fontFamily="@font/suit_bold"
+        android:fontFamily="@font/suite_bold"
         android:includeFontPadding="false"
         android:letterSpacing="-0.02"
         tools:text="2026.12.25"
