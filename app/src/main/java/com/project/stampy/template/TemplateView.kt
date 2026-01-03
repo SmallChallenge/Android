@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
@@ -43,7 +44,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             "basic_1" -> bindBasic1Template(showLogo)
             "moody_1" -> bindMoody1Template(showLogo)
             "active_1" -> bindActive1Template(showLogo)
-            // TODO: 다른 템플릿 추가
+            "digital_1" -> bindDigital1Template(showLogo)
         }
     }
 
@@ -61,14 +62,14 @@ class TemplateView(context: Context) : FrameLayout(context) {
             tvTime?.apply {
                 text = currentTime
                 typeface = pretendardMedium
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 55f))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 55f))
                 // 행간 100%
                 setLineSpacing(0f, 1.0f)
                 // 자간 -2%는 이미 XML에 letterSpacing="-0.02"로 설정됨
 
                 // 텍스트 그림자: x=0, y=0, 흐림=5px, #000000 45%
                 setShadowLayer(
-                    DesignUtils.dpToPx(context, 5f),
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
                     0f,
                     0f,
                     0x73000000.toInt()
@@ -82,14 +83,14 @@ class TemplateView(context: Context) : FrameLayout(context) {
                 text = "$currentDate • Stampic"
                 typeface = pretendardMedium
                 // 디자인 가이드 15 (375 기준) → 기기에 맞춰 가변
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 15f))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 15f))
                 // 행간 100%
                 setLineSpacing(0f, 1.0f)
                 // 자간 -2%는 이미 XML에 letterSpacing="-0.02"로 설정됨
 
                 // 텍스트 그림자: x=0, y=0, 흐림=5px, #000000 45%
                 setShadowLayer(
-                    DesignUtils.dpToPx(context, 5f),  // 블러 반경 5px
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),  // 블러 반경 5px
                     0f,  // x 오프셋 0
                     0f,  // y 오프셋 0
                     0x73000000.toInt()  // #000000 45%
@@ -104,7 +105,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
                 // 로고 크기를 기기에 맞춰 조정 (디자인 가이드에 따라 적절한 크기 설정)
                 // 예: 48px 기준으로 가변
                 layoutParams = layoutParams?.apply {
-                    val logoSize = DesignUtils.dpToPxInt(context, 48f)
+                    val logoSize = DesignUtils.dpToPxInt(this@TemplateView.context, 48f)
                     width = logoSize
                     height = logoSize
                 }
@@ -162,10 +163,10 @@ class TemplateView(context: Context) : FrameLayout(context) {
             tvDate?.apply {
                 text = currentDate
                 movesansFont?.let { typeface = it }
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 30f))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 30f))
                 setLineSpacing(0f, 1.0f)
                 setShadowLayer(
-                    DesignUtils.dpToPx(context, 5f),
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
                     0f,
                     0f,
                     0x73000000.toInt()
@@ -179,10 +180,10 @@ class TemplateView(context: Context) : FrameLayout(context) {
             tvTime?.apply {
                 text = currentTime
                 movesansFont?.let { typeface = it }
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 16f))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 16f))
                 setLineSpacing(0f, 1.0f)
                 setShadowLayer(
-                    DesignUtils.dpToPx(context, 5f),
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
                     0f,
                     0f,
                     0x73000000.toInt()
@@ -196,7 +197,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
 
                 // 로고 크기를 기기에 맞춰 조정
                 layoutParams = layoutParams?.apply {
-                    val logoSize = DesignUtils.dpToPxInt(context, 48f)
+                    val logoSize = DesignUtils.dpToPxInt(this@TemplateView.context, 48f)
                     width = logoSize
                     height = logoSize
                 }
@@ -238,7 +239,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
         templateRootView?.let { root ->
             // 기후위기 폰트 로드
             val gihugwigiFont = try {
-                ResourcesCompat.getFont(context, R.font.gihugwigi1990)
+                ResourcesCompat.getFont(context, R.font.gihugwigi)
             } catch (e: Exception) {
                 null  // 폰트 로드 실패 시 null (시스템 기본 폰트 사용)
             }
@@ -251,11 +252,9 @@ class TemplateView(context: Context) : FrameLayout(context) {
                 text = currentTime
                 // 폰트 적용
                 gihugwigiFont?.let { typeface = it }
-                // 폰트: 기후위기 50
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 50f))
-                // 그림자: x=0, y=0, 흐림=5px, #000000 45%
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 50f))
                 setShadowLayer(
-                    DesignUtils.dpToPx(context, 5f),
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
                     0f,
                     0f,
                     0x73000000.toInt()
@@ -271,10 +270,10 @@ class TemplateView(context: Context) : FrameLayout(context) {
                 // 폰트 적용
                 gihugwigiFont?.let { typeface = it }
                 // 폰트: 기후위기 16
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 16f))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 16f))
                 // 그림자: x=0, y=0, 흐림=5px, #000000 45%
                 setShadowLayer(
-                    DesignUtils.dpToPx(context, 5f),
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
                     0f,
                     0f,
                     0x73000000.toInt()
@@ -288,7 +287,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
 
                 // 로고 크기를 기기에 맞춰 조정
                 layoutParams = layoutParams?.apply {
-                    val logoSize = DesignUtils.dpToPxInt(context, 48f)
+                    val logoSize = DesignUtils.dpToPxInt(this@TemplateView.context, 48f)
                     width = logoSize
                     height = logoSize
                 }
@@ -324,17 +323,144 @@ class TemplateView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * Digital 1 템플릿 데이터 바인딩
+     */
+    private fun bindDigital1Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            val suitExtraBold = try {
+                ResourcesCompat.getFont(context, R.font.suit_extrabold)
+            } catch (e: Exception) {
+                null
+            }
+
+            val suitBold = try {
+                ResourcesCompat.getFont(context, R.font.suit_bold)
+            } catch (e: Exception) {
+                null
+            }
+
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val currentTime = timeFormat.format(Date())
+            val timeParts = currentTime.split(":")
+            val hour = timeParts[0]
+            val minute = timeParts[1]
+
+            root.findViewById<TextView>(R.id.tv_hour_1)?.apply {
+                text = hour[0].toString()
+                suitExtraBold?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 50f))
+            }
+
+            root.findViewById<TextView>(R.id.tv_hour_2)?.apply {
+                text = hour[1].toString()
+                suitExtraBold?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 50f))
+            }
+
+            root.findViewById<TextView>(R.id.tv_colon)?.apply {
+                suitExtraBold?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 50f))
+            }
+
+            root.findViewById<TextView>(R.id.tv_minute_1)?.apply {
+                text = minute[0].toString()
+                suitExtraBold?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 50f))
+            }
+
+            root.findViewById<TextView>(R.id.tv_minute_2)?.apply {
+                text = minute[1].toString()
+                suitExtraBold?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 50f))
+            }
+
+            root.findViewById<TextView>(R.id.tv_date)?.apply {
+                val dateFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+                text = dateFormat.format(Date())
+                suitBold?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 24f))
+            }
+
+            root.findViewById<ImageView>(R.id.iv_stampic_logo)?.apply {
+                visibility = if (showLogo) View.VISIBLE else View.GONE
+                layoutParams = layoutParams?.apply {
+                    val logoSize = DesignUtils.dpToPxInt(this@TemplateView.context, 48f)
+                    width = logoSize
+                    height = logoSize
+                }
+            }
+
+            adjustDigital1Margins(root)
+        }
+    }
+
+    private fun adjustDigital1Margins(root: View) {
+        val boxWidth = DesignUtils.dpToPxInt(context, 45f)
+        val boxHeight = DesignUtils.dpToPxInt(context, 60f)
+        val gap = DesignUtils.dpToPxInt(context, 6f)
+
+        root.findViewById<TextView>(R.id.tv_hour_1)?.layoutParams =
+            root.findViewById<TextView>(R.id.tv_hour_1)?.layoutParams?.apply {
+                width = boxWidth
+                height = boxHeight
+            }
+
+        root.findViewById<TextView>(R.id.tv_hour_2)?.layoutParams =
+            (root.findViewById<TextView>(R.id.tv_hour_2)?.layoutParams as? LinearLayout.LayoutParams)?.apply {
+                width = boxWidth
+                height = boxHeight
+                marginStart = gap
+            }
+
+        root.findViewById<TextView>(R.id.tv_colon)?.layoutParams =
+            (root.findViewById<TextView>(R.id.tv_colon)?.layoutParams as? LinearLayout.LayoutParams)?.apply {
+                marginStart = gap
+                marginEnd = gap
+            }
+
+        root.findViewById<TextView>(R.id.tv_minute_1)?.layoutParams =
+            root.findViewById<TextView>(R.id.tv_minute_1)?.layoutParams?.apply {
+                width = boxWidth
+                height = boxHeight
+            }
+
+        root.findViewById<TextView>(R.id.tv_minute_2)?.layoutParams =
+            (root.findViewById<TextView>(R.id.tv_minute_2)?.layoutParams as? LinearLayout.LayoutParams)?.apply {
+                width = boxWidth
+                height = boxHeight
+                marginStart = gap
+            }
+
+        val timeContainer = root.findViewById<LinearLayout>(R.id.time_container)
+        (timeContainer?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 70f)
+            timeContainer.layoutParams = this
+        }
+
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        (tvDate?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            tvDate.layoutParams = this
+        }
+
+        val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 16f)
+            ivStampicLogo.layoutParams = this
+        }
+    }
+
+    /**
      * 로고 표시 상태 변경
      */
     fun setLogoVisibility(visible: Boolean) {
         templateRootView?.let { root ->
             // Basic 템플릿의 ImageView 로고
-            val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
-            ivLogo?.visibility = if (visible) View.VISIBLE else View.GONE
-
+            root.findViewById<ImageView>(R.id.iv_logo)?.visibility =
+                if (visible) View.VISIBLE else View.GONE
             // Moody 템플릿의 ImageView 로고
-            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
-            ivStampicLogo?.visibility = if (visible) View.VISIBLE else View.GONE
+            root.findViewById<ImageView>(R.id.iv_stampic_logo)?.visibility =
+                if (visible) View.VISIBLE else View.GONE
         }
     }
 

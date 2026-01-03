@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Digital 1 템플릿 -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Stampic 로고 이미지 (중앙 상단, 위 여백 16px) -->
+    <ImageView
+        android:id="@+id/iv_stampic_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/stampic"
+        android:contentDescription="Stampic Logo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 시간 컨테이너 (좌우 중앙, 상단에서 70px) -->
+    <LinearLayout
+        android:id="@+id/time_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <!-- 시간 첫째 자리 -->
+        <TextView
+            android:id="@+id/tv_hour_1"
+            android:layout_width="45dp"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:fontFamily="@font/suit_extrabold"
+            app:fontFamily="@font/suit_extrabold"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.02"
+            android:background="@drawable/bg_digital_time_box"
+            tools:text="1" />
+
+        <!-- 시간 둘째 자리 -->
+        <TextView
+            android:id="@+id/tv_hour_2"
+            android:layout_width="45dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="6dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:fontFamily="@font/suit_extrabold"
+            app:fontFamily="@font/suit_extrabold"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.02"
+            android:background="@drawable/bg_digital_time_box"
+            tools:text="0" />
+
+        <!-- 콜론 (:) -->
+        <TextView
+            android:id="@+id/tv_colon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:text=":"
+            android:textColor="@color/white"
+            android:fontFamily="@font/suit_extrabold"
+            app:fontFamily="@font/suit_extrabold"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.02"
+            tools:textSize="50sp" />
+
+        <!-- 분 첫째 자리 -->
+        <TextView
+            android:id="@+id/tv_minute_1"
+            android:layout_width="45dp"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:fontFamily="@font/suit_extrabold"
+            app:fontFamily="@font/suit_extrabold"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.02"
+            android:background="@drawable/bg_digital_time_box"
+            tools:text="3" />
+
+        <!-- 분 둘째 자리 -->
+        <TextView
+            android:id="@+id/tv_minute_2"
+            android:layout_width="45dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="6dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:fontFamily="@font/suit_extrabold"
+            app:fontFamily="@font/suit_extrabold"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.02"
+            android:background="@drawable/bg_digital_time_box"
+            tools:text="9" />
+
+    </LinearLayout>
+
+    <!-- 날짜 표시 (중앙 하단, 아래 여백 16px) -->
+    <!-- 형식: YYYY.MM.DD -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:fontFamily="@font/suit_bold"
+        app:fontFamily="@font/suit_bold"
+        android:includeFontPadding="false"
+        android:letterSpacing="-0.02"
+        tools:text="2026.12.25"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

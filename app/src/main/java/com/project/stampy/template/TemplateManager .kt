@@ -40,10 +40,17 @@ object TemplateManager {
             )
         )
 
+        // Digital 카테고리 템플릿
+        templates.add(
+            Template(
+                id = "digital_1",
+                category = TemplateCategory.DIGITAL,
+                name = "Digital 1",
+                layoutResId = R.layout.template_digital_1
+            )
+        )
+
         // TODO: 나머지 템플릿 추가
-        // templates.add(Template("basic_2", TemplateCategory.BASIC, "Basic 2", R.layout.template_basic_2))
-        // templates.add(Template("digital_1", TemplateCategory.DIGITAL, "Digital 1", R.layout.template_digital_1))
-        // ...
     }
 
     /**
