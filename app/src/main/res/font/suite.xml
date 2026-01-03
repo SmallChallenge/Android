@@ -17,4 +17,13 @@
         app:fontStyle="normal"
         app:fontWeight="800"
         app:font="@font/suite_extrabold" />
+
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="900"
+        android:font="@font/suite_heavy"
+        app:fontStyle="normal"
+        app:fontWeight="900"
+        app:font="@font/suite_heavy" />
+
 </font-family>

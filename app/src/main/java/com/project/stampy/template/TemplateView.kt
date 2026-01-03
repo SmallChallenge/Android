@@ -42,6 +42,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
         // 템플릿별 데이터 바인딩
         when (template.id) {
             "basic_1" -> bindBasic1Template(showLogo)
+            "basic_2" -> bindBasic2Template(showLogo)
             "moody_1" -> bindMoody1Template(showLogo)
             "active_1" -> bindActive1Template(showLogo)
             "digital_1" -> bindDigital1Template(showLogo)
@@ -141,6 +142,112 @@ class TemplateView(context: Context) : FrameLayout(context) {
             bottomMargin = DesignUtils.dpToPxInt(context, 16f)
             marginEnd = DesignUtils.dpToPxInt(context, 16f)
             ivLogo.layoutParams = this
+        }
+    }
+
+    /**
+     * Basic 2 템플릿 데이터 바인딩
+     */
+    private fun bindBasic2Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // SUIT Heavy 폰트 로드
+            val suitHeavy = try {
+                ResourcesCompat.getFont(context, R.font.suite_heavy)
+            } catch (e: Exception) {
+                null
+            }
+
+            // === 날짜 설정 (YYYY년 MM월 DD일 (요일)) ===
+            val tvDate = root.findViewById<TextView>(R.id.tv_date)
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH) + 1
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // 요일 구하기 (한글)
+            val dayOfWeek = when (calendar.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.SUNDAY -> "일"
+                Calendar.MONDAY -> "월"
+                Calendar.TUESDAY -> "화"
+                Calendar.WEDNESDAY -> "수"
+                Calendar.THURSDAY -> "목"
+                Calendar.FRIDAY -> "금"
+                Calendar.SATURDAY -> "토"
+                else -> ""
+            }
+
+            val dateText = "${year}년 ${month}월 ${day}일 (${dayOfWeek})"
+
+            tvDate?.apply {
+                text = dateText
+                suitHeavy?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 24f))
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === 시간 설정 (오전/오후 HH:mm) ===
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val amPm = if (hour < 12) "오전" else "오후"
+            val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+            val timeText = String.format("%s %02d:%02d", amPm, displayHour, minute)
+
+            tvTime?.apply {
+                text = timeText
+                suitHeavy?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 24f))
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === Stampic 아이콘 ===
+            val ivLogoIcon = root.findViewById<ImageView>(R.id.iv_logo_icon)
+            ivLogoIcon?.apply {
+                visibility = if (showLogo) View.VISIBLE else View.GONE
+
+                // 아이콘 크기를 기기에 맞춰 조정 (38dp 기준)
+                layoutParams = layoutParams?.apply {
+                    val iconSize = DesignUtils.dpToPxInt(this@TemplateView.context, 38f)
+                    width = iconSize
+                    height = iconSize
+                }
+            }
+
+            // === 여백 조정 ===
+            adjustBasic2Margins(root)
+        }
+    }
+
+    /**
+     * Basic 2 템플릿 여백 조정
+     */
+    private fun adjustBasic2Margins(root: View) {
+        val ivLogoIcon = root.findViewById<ImageView>(R.id.iv_logo_icon)
+        val datetimeContainer = root.findViewById<LinearLayout>(R.id.datetime_container)
+
+        // 아이콘: 상단 16px, 우측 16px
+        (ivLogoIcon?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 16f)
+            marginEnd = DesignUtils.dpToPxInt(context, 16f)
+            ivLogoIcon.layoutParams = this
+        }
+
+        // 날짜/시간 컨테이너: 좌측 24px, 하단 24px
+        (datetimeContainer?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            marginStart = DesignUtils.dpToPxInt(context, 24f)
+            bottomMargin = DesignUtils.dpToPxInt(context, 24f)
+            datetimeContainer.layoutParams = this
         }
     }
 
@@ -456,10 +563,13 @@ class TemplateView(context: Context) : FrameLayout(context) {
      */
     fun setLogoVisibility(visible: Boolean) {
         templateRootView?.let { root ->
-            // Basic 템플릿의 ImageView 로고
+            // Basic 1 템플릿의 ImageView 로고
             root.findViewById<ImageView>(R.id.iv_logo)?.visibility =
                 if (visible) View.VISIBLE else View.GONE
-            // Moody 템플릿의 ImageView 로고
+            // Basic 2 템플릿의 아이콘
+            root.findViewById<ImageView>(R.id.iv_logo_icon)?.visibility =
+                if (visible) View.VISIBLE else View.GONE
+            // Moody, Active, Digital 템플릿의 ImageView 로고
             root.findViewById<ImageView>(R.id.iv_stampic_logo)?.visibility =
                 if (visible) View.VISIBLE else View.GONE
         }
