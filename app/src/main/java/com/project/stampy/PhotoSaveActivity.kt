@@ -29,6 +29,8 @@ import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.ImageRepository
 import com.project.stampy.etc.TagView
 import com.project.stampy.etc.DoubleButtonDialog
+import com.project.stampy.template.TemplateManager
+import com.project.stampy.template.TemplateView
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,6 +48,8 @@ class PhotoSaveActivity : AppCompatActivity() {
 
     // 사진
     private lateinit var ivPhoto: ImageView
+    private lateinit var photoContainer: FrameLayout
+    private lateinit var templateView: TemplateView
     private lateinit var tvTemplateOverlay: TextView
 
     // 카테고리
@@ -73,6 +77,7 @@ class PhotoSaveActivity : AppCompatActivity() {
 
     private var photoUri: Uri? = null
     private var templateName: String? = null
+    private var templateId: String? = null
 
     private val categoryMap by lazy {
         mapOf(
@@ -87,6 +92,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         private const val TAG = "PhotoSaveActivity"
         const val EXTRA_PHOTO_URI = "extra_photo_uri"
         const val EXTRA_TEMPLATE_NAME = "extra_template_name"
+        const val EXTRA_TEMPLATE_ID = "extra_template_id"
 
         private const val TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss"
         private const val FILE_PREFIX = "STAMPIC_"  // "Stampic" 파일명으로 저장
@@ -124,10 +130,12 @@ class PhotoSaveActivity : AppCompatActivity() {
         // Intent로 전달받은 데이터
         photoUri = intent.getParcelableExtra(EXTRA_PHOTO_URI)
         templateName = intent.getStringExtra(EXTRA_TEMPLATE_NAME)
+        templateId = intent.getStringExtra(EXTRA_TEMPLATE_ID)
 
         initViews()
         setupListeners()
         loadPhoto()
+        applyTemplate()
     }
 
     private fun initViews() {
@@ -138,9 +146,14 @@ class PhotoSaveActivity : AppCompatActivity() {
         btnComplete = findViewById(R.id.btn_complete)
         btnComplete?.text = "완료"
 
-        // 사진
+        // 사진 컨테이너
+        photoContainer = findViewById(R.id.photo_container)
         ivPhoto = findViewById(R.id.iv_photo)
         tvTemplateOverlay = findViewById(R.id.tv_template_overlay)
+
+        // 템플릿 뷰 추가
+        templateView = TemplateView(this)
+        photoContainer.addView(templateView)
 
         // 카테고리 LinearLayout
         categoryStudy = findViewById(R.id.category_study)
@@ -266,7 +279,7 @@ class PhotoSaveActivity : AppCompatActivity() {
      */
     private fun savePhoto() {
         val uri = photoUri ?: run {
-            showToast("사진 정보가 없습니다")
+            showToast("사진 정보가 없어요.")
             return
         }
 
@@ -292,7 +305,7 @@ class PhotoSaveActivity : AppCompatActivity() {
             try {
                 // 1. 템플릿 적용된 최종 이미지 생성
                 val finalBitmap = createFinalImage(uri) ?: run {
-                    showToast("이미지 생성 실패")
+                    showToast("저장에 실패했어요. 다시 시도해 주세요.")
                     btnComplete?.isEnabled = true
                     return@launch
                 }
@@ -311,7 +324,7 @@ class PhotoSaveActivity : AppCompatActivity() {
 
             } catch (e: Exception) {
                 Log.e(TAG, "사진 저장 실패", e)
-                showToast("사진 저장 실패: ${e.message}")
+                showToast("저장에 실패했어요. 다시 시도해 주세요.: ${e.message}")
                 btnComplete?.isEnabled = true
             }
         }
@@ -333,7 +346,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         val localFile = saveToLocal(bitmap, fileName)
         if (localFile == null) {
             withContext(Dispatchers.Main) {
-                showToast("로컬 저장 실패")
+                showToast("저장에 실패했어요. 다시 시도해 주세요.")
                 btnComplete?.isEnabled = true
             }
             return
@@ -343,7 +356,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         val galleryUri = saveToGallery(bitmap, fileName)
         if (galleryUri == null) {
             withContext(Dispatchers.Main) {
-                showToast("갤러리 저장 실패")
+                showToast("저장에 실패했어요. 다시 시도해 주세요.")
                 btnComplete?.isEnabled = true
             }
             return
@@ -387,7 +400,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         val galleryUri = saveToGallery(bitmap, fileName)
         if (galleryUri == null) {
             withContext(Dispatchers.Main) {
-                showToast("갤러리 저장 실패")
+                showToast("저장에 실패했어요. 다시 시도해 주세요.")
                 btnComplete?.isEnabled = true
             }
             return
@@ -397,7 +410,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         val tempFile = saveTempFile(bitmap, fileName)
         if (tempFile == null) {
             withContext(Dispatchers.Main) {
-                showToast("임시 파일 생성 실패")
+                showToast("요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.")
                 btnComplete?.isEnabled = true
             }
             return
@@ -691,7 +704,7 @@ class PhotoSaveActivity : AppCompatActivity() {
                     Log.e(TAG, "서버 업로드 실패: ${error.message}", error)
                     // 서버 업로드 실패해도 갤러리는 저장됨
                     file.delete()
-                    showToast("갤러리 저장 완료 (서버 업로드 실패)")
+                    showToast("갤러리 저장이 완료되었어요. (서버 업로드 실패)")
                     navigateToMain()
                 }
             }
@@ -699,7 +712,7 @@ class PhotoSaveActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 Log.e(TAG, "서버 업로드 오류", e)
                 file.delete()
-                showToast("갤러리 저장 완료 (서버 업로드 실패)")
+                showToast("갤러리 저장 완료이 완료되었어요. (서버 업로드 실패)")
                 navigateToMain()
             }
         }
@@ -787,6 +800,19 @@ class PhotoSaveActivity : AppCompatActivity() {
             tvTemplateOverlay.text = name
             tvTemplateOverlay.visibility = View.VISIBLE
         }
+    }
+
+    /**
+     * 템플릿 적용
+     */
+    private fun applyTemplate() {
+        templateId?.let { id ->
+            val template = TemplateManager.getTemplateById(id)
+            template?.let {
+                templateView.applyTemplate(it, showLogo = true)
+                Log.d(TAG, "템플릿 적용: ${it.name}")
+            } ?: Log.e(TAG, "템플릿을 찾을 수 없습니다: $id")
+        } ?: Log.w(TAG, "템플릿 ID가 없습니다")
     }
 
     /**

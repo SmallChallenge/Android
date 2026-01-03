@@ -414,7 +414,7 @@ class PhotoDetailActivity : AppCompatActivity() {
                     // 서버 이미지 URL만 있는 경우 - 다운로드 후 공유
                     downloadAndShareImage(photoUrl!!)
                 } else {
-                    showToast("공유할 사진을 찾을 수 없습니다")
+                    showToast("공유에 실패했어요. 다시 시도해 주세요.")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "사진 공유 오류", e)

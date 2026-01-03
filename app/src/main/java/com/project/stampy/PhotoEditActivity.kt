@@ -237,7 +237,7 @@ class PhotoEditActivity : AppCompatActivity() {
             }
             .setOnConfirmListener {
                 // 광고 시청 (TODO: 광고 연결)
-                showToast("광고 기능은 곧 추가됩니다")
+                showToast("광고 기능은 곧 추가될 예정이에요.")
                 // 광고 성공 후 OFF 유지
                 showLogo = false
                 switchLogo.isChecked = false
@@ -257,7 +257,8 @@ class PhotoEditActivity : AppCompatActivity() {
             // 선택된 템플릿 정보 전달
             selectedTemplate?.let { template ->
                 intent.putExtra(PhotoSaveActivity.EXTRA_TEMPLATE_NAME, template.name)
-                Log.d(TAG, "Template name: ${template.name}")
+                intent.putExtra(PhotoSaveActivity.EXTRA_TEMPLATE_ID, template.id)  // 추가
+                Log.d(TAG, "Template ID: ${template.id}, name: ${template.name}")
             }
 
             Log.d(TAG, "Starting PhotoSaveActivity...")
@@ -265,7 +266,7 @@ class PhotoEditActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e(TAG, "Error starting PhotoSaveActivity: ${e.message}")
             e.printStackTrace()
-            showToast("화면 전환 오류: ${e.message}")
+            showToast("요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.")
         }
     }
 }

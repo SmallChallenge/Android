@@ -117,7 +117,7 @@ class LoginActivity : AppCompatActivity() {
             Log.d(TAG, "Google Sign-In client initialized successfully")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to initialize Google Sign-In", e)
-            showToast("구글 로그인 초기화 실패: ${e.message}", Toast.LENGTH_LONG)
+            showToast("로그인에 실패했어요. 다시 시도해 주세요.", Toast.LENGTH_LONG)
         }
     }
 
@@ -263,7 +263,7 @@ class LoginActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start sign in", e)
-            showToast("로그인 시작 실패: ${e.message}")
+            showToast("로그인에 실패했어요. 다시 시도해 주세요.")
         }
     }
 

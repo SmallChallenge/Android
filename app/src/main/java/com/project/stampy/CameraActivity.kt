@@ -297,7 +297,7 @@ class CameraActivity : AppCompatActivity() {
                 )
             } catch (e: Exception) {
                 Log.e(TAG, "카메라 시작 실패", e)
-                showToast("카메라 시작 실패")
+                showToast("요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.")
             }
 
         }, ContextCompat.getMainExecutor(this))
@@ -363,7 +363,7 @@ class CameraActivity : AppCompatActivity() {
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    showToast("사진 촬영 실패: ${exception.message}")
+                    showToast("사진 촬영에 실패했어요.: ${exception.message}")
                     Log.e(TAG, "사진 촬영 실패", exception)
                 }
             }

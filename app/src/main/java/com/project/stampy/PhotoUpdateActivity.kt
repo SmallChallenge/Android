@@ -310,7 +310,7 @@ class PhotoUpdateActivity : AppCompatActivity() {
                     updateServerPhoto(imageId!!, categoryCode, visibility)
                 } else {
                     withContext(Dispatchers.Main) {
-                        showToast("수정할 수 없는 사진입니다")
+                        showToast("수정할 수 없는 사진이에요.")
                         btnComplete?.isEnabled = true
                     }
                 }
