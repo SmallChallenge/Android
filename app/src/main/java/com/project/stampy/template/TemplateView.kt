@@ -42,6 +42,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
         when (template.id) {
             "basic_1" -> bindBasic1Template(showLogo)
             "moody_1" -> bindMoody1Template(showLogo)
+            "active_1" -> bindActive1Template(showLogo)
             // TODO: 다른 템플릿 추가
         }
     }
@@ -125,23 +126,21 @@ class TemplateView(context: Context) : FrameLayout(context) {
         // 시간: 상단 여백 24px
         (tvTime?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
             topMargin = DesignUtils.dpToPxInt(context, 24f)
+            tvTime.layoutParams = this
         }
 
         // 날짜+Stampic: 시간 아래 8px
         (tvDateStampic?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
             topMargin = DesignUtils.dpToPxInt(context, 8f)
+            tvDateStampic.layoutParams = this
         }
 
         // 로고: 오른쪽 16px, 아래 16px
         (ivLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
             bottomMargin = DesignUtils.dpToPxInt(context, 16f)
             marginEnd = DesignUtils.dpToPxInt(context, 16f)
+            ivLogo.layoutParams = this
         }
-
-        // 레이아웃 업데이트
-        tvTime?.requestLayout()
-        tvDateStampic?.requestLayout()
-        ivLogo?.requestLayout()
     }
 
     /**
@@ -218,19 +217,110 @@ class TemplateView(context: Context) : FrameLayout(context) {
 
         (tvDate?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
             topMargin = DesignUtils.dpToPxInt(context, 24f)
+            tvDate.layoutParams = this
         }
 
         (tvTime?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
             topMargin = DesignUtils.dpToPxInt(context, 4f)
+            tvTime.layoutParams = this
         }
 
         (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
             bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            ivStampicLogo.layoutParams = this
+        }
+    }
+
+    /**
+     * Active 1 템플릿 데이터 바인딩
+     */
+    private fun bindActive1Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // 기후위기 폰트 로드
+            val gihugwigiFont = try {
+                ResourcesCompat.getFont(context, R.font.gihugwigi1990)
+            } catch (e: Exception) {
+                null  // 폰트 로드 실패 시 null (시스템 기본 폰트 사용)
+            }
+
+            // === 시간 설정 (HH:mm) ===
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val currentTime = timeFormat.format(Date())
+            tvTime?.apply {
+                text = currentTime
+                // 폰트 적용
+                gihugwigiFont?.let { typeface = it }
+                // 폰트: 기후위기 50
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 50f))
+                // 그림자: x=0, y=0, 흐림=5px, #000000 45%
+                setShadowLayer(
+                    DesignUtils.dpToPx(context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === 날짜 설정 (E, d MMM) ===
+            val tvDate = root.findViewById<TextView>(R.id.tv_date)
+            val dateFormat = SimpleDateFormat("E, d MMM", Locale.US)
+            val currentDate = dateFormat.format(Date()).uppercase(Locale.US)
+            tvDate?.apply {
+                text = currentDate
+                // 폰트 적용
+                gihugwigiFont?.let { typeface = it }
+                // 폰트: 기후위기 16
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 16f))
+                // 그림자: x=0, y=0, 흐림=5px, #000000 45%
+                setShadowLayer(
+                    DesignUtils.dpToPx(context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === Stampic 로고 이미지 ===
+            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+            ivStampicLogo?.apply {
+                visibility = if (showLogo) View.VISIBLE else View.GONE
+
+                // 로고 크기를 기기에 맞춰 조정
+                layoutParams = layoutParams?.apply {
+                    val logoSize = DesignUtils.dpToPxInt(context, 48f)
+                    width = logoSize
+                    height = logoSize
+                }
+            }
+
+            // === 여백 조정 ===
+            adjustActive1Margins(root)
+        }
+    }
+
+    /**
+     * Active 1 템플릿 여백 조정
+     */
+    private fun adjustActive1Margins(root: View) {
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+
+        // 시간과 날짜는 중앙에 위치하므로 별도 margin 조정 불필요
+        // ConstraintLayout으로 이미 중앙 정렬됨
+
+        // 날짜는 시간 바로 아래 (간격 조정 필요시)
+        (tvDate?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 0f)  // 바로 아래 붙임
+            tvDate.layoutParams = this
         }
 
-        tvDate?.requestLayout()
-        tvTime?.requestLayout()
-        ivStampicLogo?.requestLayout()
+        // 로고: 아래 16px - 중요: 기존 layoutParams 수정
+        (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            ivStampicLogo.layoutParams = this
+        }
     }
 
     /**

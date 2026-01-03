@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Moody 1 템플릿 -->
+<!-- Active 1 템플릿 -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,45 +7,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 날짜 표시 (중앙 상단, 상단 여백 24px) -->
-    <!-- 형식: E, d MMM (예: WED, 22 SEPT) -->
-    <TextView
-        android:id="@+id/tv_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:fontFamily="@font/movesans"
-        app:fontFamily="@font/movesans"
-        android:includeFontPadding="false"
-        android:letterSpacing="-0.02"
-        android:textAllCaps="true"
-        android:shadowColor="#73000000"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        tools:text="WED, 22 SEPT"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- 시간 표시 (날짜 아래 4px) -->
-    <!-- 형식: a hh:mm (Locale: US, 예: PM 12:53) -->
+    <!-- 시간 표시 (중앙) -->
+    <!-- 형식: HH:mm (예: 12:53) -->
     <TextView
         android:id="@+id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:fontFamily="@font/movesans"
-        app:fontFamily="@font/movesans"
+        android:fontFamily="@font/gihugwigi1990"
+        app:fontFamily="@font/gihugwigi1990"
         android:includeFontPadding="false"
-        android:letterSpacing="-0.02"
+        android:shadowColor="#73000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        tools:text="12:53"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <!-- 날짜 표시 (시간 바로 아래) -->
+    <!-- 형식: E, d MMM (예: Mon, 8 Nov) -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:fontFamily="@font/gihugwigi1990"
+        app:fontFamily="@font/gihugwigi1990"
+        android:includeFontPadding="false"
         android:textAllCaps="true"
         android:shadowColor="#73000000"
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="5"
-        tools:text="PM 12:53"
-        app:layout_constraintTop_toBottomOf="@id/tv_date"
+        tools:text="MON, 8 NOV"
+        app:layout_constraintTop_toBottomOf="@id/tv_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
