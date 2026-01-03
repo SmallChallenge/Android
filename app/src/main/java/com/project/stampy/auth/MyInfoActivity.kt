@@ -14,7 +14,6 @@ import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
 import com.project.stampy.etc.DoubleButtonDialog
 import com.project.stampy.etc.SingleButtonDialog
-import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
 class MyInfoActivity : AppCompatActivity() {
@@ -35,8 +34,7 @@ class MyInfoActivity : AppCompatActivity() {
             // 닉네임이 변경되었으면 업데이트
             val updatedNickname = tokenManager.getNickname()
             tvNicknameValue.text = updatedNickname ?: "사용자"
-
-            showToast("저장이 완료되었습니다.")
+            // NicknameActivity에서 토스트를 띄우므로 여기서는 제거
         }
     }
 

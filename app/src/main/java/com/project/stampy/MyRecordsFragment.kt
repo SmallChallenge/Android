@@ -29,10 +29,12 @@ import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.ImageRepository
 import kotlinx.coroutines.launch
 import java.io.File
+import android.widget.HorizontalScrollView
 
 class MyRecordsFragment : Fragment() {
 
     // 카테고리 뷰들
+    private lateinit var categoryScroll: HorizontalScrollView
     private lateinit var categoryAll: LinearLayout
     private lateinit var categoryStudy: LinearLayout
     private lateinit var categoryExercise: LinearLayout
@@ -53,6 +55,8 @@ class MyRecordsFragment : Fragment() {
 
     private lateinit var rvPhotos: RecyclerView
     private lateinit var emptyStateContainer: ConstraintLayout
+    private lateinit var ivEmptyCharacter: ImageView
+    private lateinit var tvEmptyState: TextView
     private lateinit var btnProfile: ImageView
 
     // 18장 도달 배너
@@ -74,6 +78,9 @@ class MyRecordsFragment : Fragment() {
 
     // 배너 닫힘 상태 저장
     private var isBannerDismissed = false
+
+    // 전체 사진 개수 추적
+    private var totalPhotoCount = 0
 
     companion object {
         private const val PHOTO_LIMIT_BANNER_THRESHOLD = 18
@@ -123,11 +130,15 @@ class MyRecordsFragment : Fragment() {
         // 배너 클릭 리스너
         setupBannerListeners()
 
+        // 빈 상태 텍스트 볼드 처리
+        setupEmptyStateText()
+
         // 사진 로드
         loadPhotos()
     }
 
     private fun initViews(view: View) {
+        categoryScroll = view.findViewById(R.id.category_scroll)
         categoryAll = view.findViewById(R.id.category_all)
         categoryStudy = view.findViewById(R.id.category_study)
         categoryExercise = view.findViewById(R.id.category_exercise)
@@ -148,6 +159,8 @@ class MyRecordsFragment : Fragment() {
 
         rvPhotos = view.findViewById(R.id.rv_photos)
         emptyStateContainer = view.findViewById(R.id.empty_state_container)
+        ivEmptyCharacter = view.findViewById(R.id.iv_empty_character)
+        tvEmptyState = view.findViewById(R.id.tv_empty_state)
         btnProfile = view.findViewById(R.id.btn_profile)
 
         // 배너 뷰들
@@ -180,6 +193,27 @@ class MyRecordsFragment : Fragment() {
         }
 
         tvBannerText.text = spannableString
+    }
+
+    /**
+     * 빈 상태 텍스트 설정 ("+버튼" 볼드 처리)
+     */
+    private fun setupEmptyStateText() {
+        val fullText = "아직 남긴 기록이 없어요.\n+버튼을 눌러 기록을 시작해보세요!"
+        val boldText = "+버튼"
+        val spannableString = SpannableString(fullText)
+
+        val startIndex = fullText.indexOf(boldText)
+        if (startIndex >= 0) {
+            spannableString.setSpan(
+                StyleSpan(android.graphics.Typeface.BOLD),
+                startIndex,
+                startIndex + boldText.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        tvEmptyState.text = spannableString
     }
 
     /**
@@ -389,6 +423,9 @@ class MyRecordsFragment : Fragment() {
                 val allPhotos = (serverPhotos + localPhotos)
                     .sortedByDescending { it.timestamp }
 
+                // 전체 사진 개수 계산 (카테고리 필터링 전)
+                totalPhotoCount = calculateTotalPhotoCount()
+
                 // 4. UI 업데이트
                 if (allPhotos.isEmpty()) {
                     showEmptyState()
@@ -400,9 +437,32 @@ class MyRecordsFragment : Fragment() {
                 Log.d("MyRecordsFragment", "전체 사진 ${allPhotos.size}개 표시 (서버: ${serverPhotos.size}, 로컬: ${localPhotos.size})")
             } catch (e: Exception) {
                 Log.e("MyRecordsFragment", "사진 로드 오류", e)
+                totalPhotoCount = 0
                 showEmptyState()
             }
         }
+    }
+
+    /**
+     * 전체 사진 개수 계산 (로그인 사용자)
+     */
+    private suspend fun calculateTotalPhotoCount(): Int {
+        var count = 0
+
+        // 서버 사진 개수
+        imageRepository.getMyImages(
+            category = null,  // 전체
+            page = 0,
+            size = 100
+        ).onSuccess { response ->
+            count += response.images.size
+        }
+
+        // 로컬 사진 개수 (서버에 업로드되지 않은 것만)
+        val localPhotos = loadLocalPhotosForLoggedInUser(null, photoMetadataManager)
+        count += localPhotos.size
+
+        return count
     }
 
     /**
@@ -478,6 +538,7 @@ class MyRecordsFragment : Fragment() {
         val picturesDir = File(requireContext().filesDir, "Pictures")
 
         if (!picturesDir.exists() || !picturesDir.isDirectory) {
+            totalPhotoCount = 0
             showEmptyState()
             updatePhotoLimitBanner(0)  // 배너 업데이트
             return
@@ -532,6 +593,9 @@ class MyRecordsFragment : Fragment() {
             }
             .sortedByDescending { it.timestamp }  // 최신순 정렬
 
+        // 전체 사진 개수 저장 (배너용)
+        totalPhotoCount = nonLoginPhotoManager.getPhotoCount()
+
         // 4. UI 업데이트
         if (photos.isEmpty()) {
             showEmptyState()
@@ -541,7 +605,6 @@ class MyRecordsFragment : Fragment() {
         }
 
         // 배너 업데이트 (전체 사진 개수 기준)
-        val totalPhotoCount = nonLoginPhotoManager.getPhotoCount()
         updatePhotoLimitBanner(totalPhotoCount)
 
         Log.d("MyRecordsFragment", "비회원 로컬 사진 ${photos.size}개 로드됨 (전체: $totalPhotoCount)")
@@ -557,11 +620,24 @@ class MyRecordsFragment : Fragment() {
     private fun showEmptyState() {
         rvPhotos.visibility = View.GONE
         emptyStateContainer.visibility = View.VISIBLE
+
+        // 전체 사진이 0장이면 캐릭터와 텍스트 보이고 카테고리 숨김
+        if (totalPhotoCount == 0) {
+            ivEmptyCharacter.visibility = View.VISIBLE
+            tvEmptyState.visibility = View.VISIBLE
+            categoryScroll.visibility = View.GONE
+        } else {
+            // 사진은 있는데 선택한 카테고리에는 없는 경우
+            ivEmptyCharacter.visibility = View.GONE
+            tvEmptyState.visibility = View.GONE
+            categoryScroll.visibility = View.VISIBLE
+        }
     }
 
     private fun hideEmptyState() {
         rvPhotos.visibility = View.VISIBLE
         emptyStateContainer.visibility = View.GONE
+        categoryScroll.visibility = View.VISIBLE
     }
 
     /**

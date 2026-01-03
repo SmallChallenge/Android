@@ -337,7 +337,8 @@ class NicknameActivity : AppCompatActivity() {
                     Log.d(TAG, "닉네임 설정 성공: ${response.nickname}")
 
                     if (isEditMode) {
-                        // 수정 모드: 이전 화면으로 돌아가기
+                        // 수정 화면: 환영 메시지 표시 후 이전 화면으로 돌아가기
+                        showToast("반가워요, ${response.nickname ?: nickname}님! 이제 기록을 시작해볼까요?", Toast.LENGTH_LONG)
                         setResult(RESULT_OK)
                         finish()
                     } else {

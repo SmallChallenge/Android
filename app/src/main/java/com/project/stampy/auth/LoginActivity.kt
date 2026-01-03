@@ -61,7 +61,7 @@ class LoginActivity : AppCompatActivity() {
         private const val TAG = "LoginActivity"
         private const val RC_GOOGLE_SIGN_IN = 9001
         private const val REQUEST_CODE_NICKNAME = 1001
-        private const val TERMS_URL = "https://placid-aurora-3ad.notion.site/2b54e8ebd8b080c1a8bdd9267b94dc3e?source=copy_link"
+        private const val TERMS_URL = "https://sage-hare-ff7.notion.site/2d5f2907580d80df9a21f95acd343d3f?source=copy_link" // 스탬픽 이용약관 웹뷰
 
         // 사진 저장 화면에서 왔는지 확인하는 Extra
         const val EXTRA_RETURN_TO_PHOTO_SAVE = "extra_return_to_photo_save"
