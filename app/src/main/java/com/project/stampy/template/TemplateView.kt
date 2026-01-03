@@ -44,6 +44,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             "basic_1" -> bindBasic1Template(showLogo)
             "basic_2" -> bindBasic2Template(showLogo)
             "moody_1" -> bindMoody1Template(showLogo)
+            "moody_2" -> bindMoody2Template(showLogo)
             "active_1" -> bindActive1Template(showLogo)
             "digital_1" -> bindDigital1Template(showLogo)
         }
@@ -152,7 +153,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
         templateRootView?.let { root ->
             // SUIT Heavy 폰트 로드
             val suitHeavy = try {
-                ResourcesCompat.getFont(context, R.font.suite_heavy)
+                ResourcesCompat.getFont(context, R.font.suit_heavy)
             } catch (e: Exception) {
                 null
             }
@@ -331,6 +332,119 @@ class TemplateView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * Moody 2 템플릿 데이터 바인딩
+     */
+    private fun bindMoody2Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // Suite ExtraLight 폰트 로드
+            val suiteExtraLight = try {
+                ResourcesCompat.getFont(context, R.font.suit_extralight)
+            } catch (e: Exception) {
+                null
+            }
+
+            // Suite Bold 폰트 로드
+            val suiteBold = try {
+                ResourcesCompat.getFont(context, R.font.suit_bold)
+            } catch (e: Exception) {
+                null
+            }
+
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val currentTime = timeFormat.format(Date())
+            val timeParts = currentTime.split(":")
+            val hour = timeParts[0]
+            val minute = timeParts[1]
+
+            // 375px 기준 가변 크기 계산
+            val scaledTimeSize = DesignUtils.getScaledTextSize(context, 100f)
+            val scaledDateSize = DesignUtils.getScaledTextSize(context, 20f)
+
+            // 그림자: x0 y0 blur10 #000000 30%
+            val shadowRadius = DesignUtils.dpToPx(context, 10f)
+            val shadowColor = 0x4D000000.toInt() // 30%
+
+            // 시간 첫째 자리
+            root.findViewById<TextView>(R.id.tv_hour_1)?.apply {
+                text = hour[0].toString()
+                suiteExtraLight?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledTimeSize)
+                setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
+            }
+
+            // 시간 둘째 자리
+            root.findViewById<TextView>(R.id.tv_hour_2)?.apply {
+                text = hour[1].toString()
+                suiteExtraLight?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledTimeSize)
+                setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
+            }
+
+            // 분 첫째 자리
+            root.findViewById<TextView>(R.id.tv_minute_1)?.apply {
+                text = minute[0].toString()
+                suiteExtraLight?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledTimeSize)
+                setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
+            }
+
+            // 분 둘째 자리
+            root.findViewById<TextView>(R.id.tv_minute_2)?.apply {
+                text = minute[1].toString()
+                suiteExtraLight?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledTimeSize)
+                setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
+            }
+
+            // 날짜 (YYYY.MM.DD)
+            root.findViewById<TextView>(R.id.tv_date)?.apply {
+                val dateFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+                text = dateFormat.format(Date())
+                suiteBold?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledDateSize)
+            }
+
+            // 로고
+            root.findViewById<ImageView>(R.id.iv_stampic_logo)?.visibility =
+                if (showLogo) View.VISIBLE else View.GONE
+
+            // 여백 조정
+            adjustMoody2Margins(root)
+        }
+    }
+
+    /**
+     * Moody 2 템플릿 여백 조정
+     */
+    private fun adjustMoody2Margins(root: View) {
+        val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        val ivCircleBg = root.findViewById<ImageView>(R.id.iv_circle_bg)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+
+        // 로고: 상단 여백 16px
+        (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 16f)
+            ivStampicLogo.layoutParams = this
+        }
+
+        // 원형 배경: 220dp 크기를 기기에 맞춰 조정
+        (ivCircleBg?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            val circleSize = DesignUtils.dpToPxInt(context, 220f)
+            width = circleSize
+            height = circleSize
+            ivCircleBg.layoutParams = this
+        }
+
+        // 날짜: 하단 여백 16px
+        (tvDate?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            tvDate.layoutParams = this
+        }
+
+        // 숫자 간격 6px (Space로 이미 설정됨)
+    }
+
+    /**
      * Active 1 템플릿 데이터 바인딩
      */
     private fun bindActive1Template(showLogo: Boolean) {
@@ -406,13 +520,13 @@ class TemplateView(context: Context) : FrameLayout(context) {
     private fun bindDigital1Template(showLogo: Boolean) {
         templateRootView?.let { root ->
             val suitExtraBold = try {
-                ResourcesCompat.getFont(context, R.font.suite_extrabold)
+                ResourcesCompat.getFont(context, R.font.suit_extrabold)
             } catch (e: Exception) {
                 null
             }
 
             val suitBold = try {
-                ResourcesCompat.getFont(context, R.font.suite_bold)
+                ResourcesCompat.getFont(context, R.font.suit_bold)
             } catch (e: Exception) {
                 null
             }

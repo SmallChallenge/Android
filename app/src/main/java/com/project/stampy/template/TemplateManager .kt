@@ -39,6 +39,15 @@ object TemplateManager {
             )
         )
 
+        templates.add(
+            Template(
+                id = "moody_2",
+                category = TemplateCategory.MOODY,
+                name = "Moody 2",
+                layoutResId = R.layout.template_moody_2
+            )
+        )
+
         // Active 카테고리 템플릿
         templates.add(
             Template(
