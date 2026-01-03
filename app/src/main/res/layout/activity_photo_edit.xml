@@ -46,17 +46,7 @@
             android:scaleType="centerCrop"
             android:contentDescription="편집할 사진" />
 
-        <!-- 템플릿 오버레이 (선택된 템플릿) -->
-        <TextView
-            android:id="@+id/tv_template_overlay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textColor="@color/gray_50"
-            android:textSize="24sp"
-            android:fontFamily="@font/pretendard_regular"
-            android:visibility="gone"
-            android:text="템플릿" />
+        <!-- 템플릿 오버레이는 TemplateView가 동적으로 추가됨 -->
 
     </FrameLayout>
 
@@ -174,125 +164,18 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 템플릿 목록 -->
-    <HorizontalScrollView
-        android:id="@+id/template_scroll"
+    <!-- 템플릿 목록 (RecyclerView) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/template_recycler_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:scrollbars="none"
         android:layout_marginTop="24dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/category_logo_area"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:id="@+id/template_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp">
-
-            <!-- 템플릿 1 -->
-            <FrameLayout
-                android:id="@+id/template_1"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:background="@drawable/bg_template_item"
-                android:clickable="true"
-                android:focusable="true">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="T1"
-                    android:textColor="@color/gray_50"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/pretendard_semibold" />
-            </FrameLayout>
-
-            <!-- 템플릿 2 -->
-            <FrameLayout
-                android:id="@+id/template_2"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_template_item"
-                android:clickable="true"
-                android:focusable="true">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="T2"
-                    android:textColor="@color/gray_50"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/pretendard_semibold" />
-            </FrameLayout>
-
-            <!-- 템플릿 3 -->
-            <FrameLayout
-                android:id="@+id/template_3"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_template_item"
-                android:clickable="true"
-                android:focusable="true">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="T3"
-                    android:textColor="@color/gray_50"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/pretendard_semibold" />
-            </FrameLayout>
-
-            <!-- 템플릿 4 -->
-            <FrameLayout
-                android:id="@+id/template_4"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_template_item"
-                android:clickable="true"
-                android:focusable="true">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="T4"
-                    android:textColor="@color/gray_50"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/pretendard_semibold" />
-            </FrameLayout>
-
-            <!-- 템플릿 5 -->
-            <FrameLayout
-                android:id="@+id/template_5"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_template_item"
-                android:clickable="true"
-                android:focusable="true">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="T5"
-                    android:textColor="@color/gray_50"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/pretendard_semibold" />
-            </FrameLayout>
-
-        </LinearLayout>
-    </HorizontalScrollView>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

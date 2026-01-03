@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 템플릿 아이템 레이아웃 -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/template_container"
+    android:layout_width="90dp"
+    android:layout_height="90dp"
+    android:layout_marginEnd="8dp"
+    android:background="@drawable/bg_template_item"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- 템플릿 프리뷰 이미지 (추후 실제 이미지로 대체) -->
+    <ImageView
+        android:id="@+id/iv_template_preview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="템플릿 프리뷰"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 템플릿 이름 -->
+    <TextView
+        android:id="@+id/tv_template_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/gray_50"
+        android:textSize="16sp"
+        android:fontFamily="@font/pretendard_semibold"
+        tools:text="T1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
