@@ -438,7 +438,13 @@ class PhotoSaveActivity : AppCompatActivity() {
         try {
             // 화면에 보이는 그대로 캡처 (템플릿 포함)
             val finalBitmap = withContext(Dispatchers.Main) {
-                captureViewAsBitmap()
+                // 템플릿 오버레이 텍스트 숨기기
+                tvTemplateOverlay.visibility = View.GONE
+
+                // 캡처
+                val bitmap = captureViewAsBitmap()
+
+                bitmap
             }
 
             if (finalBitmap != null) {
@@ -691,10 +697,9 @@ class PhotoSaveActivity : AppCompatActivity() {
                     // 임시 파일 삭제
                     file.delete()
 
-                    // TODO: 전체 공개인 경우 커뮤니티 업로드 (추후 개발)
+                    // 전체 공개인 경우 자동으로 커뮤니티에 게시됨
                     if (visibility == "PUBLIC") {
-                        Log.d(TAG, "전체 공개 - 커뮤니티 업로드 예정 (TODO)")
-                        // uploadToCommunity(response.imageId)
+                        Log.d(TAG, "전체 공개 - 커뮤니티에 자동 게시됨")
                     }
 
                     showToast("저장이 완료되었어요.")
@@ -793,12 +798,6 @@ class PhotoSaveActivity : AppCompatActivity() {
                 .load(uri)
                 .centerCrop()
                 .into(ivPhoto)
-        }
-
-        // 템플릿 오버레이
-        templateName?.let { name ->
-            tvTemplateOverlay.text = name
-            tvTemplateOverlay.visibility = View.VISIBLE
         }
     }
 
