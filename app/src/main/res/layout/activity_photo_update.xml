@@ -228,7 +228,7 @@
                 android:orientation="horizontal"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginTop="40dp">
+                android:layout_marginTop="24dp">
 
                 <TextView
                     android:id="@+id/tv_privacy_title"
@@ -282,32 +282,34 @@
 
             </LinearLayout>
 
-            <!-- 로그인 필요 경고 (비로그인 유저만) -->
+            <!-- 비로그인 경고 메시지 (게스트만 보임) -->
             <LinearLayout
-                android:id="@+id/warning_login_required"
+                android:id="@+id/warning_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_height="46dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_tag_pressed"
                 android:visibility="gone">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/ic_warning"
-                    android:contentDescription="경고" />
+                    android:contentDescription="경고"
+                    app:tint="@color/gray_500"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:text="게스트 게시물은 공개 범위를 수정할 수 없어요."
-                    android:textAppearance="@style/TextAppearance.App.Body2"
+                    android:textSize="14sp"
                     android:textColor="@color/gray_500"
-                    android:layout_marginStart="4dp" />
-
+                    android:textAppearance="@style/TextAppearance.App.Body2" />
             </LinearLayout>
 
             <!-- 안내 문구 (로그인 유저만) -->

@@ -45,7 +45,7 @@ class PhotoUpdateActivity : AppCompatActivity() {
 
     // 안내 메시지
     private lateinit var tvPrivacyGuide: TextView
-    private lateinit var warningLoginRequired: LinearLayout
+    private lateinit var warningContainer: LinearLayout
 
     // 에러 메시지
     private lateinit var tvCategoryError: TextView
@@ -129,7 +129,7 @@ class PhotoUpdateActivity : AppCompatActivity() {
 
         // 안내 메시지
         tvPrivacyGuide = findViewById(R.id.tv_privacy_guide)
-        warningLoginRequired = findViewById(R.id.warning_login_required)
+        warningContainer = findViewById(R.id.warning_container)
 
         // 에러 메시지
         tvCategoryError = findViewById(R.id.tv_category_error)
@@ -141,17 +141,17 @@ class PhotoUpdateActivity : AppCompatActivity() {
         if (isLocalPhoto) {
             // 로컬 사진: 로그인 여부와 관계없이 비공개만 가능
             tagPublic.visibility = View.GONE
-            warningLoginRequired.visibility = View.VISIBLE
+            warningContainer.visibility = View.VISIBLE
             tvPrivacyGuide.visibility = View.GONE
         } else if (!tokenManager.isLoggedIn()) {
             // 비로그인 유저 (서버 사진은 볼 수 없지만 방어 코드)
             tagPublic.visibility = View.GONE
-            warningLoginRequired.visibility = View.VISIBLE
+            warningContainer.visibility = View.VISIBLE
             tvPrivacyGuide.visibility = View.GONE
         } else {
             // 로그인 유저 + 서버 사진: 전체 공개 가능
             tagPublic.visibility = View.VISIBLE
-            warningLoginRequired.visibility = View.GONE
+            warningContainer.visibility = View.GONE
             tvPrivacyGuide.visibility = View.VISIBLE
         }
     }

@@ -250,45 +250,12 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_visibility_label"
                 app:layout_constraintStart_toStartOf="@id/tv_visibility_label" />
 
-            <!-- 비로그인 경고 메시지 (게스트만 보임) -->
-            <LinearLayout
-                android:id="@+id/warning_container"
-                android:layout_width="0dp"
-                android:layout_height="46dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:background="@drawable/bg_tag_pressed"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/category_container"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_warning"
-                    android:contentDescription="경고"
-                    app:tint="@color/gray_500"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="게스트 게시물은 공개 범위를 수정할 수 없어요."
-                    android:textSize="14sp"
-                    android:textColor="@color/gray_500"
-                    android:fontFamily="@font/pretendard_regular" />
-            </LinearLayout>
-
             <!-- 공유하기 버튼 -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_share"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="40dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="40dp"
@@ -301,17 +268,9 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 app:backgroundTint="@null"
-                app:layout_constraintTop_toBottomOf="@id/warning_container"
+                app:layout_constraintTop_toBottomOf="@id/category_container"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
-
-            <!-- 게스트가 아닌 경우 공유하기 버튼 위치 조정용 가이드라인 -->
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/barrier_share_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:barrierDirection="bottom"
-                app:constraint_referenced_ids="category_container" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -48,9 +48,6 @@ class PhotoDetailActivity : AppCompatActivity() {
     // 공개 여부
     private lateinit var tagVisibility: TagView
 
-    // 경고 메시지 (비로그인만)
-    private lateinit var warningContainer: LinearLayout
-
     // 공유하기 버튼
     private lateinit var btnShare: MaterialButton
 
@@ -117,32 +114,11 @@ class PhotoDetailActivity : AppCompatActivity() {
         // 공개 여부
         tagVisibility = findViewById(R.id.tag_visibility)
 
-        // 경고 메시지
-        warningContainer = findViewById(R.id.warning_container)
-
         // 공유하기 버튼
         btnShare = findViewById(R.id.btn_share)
 
         // 로컬 사진(로그인 전에 올린 사진)일 경우 경고 메시지 표시
         val isLocalPhoto = imageId == null  // 서버 imageId가 없으면 로컬 사진
-
-        if (isLocalPhoto) {
-            warningContainer.visibility = View.VISIBLE
-        } else {
-            warningContainer.visibility = View.GONE
-            // 공유하기 버튼을 카테고리 아이콘 40dp 아래로 이동
-            val constraintLayout = btnShare.parent as androidx.constraintlayout.widget.ConstraintLayout
-            val constraintSet = androidx.constraintlayout.widget.ConstraintSet()
-            constraintSet.clone(constraintLayout)
-            constraintSet.connect(
-                R.id.btn_share,
-                androidx.constraintlayout.widget.ConstraintSet.TOP,
-                R.id.category_container,
-                androidx.constraintlayout.widget.ConstraintSet.BOTTOM,
-                40
-            )
-            constraintSet.applyTo(constraintLayout)
-        }
     }
 
     private fun setupListeners() {
