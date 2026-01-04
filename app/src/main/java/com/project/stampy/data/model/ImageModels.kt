@@ -22,7 +22,10 @@ data class ImageSaveRequest(
     val category: String, // "STUDY", "EXERCISE", "FOOD", "ETC"
 
     @SerializedName("visibility")
-    val visibility: String = "PRIVATE" // "PRIVATE", "PUBLIC"
+    val visibility: String = "PRIVATE", // "PRIVATE", "PUBLIC"
+
+    @SerializedName("originalTakenAt")
+    val originalTakenAt: String  // "yyyy-MM-dd'T'HH:mm:ss" 포맷
 )
 
 /**

@@ -681,10 +681,14 @@ class PhotoSaveActivity : AppCompatActivity() {
         try {
             Log.d(TAG, "서버 업로드 시작: category=$category, visibility=$visibility")
 
+            // 파일 이름에서 타임스탬프 추출
+            val timestamp = extractTimestampFromFileName(fileName)
+
             val result = imageRepository.uploadImage(
                 imageFile = file,
                 category = category,
-                visibility = visibility
+                visibility = visibility,
+                takenAtTimestamp = timestamp
             )
 
             withContext(Dispatchers.Main) {
@@ -828,6 +832,26 @@ class PhotoSaveActivity : AppCompatActivity() {
             // 비공개
             tagPrivate.isSelected = true
             tagPublic.isSelected = false
+        }
+    }
+
+    /**
+     * 파일명에서 타임스탬프 추출
+     * 예: STAMPIC_20260103_152745.jpg → 1735905596000 (Unix timestamp)
+     */
+    private fun extractTimestampFromFileName(fileName: String): Long {
+        return try {
+            // STAMPIC_20260103_152745.jpg → 20260103_152745
+            val timestampStr = fileName
+                .removePrefix(FILE_PREFIX)
+                .removeSuffix(FILE_EXTENSION)
+
+            val sdf = SimpleDateFormat(TIMESTAMP_FORMAT, Locale.getDefault())
+            val date = sdf.parse(timestampStr)
+            date?.time ?: System.currentTimeMillis()
+        } catch (e: Exception) {
+            Log.e(TAG, "파일명에서 타임스탬프 추출 실패", e)
+            System.currentTimeMillis()
         }
     }
 }

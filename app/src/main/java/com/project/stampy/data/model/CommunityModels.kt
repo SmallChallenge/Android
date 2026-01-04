@@ -27,7 +27,7 @@ data class FeedItem(
     val nickname: String,
 
     @SerializedName("profileImageUrl")
-    val profileImageUrl: String,
+    val profileImageUrl: String?,
 
     @SerializedName("liked")
     val isLiked: Boolean,

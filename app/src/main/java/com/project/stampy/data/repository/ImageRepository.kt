@@ -8,6 +8,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * 이미지 관련 Repository
@@ -53,7 +55,8 @@ class ImageRepository(
     suspend fun uploadImage(
         imageFile: File,
         category: String = "ETC", // "STUDY", "EXERCISE", "FOOD", "ETC"
-        visibility: String = "PRIVATE" // "PRIVATE", "PUBLIC"
+        visibility: String = "PRIVATE", // "PRIVATE", "PUBLIC"
+        takenAtTimestamp: Long = System.currentTimeMillis()
     ): Result<ImageSaveResponse> {
         return try {
             val token = "Bearer ${tokenManager.getAccessToken()}"
@@ -93,16 +96,41 @@ class ImageRepository(
             val saveRequest = ImageSaveRequest(
                 originalFilename = imageFile.name,
                 objectKey = presignedData.objectKey,
-                contentType = contentType,  // image/jpg
+                contentType = contentType,  // image/jpeg
                 fileSize = imageFile.length(),
                 category = category,
-                visibility = visibility
+                visibility = visibility,
+                originalTakenAt = formatTimestamp(takenAtTimestamp)
             )
 
             safeApiCall { imageApi.saveImage(token, saveRequest) }
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    /**
+     * Unix timestamp를 iOS와 동일한 ISO 8601 포맷으로 변환
+     *
+     * @param timestamp Unix timestamp (밀리초)
+     * @return "yyyy-MM-dd'T'HH:mm:ss" 포맷 (예: "2026-01-03T19:27:35")
+     *
+     * CRITICAL:
+     * - iOS와 동일한 포맷: "yyyy-MM-dd'T'HH:mm:ss"
+     * - Locale.US 사용 (iOS와 일관성)
+     * - 기기 시간대 사용 (iOS와 동일)
+     * - 밀리초 제거 (초까지만)
+     */
+    private fun formatTimestamp(timestamp: Long): String {
+        val sdf = SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss",  // iOS와 동일한 포맷
+            Locale.US  // iOS와 일관성을 위해 US Locale 사용
+        )
+        // TimeZone은 기기의 시스템 시간대 사용 (iOS와 동일)
+        // 만약 iOS가 특정 TimeZone을 사용한다면 여기서 설정:
+        // sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+
+        return sdf.format(Date(timestamp))
     }
 
     /**
