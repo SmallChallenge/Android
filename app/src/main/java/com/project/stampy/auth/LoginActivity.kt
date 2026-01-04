@@ -152,7 +152,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupTermsText() {
-        val fullText = "로그인하시면 이용약관 및 동의에 자동으로 동의합니다"
+        val fullText = "로그인하시면 이용약관에 동의하는 것으로 간주됩니다."
         val termsText = "이용약관"
 
         val spannableString = SpannableString(fullText)

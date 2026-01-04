@@ -30,9 +30,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="내 정보"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             android:fontFamily="@font/pretendard_semibold"
+            app:fontFamily="@font/pretendard_semibold"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -96,7 +97,8 @@
                     android:text="닉네임"
                     android:textColor="@color/gray_300"
                     android:textSize="14sp"
-                    android:fontFamily="@font/pretendard_semibold" />
+                    android:fontFamily="@font/pretendard_semibold"
+                    app:fontFamily="@font/pretendard_semibold" />
 
                 <TextView
                     android:id="@+id/tv_nickname_value"
@@ -105,7 +107,8 @@
                     android:text="홍길동"
                     android:textColor="@color/gray_500"
                     android:textSize="14sp"
-                    android:fontFamily="@font/pretendard_semibold" />
+                    android:fontFamily="@font/pretendard_semibold"
+                    app:fontFamily="@font/pretendard_semibold" />
 
                 <ImageView
                     android:id="@+id/iv_arrow_nickname"
@@ -134,6 +137,7 @@
                     android:textColor="@color/gray_300"
                     android:textSize="16sp"
                     android:fontFamily="@font/pretendard_semibold"
+                    app:fontFamily="@font/pretendard_semibold"
                     android:layout_marginStart="24dp"/>
 
                 <TextView
@@ -142,6 +146,8 @@
                     android:text="✔️ 자동 백업 및 무제한 기록"
                     android:textColor="@color/gray_300"
                     android:textSize="14sp"
+                    android:fontFamily="@font/pretendard_regular"
+                    app:fontFamily="@font/pretendard_regular"
                     android:layout_marginTop="16dp"
                     android:layout_marginStart="24dp"/>
 
@@ -152,6 +158,8 @@
                     android:text="✔️ 자유로운 공개 여부 설정"
                     android:textColor="@color/gray_300"
                     android:textSize="14sp"
+                    android:fontFamily="@font/pretendard_regular"
+                    app:fontFamily="@font/pretendard_regular"
                     android:layout_marginTop="12dp"
                     android:layout_marginStart="24dp"/>
 
@@ -174,6 +182,8 @@
                         android:text="로그인 전 기록은 백업·공개가 불가해요."
                         android:textColor="@color/gray_500"
                         android:textSize="12sp"
+                        android:fontFamily="@font/pretendard_regular"
+                        app:fontFamily="@font/pretendard_regular"
                         android:layout_marginStart="8dp" />
                 </LinearLayout>
             </LinearLayout>
@@ -203,7 +213,8 @@
                     android:text="회원탈퇴"
                     android:textColor="@color/gray_300"
                     android:textSize="14sp"
-                    android:fontFamily="@font/pretendard_semibold" />
+                    android:fontFamily="@font/pretendard_semibold"
+                    app:fontFamily="@font/pretendard_semibold" />
             </LinearLayout>
 
         </LinearLayout>

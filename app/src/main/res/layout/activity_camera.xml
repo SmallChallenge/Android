@@ -59,6 +59,8 @@
             android:layout_weight="1"
             android:text="갤러리"
             android:textAppearance="@style/TextAppearance.App.Button.Medium"
+            android:fontFamily="@font/pretendard_medium"
+            app:fontFamily="@font/pretendard_medium"
             android:textColor="@color/gray_500"
             android:gravity="center"
             android:clickable="true"
@@ -73,6 +75,8 @@
             android:layout_weight="1"
             android:text="카메라"
             android:textAppearance="@style/TextAppearance.App.Button.Medium"
+            android:fontFamily="@font/pretendard_medium"
+            app:fontFamily="@font/pretendard_medium"
             android:textColor="@color/gray_50"
             android:gravity="center"
             android:clickable="true"
@@ -110,7 +114,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_camera_switch"
-                app:tint="@color/gray_50"
+                app:tint="@color/gray_300"
                 android:contentDescription="전면/후면 전환" />
         </FrameLayout>
 
@@ -149,7 +153,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_flash_off"
-                app:tint="@color/gray_50"
+                app:tint="@color/gray_300"
                 android:contentDescription="플래시" />
         </FrameLayout>
 

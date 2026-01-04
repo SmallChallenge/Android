@@ -74,7 +74,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="기록 수정"
-                android:textAppearance="@style/TextAppearance.App.Body2"
+                android:textAppearance="@style/TextAppearance.App.Button.Large"
+                app:fontFamily="@font/pretendard_semibold"
                 android:textColor="@color/gray_300"
                 android:textStyle="bold"/>
 
@@ -84,6 +85,8 @@
                 android:layout_marginStart="53dp"
                 android:src="@drawable/ic_edit"
                 android:contentDescription="수정"
+                android:textAppearance="@style/TextAppearance.App.Button.Large"
+                app:fontFamily="@font/pretendard_semibold"
                 app:tint="@color/gray_300"/>
         </LinearLayout>
 
@@ -180,7 +183,8 @@
                 android:textSize="14sp"
                 android:textColor="@color/gray_400"
                 android:textStyle="bold"
-                android:fontFamily="@font/pretendard_regular"
+                android:textAppearance="@style/TextAppearance.App.Subtitle2"
+                app:fontFamily="@font/pretendard_semibold"
                 app:layout_constraintTop_toBottomOf="@id/iv_photo"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -212,7 +216,8 @@
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="@color/gray_50"
-                    android:fontFamily="@font/pretendard_regular" />
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold" />
             </LinearLayout>
 
             <!-- 공개 여부 라벨 -->
@@ -225,7 +230,8 @@
                 android:textSize="14sp"
                 android:textColor="@color/gray_400"
                 android:textStyle="bold"
-                android:fontFamily="@font/pretendard_regular"
+                android:textAppearance="@style/TextAppearance.App.Subtitle2"
+                app:fontFamily="@font/pretendard_semibold"
                 app:layout_constraintTop_toTopOf="@id/tv_category_label"
                 app:layout_constraintStart_toEndOf="@id/tv_category_label" />
 
@@ -238,6 +244,8 @@
                 android:text="비공개"
                 android:clickable="false"
                 android:focusable="false"
+                android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                app:fontFamily="@font/pretendard_semibold"
                 app:layout_constraintTop_toBottomOf="@id/tv_visibility_label"
                 app:layout_constraintStart_toStartOf="@id/tv_visibility_label" />
 
@@ -268,7 +276,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="로그인 전 게시물은 공개 범위를 수정할 수 없어요."
+                    android:text="게스트 게시물은 공개 범위를 수정할 수 없어요."
                     android:textSize="14sp"
                     android:textColor="@color/gray_500"
                     android:fontFamily="@font/pretendard_regular" />
@@ -286,6 +294,7 @@
                 android:text="공유하기"
                 android:textStyle="bold"
                 android:textAppearance="@style/TextAppearance.App.Button.Large"
+                app:fontFamily="@font/pretendard_semibold"
                 android:textColor="@color/gray_300"
                 android:background="@drawable/bg_button_share"
                 android:insetTop="0dp"

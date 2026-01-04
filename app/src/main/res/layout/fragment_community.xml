@@ -92,7 +92,7 @@
             android:text="아직은 우리만의 비밀 공간 같아요.\n첫 게시물로 문을 열어주세요!"
             android:textColor="@color/text_secondary"
             android:textSize="16sp"
-            android:fontFamily="@font/pretendard_regular"
+            android:textAppearance="@style/TextAppearance.App.Body1"
             android:textAlignment="center"
             android:gravity="center"
             android:layout_marginTop="20dp"

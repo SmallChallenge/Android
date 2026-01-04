@@ -3,7 +3,8 @@
     <item
         android:id="@+id/navigation_storage"
         android:icon="@drawable/ic_my_records_selector"
-        android:title="내 기록" />
+        android:title="내 기록"
+        android:textAppearance="@style/TextAppearance.App.Label" />
 
     <item
         android:id="@+id/navigation_add"
@@ -13,5 +14,6 @@
     <item
         android:id="@+id/navigation_community"
         android:icon="@drawable/ic_community_selector"
-        android:title="커뮤니티" />
+        android:title="커뮤니티"
+        android:textAppearance="@style/TextAppearance.App.Label" />
 </menu>

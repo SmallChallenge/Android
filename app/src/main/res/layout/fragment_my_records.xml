@@ -92,6 +92,7 @@
                     android:textColor="@color/gray_50"
                     android:textSize="12sp"
                     android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"
                     android:layout_marginTop="8dp" />
             </LinearLayout>
 
@@ -122,7 +123,8 @@
                     android:text="공부"
                     android:textColor="@color/gray_500"
                     android:textSize="12sp"
-                    android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"
                     android:layout_marginTop="8dp" />
             </LinearLayout>
 
@@ -153,7 +155,8 @@
                     android:text="운동"
                     android:textColor="@color/gray_500"
                     android:textSize="12sp"
-                    android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"
                     android:layout_marginTop="8dp" />
             </LinearLayout>
 
@@ -184,7 +187,8 @@
                     android:text="음식"
                     android:textColor="@color/gray_500"
                     android:textSize="12sp"
-                    android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"
                     android:layout_marginTop="8dp" />
             </LinearLayout>
 
@@ -214,7 +218,8 @@
                     android:text="기타"
                     android:textColor="@color/gray_500"
                     android:textSize="12sp"
-                    android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"
                     android:layout_marginTop="8dp" />
             </LinearLayout>
 

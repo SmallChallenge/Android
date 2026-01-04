@@ -7,6 +7,8 @@
     android:layout_width="match_parent"
     android:layout_height="56dp"
     android:text="완료하기"
+    android:fontFamily="@font/pretendard_semibold"
+    app:fontFamily="@font/pretendard_semibold"
     android:textAppearance="@style/TextAppearance.App.Button.Large"
     android:gravity="center"
     app:cornerRadius="16dp"

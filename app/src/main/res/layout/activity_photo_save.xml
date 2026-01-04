@@ -95,6 +95,7 @@
                     android:layout_height="wrap_content"
                     android:text="카테고리 선택"
                     android:textAppearance="@style/TextAppearance.App.Subtitle2"
+                    app:fontFamily="@font/pretendard_semibold"
                     android:textColor="@color/gray_50" />
 
                 <!-- 카테고리 에러 메시지 -->
@@ -143,7 +144,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="공부"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        app:fontFamily="@font/pretendard_semibold"
                         android:textColor="@color/gray_300"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
@@ -173,7 +175,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="운동"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        app:fontFamily="@font/pretendard_semibold"
                         android:textColor="@color/gray_300"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
@@ -203,7 +206,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="음식"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        app:fontFamily="@font/pretendard_semibold"
                         android:textColor="@color/gray_300"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
@@ -233,7 +237,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="기타"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        app:fontFamily="@font/pretendard_semibold"
                         android:textColor="@color/gray_300"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
@@ -255,6 +260,7 @@
                     android:layout_height="wrap_content"
                     android:text="공개 여부 선택"
                     android:textAppearance="@style/TextAppearance.App.Subtitle2"
+                    app:fontFamily="@font/pretendard_semibold"
                     android:textColor="@color/gray_50" />
 
                 <!-- 공개 여부 에러 메시지 -->
@@ -284,7 +290,9 @@
                     android:id="@+id/tag_public"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="전체 공개" />
+                    android:text="전체 공개"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                    app:fontFamily="@font/pretendard_medium" />
 
                 <!-- 비공개 태그 -->
                 <com.project.stampy.etc.TagView
@@ -292,7 +300,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="비공개"
-                    android:layout_marginStart="8dp" />
+                    android:layout_marginStart="8dp"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                    app:fontFamily="@font/pretendard_medium" />
 
             </LinearLayout>
 
