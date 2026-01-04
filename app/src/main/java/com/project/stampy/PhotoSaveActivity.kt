@@ -78,6 +78,7 @@ class PhotoSaveActivity : AppCompatActivity() {
     private var photoUri: Uri? = null
     private var templateName: String? = null
     private var templateId: String? = null
+    private var showLogo: Boolean = true
 
     private val categoryMap by lazy {
         mapOf(
@@ -93,6 +94,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         const val EXTRA_PHOTO_URI = "extra_photo_uri"
         const val EXTRA_TEMPLATE_NAME = "extra_template_name"
         const val EXTRA_TEMPLATE_ID = "extra_template_id"
+        const val EXTRA_SHOW_LOGO = "extra_show_logo"
 
         private const val TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss"
         private const val FILE_PREFIX = "STAMPIC_"  // "Stampic" 파일명으로 저장
@@ -131,6 +133,9 @@ class PhotoSaveActivity : AppCompatActivity() {
         photoUri = intent.getParcelableExtra(EXTRA_PHOTO_URI)
         templateName = intent.getStringExtra(EXTRA_TEMPLATE_NAME)
         templateId = intent.getStringExtra(EXTRA_TEMPLATE_ID)
+        showLogo = intent.getBooleanExtra(EXTRA_SHOW_LOGO, true)
+
+        Log.d(TAG, "Received showLogo: $showLogo")  // 로그 추가
 
         initViews()
         setupListeners()
@@ -834,8 +839,8 @@ class PhotoSaveActivity : AppCompatActivity() {
         templateId?.let { id ->
             val template = TemplateManager.getTemplateById(id)
             template?.let {
-                templateView.applyTemplate(it, showLogo = true)
-                Log.d(TAG, "템플릿 적용: ${it.name}")
+                templateView.applyTemplate(it, showLogo = showLogo)  // showLogo 변수 사용
+                Log.d(TAG, "템플릿 적용: ${it.name}, 로고 표시: $showLogo")
             } ?: Log.e(TAG, "템플릿을 찾을 수 없습니다: $id")
         } ?: Log.w(TAG, "템플릿 ID가 없습니다")
     }

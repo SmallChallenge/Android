@@ -128,11 +128,16 @@ class PhotoEditActivity : AppCompatActivity() {
             selectCategory(TemplateCategory.DIGITAL, btnCategoryDigital)
         }
 
+        // TODO: 광고 도입하면서 수정
         // 로고 토글
         switchLogo.setOnCheckedChangeListener { _, isChecked ->
             if (!isChecked) {
-                // OFF로 변경 시 모달 표시
-                showLogoOffDialog()
+                // OFF로 변경 시 모달 표시 - 주석처리
+                // showLogoOffDialog()
+
+                // 바로 로고 숨김 처리
+                showLogo = false
+                templateView.setLogoVisibility(false)
             } else {
                 // ON으로 변경
                 showLogo = true
@@ -287,9 +292,13 @@ class PhotoEditActivity : AppCompatActivity() {
             // 선택된 템플릿 정보 전달
             selectedTemplate?.let { template ->
                 intent.putExtra(PhotoSaveActivity.EXTRA_TEMPLATE_NAME, template.name)
-                intent.putExtra(PhotoSaveActivity.EXTRA_TEMPLATE_ID, template.id)  // 추가
+                intent.putExtra(PhotoSaveActivity.EXTRA_TEMPLATE_ID, template.id)
                 Log.d(TAG, "Template ID: ${template.id}, name: ${template.name}")
             }
+
+            // 로고 표시 여부 전달 추가
+            intent.putExtra(PhotoSaveActivity.EXTRA_SHOW_LOGO, showLogo)
+            Log.d(TAG, "Show logo: $showLogo")
 
             Log.d(TAG, "Starting PhotoSaveActivity...")
             startActivity(intent)
