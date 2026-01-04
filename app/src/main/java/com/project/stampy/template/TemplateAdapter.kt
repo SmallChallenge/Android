@@ -48,12 +48,8 @@ class TemplateAdapter(
 
         private val container: ConstraintLayout = itemView.findViewById(R.id.template_container)
         private val templatePreview: ImageView = itemView.findViewById(R.id.iv_template_preview)
-        private val templateName: TextView = itemView.findViewById(R.id.tv_template_name)
 
         fun bind(template: Template, isSelected: Boolean) {
-            // 템플릿 이름 설정
-            templateName.text = template.name
-
             // 선택 상태에 따른 배경 변경
             if (isSelected) {
                 container.setBackgroundResource(R.drawable.bg_template_item_selected)
@@ -61,8 +57,9 @@ class TemplateAdapter(
                 container.setBackgroundResource(R.drawable.bg_template_item)
             }
 
-            // 템플릿 프리뷰 이미지 설정 (TODO: 실제 프리뷰 이미지)
-            // templatePreview.setImageResource(template.previewImageResId)
+            // 썸네일 이미지 설정
+            templatePreview.setImageResource(template.thumbnailResId)
+            templatePreview.visibility = View.VISIBLE
 
             // 크기 조정 (375px 기준)
             val size = DesignUtils.dpToPxInt(itemView.context, 90f)

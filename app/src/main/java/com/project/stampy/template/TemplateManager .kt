@@ -16,7 +16,8 @@ object TemplateManager {
                 id = "basic_1",
                 category = TemplateCategory.BASIC,
                 name = "Basic 1",
-                layoutResId = R.layout.template_basic_1
+                layoutResId = R.layout.template_basic_1,
+                thumbnailResId = R.drawable.template_basic_1
             )
         )
 
@@ -25,7 +26,8 @@ object TemplateManager {
                 id = "basic_2",
                 category = TemplateCategory.BASIC,
                 name = "Basic 2",
-                layoutResId = R.layout.template_basic_2
+                layoutResId = R.layout.template_basic_2,
+                thumbnailResId = R.drawable.template_basic_2
             )
         )
 
@@ -34,7 +36,8 @@ object TemplateManager {
                 id = "basic_3",
                 category = TemplateCategory.BASIC,
                 name = "Basic 3",
-                layoutResId = R.layout.template_basic_3
+                layoutResId = R.layout.template_basic_3,
+                thumbnailResId = R.drawable.template_basic_3
             )
         )
 
@@ -44,7 +47,8 @@ object TemplateManager {
                 id = "moody_1",
                 category = TemplateCategory.MOODY,
                 name = "Moody 1",
-                layoutResId = R.layout.template_moody_1
+                layoutResId = R.layout.template_moody_1,
+                thumbnailResId = R.drawable.template_moody_1
             )
         )
 
@@ -53,7 +57,8 @@ object TemplateManager {
                 id = "moody_2",
                 category = TemplateCategory.MOODY,
                 name = "Moody 2",
-                layoutResId = R.layout.template_moody_2
+                layoutResId = R.layout.template_moody_2,
+                thumbnailResId = R.drawable.template_moody_2
             )
         )
 
@@ -62,7 +67,8 @@ object TemplateManager {
                 id = "moody_3",
                 category = TemplateCategory.MOODY,
                 name = "Moody 3",
-                layoutResId = R.layout.template_moody_3
+                layoutResId = R.layout.template_moody_3,
+                thumbnailResId = R.drawable.template_moody_3
             )
         )
 
@@ -72,7 +78,8 @@ object TemplateManager {
                 id = "active_1",
                 category = TemplateCategory.ACTIVE,
                 name = "Active 1",
-                layoutResId = R.layout.template_active_1
+                layoutResId = R.layout.template_active_1,
+                thumbnailResId = R.drawable.template_active_1
             )
         )
 
@@ -81,7 +88,8 @@ object TemplateManager {
                 id = "active_2",
                 category = TemplateCategory.ACTIVE,
                 name = "Active 2",
-                layoutResId = R.layout.template_active_2
+                layoutResId = R.layout.template_active_2,
+                thumbnailResId = R.drawable.template_active_2
             )
         )
 
@@ -90,7 +98,8 @@ object TemplateManager {
                 id = "active_3",
                 category = TemplateCategory.ACTIVE,
                 name = "Active 3",
-                layoutResId = R.layout.template_active_3
+                layoutResId = R.layout.template_active_3,
+                thumbnailResId = R.drawable.template_active_3
             )
         )
 
@@ -100,7 +109,8 @@ object TemplateManager {
                 id = "digital_1",
                 category = TemplateCategory.DIGITAL,
                 name = "Digital 1",
-                layoutResId = R.layout.template_digital_1
+                layoutResId = R.layout.template_digital_1,
+                thumbnailResId = R.drawable.template_digital_1
             )
         )
 
@@ -109,7 +119,8 @@ object TemplateManager {
                 id = "digital_2",
                 category = TemplateCategory.DIGITAL,
                 name = "Digital 2",
-                layoutResId = R.layout.template_digital_2
+                layoutResId = R.layout.template_digital_2,
+                thumbnailResId = R.drawable.template_digital_2
             )
         )
 
@@ -118,7 +129,8 @@ object TemplateManager {
                 id = "digital_3",
                 category = TemplateCategory.DIGITAL,
                 name = "Digital 3",
-                layoutResId = R.layout.template_digital_3
+                layoutResId = R.layout.template_digital_3,
+                thumbnailResId = R.drawable.template_digital_3
             )
         )
 
