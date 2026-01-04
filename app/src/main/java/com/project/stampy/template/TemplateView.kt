@@ -50,8 +50,10 @@ class TemplateView(context: Context) : FrameLayout(context) {
             "moody_3" -> bindMoody3Template(showLogo)
             "active_1" -> bindActive1Template(showLogo)
             "active_2" -> bindActive2Template(showLogo)
+            "active_3" -> bindActive3Template(showLogo)
             "digital_1" -> bindDigital1Template(showLogo)
             "digital_2" -> bindDigital2Template(showLogo)
+            "digital_3" -> bindDigital3Template(showLogo)
         }
     }
 
@@ -786,6 +788,131 @@ class TemplateView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * Active 3 템플릿 데이터 바인딩
+     */
+    private fun bindActive3Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // Pretendard Medium 폰트 로드
+            val pretendardMedium = try {
+                ResourcesCompat.getFont(context, R.font.pretendard_medium)
+            } catch (e: Exception) {
+                null
+            }
+
+            // Erica One 폰트 로드
+            val ericaOne = try {
+                ResourcesCompat.getFont(context, R.font.erica_one)
+            } catch (e: Exception) {
+                null
+            }
+
+            val calendar = Calendar.getInstance()
+
+            // === 날짜 설정 (E, d MMM) ===
+            val tvDate = root.findViewById<TextView>(R.id.tv_date)
+
+            // 요일 (영문 약어)
+            val dayOfWeek = when (calendar.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.SUNDAY -> "Sun"
+                Calendar.MONDAY -> "Mon"
+                Calendar.TUESDAY -> "Tue"
+                Calendar.WEDNESDAY -> "Wed"
+                Calendar.THURSDAY -> "Thu"
+                Calendar.FRIDAY -> "Fri"
+                Calendar.SATURDAY -> "Sat"
+                else -> ""
+            }
+
+            // 일 (숫자)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // 월 (영문 약어)
+            val month = when (calendar.get(Calendar.MONTH)) {
+                Calendar.JANUARY -> "Jan"
+                Calendar.FEBRUARY -> "Feb"
+                Calendar.MARCH -> "Mar"
+                Calendar.APRIL -> "Apr"
+                Calendar.MAY -> "May"
+                Calendar.JUNE -> "Jun"
+                Calendar.JULY -> "Jul"
+                Calendar.AUGUST -> "Aug"
+                Calendar.SEPTEMBER -> "Sept"
+                Calendar.OCTOBER -> "Oct"
+                Calendar.NOVEMBER -> "Nov"
+                Calendar.DECEMBER -> "Dec"
+                else -> ""
+            }
+
+            val dateText = "$dayOfWeek, $day $month"
+
+            tvDate?.apply {
+                text = dateText
+                pretendardMedium?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 14f))
+
+                // 그림자 설정
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === 시간 설정 (HH\nmm) ===
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val timeText = String.format("%02d\n%02d", hour, minute)
+
+            tvTime?.apply {
+                text = timeText
+                ericaOne?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 70f))
+
+                // 행간 좁게 (0.7 배수)
+                setLineSpacing(0f, 0.7f)
+
+                // 그림자 설정
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === TODAY DONE 텍스트 ===
+            val tvText = root.findViewById<TextView>(R.id.tv_text)
+            tvText?.apply {
+                pretendardMedium?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 14f))
+
+                // 그림자 설정
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === Stampic 로고 이미지 (그림자 포함) ===
+            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+            ivStampicLogo?.apply {
+                visibility = if (showLogo) View.VISIBLE else View.GONE
+
+                // ImageView에 그림자 효과 (elevation 사용)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    elevation = DesignUtils.dpToPx(this@TemplateView.context, 4f)
+                    outlineProvider = android.view.ViewOutlineProvider.BOUNDS
+                }
+            }
+        }
+    }
+
+    /**
      * Digital 1 템플릿 데이터 바인딩
      */
     private fun bindDigital1Template(showLogo: Boolean) {
@@ -1033,6 +1160,83 @@ class TemplateView(context: Context) : FrameLayout(context) {
         (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
             bottomMargin = DesignUtils.dpToPxInt(context, 16f)
             ivStampicLogo.layoutParams = this
+        }
+    }
+
+    /**
+     * Digital 3 템플릿 데이터 바인딩
+     */
+    private fun bindDigital3Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // DungGeunMo 폰트 로드
+            val dunggeunmo = try {
+                ResourcesCompat.getFont(context, R.font.dunggeunmo)
+            } catch (e: Exception) {
+                null
+            }
+
+            val calendar = Calendar.getInstance()
+
+            // === 날짜 설정 (YYYY년MM월DD일(요일)) ===
+            val tvDate = root.findViewById<TextView>(R.id.tv_date)
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH) + 1
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // 요일 구하기 (한글)
+            val dayOfWeek = when (calendar.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.SUNDAY -> "일"
+                Calendar.MONDAY -> "월"
+                Calendar.TUESDAY -> "화"
+                Calendar.WEDNESDAY -> "수"
+                Calendar.THURSDAY -> "목"
+                Calendar.FRIDAY -> "금"
+                Calendar.SATURDAY -> "토"
+                else -> ""
+            }
+
+            val dateText = String.format("%d년%02d월%02d일(%s)", year, month, day, dayOfWeek)
+
+            tvDate?.apply {
+                text = dateText
+                dunggeunmo?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 28f))
+
+                // 그림자 설정
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === 시간 설정 (오전/오후 HH:mm) ===
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val amPm = if (hour < 12) "오전" else "오후"
+            val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+            val timeText = String.format("%s%02d:%02d", amPm, displayHour, minute)
+
+            tvTime?.apply {
+                text = timeText
+                dunggeunmo?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 28f))
+
+                // 그림자 설정
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === Stampic 로고 이미지 (그림자 없음) ===
+            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+            ivStampicLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
         }
     }
 

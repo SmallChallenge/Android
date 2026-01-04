@@ -85,6 +85,15 @@ object TemplateManager {
             )
         )
 
+        templates.add(
+            Template(
+                id = "active_3",
+                category = TemplateCategory.ACTIVE,
+                name = "Active 3",
+                layoutResId = R.layout.template_active_3
+            )
+        )
+
         // Digital 카테고리 템플릿
         templates.add(
             Template(
@@ -101,6 +110,15 @@ object TemplateManager {
                 category = TemplateCategory.DIGITAL,
                 name = "Digital 2",
                 layoutResId = R.layout.template_digital_2
+            )
+        )
+
+        templates.add(
+            Template(
+                id = "digital_3",
+                category = TemplateCategory.DIGITAL,
+                name = "Digital 3",
+                layoutResId = R.layout.template_digital_3
             )
         )
 

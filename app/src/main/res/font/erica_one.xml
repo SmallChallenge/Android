@@ -5,8 +5,8 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/ericaone_regular"
+        android:font="@font/erica_one_regular"
         app:fontStyle="normal"
         app:fontWeight="400"
-        app:font="@font/ericaone_regular" />
+        app:font="@font/erica_one_regular" />
 </font-family>

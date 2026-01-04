@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Active 3 템플릿 -->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 날짜 (좌측 중앙) -->
+    <!-- 형식: E, d MMM (예: Wed, 28 Sept) -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginStart="16dp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/pretendard_medium"
+        app:fontFamily="@font/pretendard_medium"
+        android:textSize="14sp"
+        android:letterSpacing="0"
+        android:includeFontPadding="false"
+        android:shadowColor="#000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        tools:text="Wed, 28 Sept" />
+
+    <!-- 시간 (정중앙) -->
+    <!-- HH\nmm 형식 -->
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="@color/white"
+        android:fontFamily="@font/erica_one"
+        app:fontFamily="@font/erica_one"
+        android:textSize="70sp"
+        android:lineSpacingMultiplier="0.7"
+        android:letterSpacing="-0.04"
+        android:includeFontPadding="false"
+        android:gravity="center"
+        android:shadowColor="#000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        tools:text="12\n58" />
+
+    <!-- TODAY DONE 텍스트 (우측 중앙) -->
+    <TextView
+        android:id="@+id/tv_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginEnd="16dp"
+        android:text="TODAY DONE"
+        android:textColor="@color/white"
+        android:fontFamily="@font/pretendard_medium"
+        app:fontFamily="@font/pretendard_medium"
+        android:textSize="14sp"
+        android:letterSpacing="0"
+        android:includeFontPadding="false"
+        android:shadowColor="#000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5" />
+
+    <!-- Stampic 로고 (하단 중앙, 그림자 있음) -->
+    <ImageView
+        android:id="@+id/iv_stampic_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/stampic_tem"
+        android:contentDescription="Stampic Logo"
+        android:outlineProvider="bounds"
+        android:elevation="4dp" />
+
+</FrameLayout>
