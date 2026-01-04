@@ -21,6 +21,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.project.stampy.template.TemplateCategory
+import com.project.stampy.template.TemplateManager
+import com.project.stampy.template.TemplateView
 import com.project.stampy.utils.showToast
 import java.io.File
 import java.text.SimpleDateFormat
@@ -35,6 +38,8 @@ class CameraActivity : AppCompatActivity() {
 
     // 카메라
     private lateinit var previewView: PreviewView
+    private lateinit var cameraContainer: FrameLayout
+    private lateinit var templateView: TemplateView
 
     // 갤러리
     private lateinit var rvGallery: RecyclerView
@@ -86,6 +91,7 @@ class CameraActivity : AppCompatActivity() {
         initViews()
         setupListeners()
         setupGalleryRecyclerView()
+        setupTemplatePreview()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -122,6 +128,8 @@ class CameraActivity : AppCompatActivity() {
         // 하단 버튼
         btnGallery = findViewById(R.id.btn_gallery)
         btnCamera = findViewById(R.id.btn_camera)
+
+        cameraContainer = findViewById(R.id.camera_container)
     }
 
     private fun setupListeners() {
@@ -197,6 +205,7 @@ class CameraActivity : AppCompatActivity() {
         previewView.visibility = View.GONE
         captureArea.visibility = View.GONE
         rvGallery.visibility = View.VISIBLE
+        templateView.visibility = View.GONE  // 템플릿 숨기기
 
         // 버튼 상태 변경
         btnGallery.setTextColor(ContextCompat.getColor(this, R.color.gray_50))
@@ -204,6 +213,21 @@ class CameraActivity : AppCompatActivity() {
 
         // 갤러리 사진 로드
         loadGalleryPhotos()
+    }
+
+    /**
+     * 템플릿 미리보기 설정
+     */
+    private fun setupTemplatePreview() {
+        // TemplateView 생성 및 추가
+        templateView = TemplateView(this)
+        cameraContainer.addView(templateView)
+
+        // Basic 1 템플릿 적용
+        val basicTemplate = TemplateManager.getTemplatesByCategory(TemplateCategory.BASIC).firstOrNull()
+        basicTemplate?.let {
+            templateView.applyTemplate(it, showLogo = true)
+        }
     }
 
     /**
@@ -218,6 +242,7 @@ class CameraActivity : AppCompatActivity() {
         rvGallery.visibility = View.GONE
         previewView.visibility = View.VISIBLE
         captureArea.visibility = View.VISIBLE
+        templateView.visibility = View.VISIBLE
 
         // 버튼 상태 변경
         btnCamera.setTextColor(ContextCompat.getColor(this, R.color.gray_50))

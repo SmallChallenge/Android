@@ -16,17 +16,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 카메라 프리뷰 (1:1 정사각형, 상단바 아래 40dp) -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/preview_view"
+    <FrameLayout
+        android:id="@+id/camera_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="40dp"
-        android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@id/top_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintDimensionRatio="1:1" />
+        app:layout_constraintDimensionRatio="1:1">
+
+        <!-- 카메라 프리뷰 (1:1 정사각형, 상단바 아래 40dp) -->
+        <androidx.camera.view.PreviewView
+            android:id="@+id/preview_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+    </FrameLayout>
 
     <!-- 갤러리 그리드 (초기 상태: GONE) -->
     <androidx.recyclerview.widget.RecyclerView
@@ -82,7 +89,6 @@
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackground" />
-
     </LinearLayout>
 
     <!-- 촬영 버튼 영역 (카메라 프리뷰와 하단 버튼 사이 중앙) -->
@@ -90,7 +96,7 @@
         android:id="@+id/capture_area"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/preview_view"
+        app:layout_constraintTop_toBottomOf="@id/camera_container"
         app:layout_constraintBottom_toTopOf="@id/bottom_buttons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -100,22 +106,17 @@
             android:id="@+id/btn_switch_camera_touch_area"
             android:layout_width="44dp"
             android:layout_height="44dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_capture">
-
             <ImageView
                 android:id="@+id/iv_switch_camera"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_camera_switch"
-                app:tint="@color/gray_300"
-                android:contentDescription="전면/후면 전환" />
+                app:tint="@color/gray_300" />
         </FrameLayout>
 
         <!-- 촬영 버튼 (중앙) -->
@@ -124,24 +125,16 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/ic_camera_capture"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="@color/gray_50"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:contentDescription="촬영" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- 플래시 전환 버튼 (오른쪽) -->
         <FrameLayout
             android:id="@+id/btn_flash_touch_area"
             android:layout_width="44dp"
             android:layout_height="44dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_capture"
@@ -153,8 +146,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_flash_off"
-                app:tint="@color/gray_300"
-                android:contentDescription="플래시" />
+                app:tint="@color/gray_300" />
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
