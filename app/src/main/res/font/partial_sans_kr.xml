@@ -5,8 +5,8 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/partialsanskr_regular"
+        android:font="@font/partial_sans_kr_regular"
         app:fontStyle="normal"
         app:fontWeight="400"
-        app:font="@font/partialsanskr_regular" />
+        app:font="@font/partial_sans_kr_regular" />
 </font-family>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Active 2 템플릿 -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Stampic 로고 이미지 (상단 중앙, 위 여백 16px) -->
+    <ImageView
+        android:id="@+id/iv_stampic_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/stampic_tem"
+        android:contentDescription="Stampic Logo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 시간 표시 (하단 중앙) -->
+    <!-- 형식: HH:mm AM/PM (예: 01:42 PM) -->
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:fontFamily="@font/partial_sans_kr"
+        app:fontFamily="@font/partial_sans_kr"
+        android:textSize="28sp"
+        android:letterSpacing="0"
+        android:includeFontPadding="false"
+        android:shadowColor="#73000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        tools:text="01:42 PM"
+        app:layout_constraintBottom_toTopOf="@id/tv_date"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 날짜 표시 (시간 바로 아래, 하단 여백 24px) -->
+    <!-- 형식: December(월) DDth YYYY (예: December 26th 2026) -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/partial_sans_kr"
+        app:fontFamily="@font/partial_sans_kr"
+        android:textSize="18sp"
+        android:letterSpacing="0"
+        android:includeFontPadding="false"
+        android:gravity="center"
+        android:shadowColor="#73000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        tools:text="December 26th 2026"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
