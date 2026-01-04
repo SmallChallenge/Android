@@ -82,6 +82,9 @@ class MyRecordsFragment : Fragment() {
     // 전체 사진 개수 추적
     private var totalPhotoCount = 0
 
+    // 현재 존재하는 카테고리 추적
+    private val availableCategories = mutableSetOf<String>()
+
     companion object {
         private const val PHOTO_LIMIT_BANNER_THRESHOLD = 18
     }
@@ -305,6 +308,22 @@ class MyRecordsFragment : Fragment() {
     }
 
     /**
+     * 사용 가능한 카테고리만 표시
+     */
+    private fun updateCategoryVisibility() {
+        // 전체는 항상 표시 (사진이 1장이라도 있으면)
+        categoryAll.visibility = if (availableCategories.isNotEmpty()) View.VISIBLE else View.GONE
+
+        // 각 카테고리는 해당 카테고리에 사진이 있을 때만 표시
+        categoryStudy.visibility = if (availableCategories.contains("공부")) View.VISIBLE else View.GONE
+        categoryExercise.visibility = if (availableCategories.contains("운동")) View.VISIBLE else View.GONE
+        categoryFood.visibility = if (availableCategories.contains("음식")) View.VISIBLE else View.GONE
+        categoryEtc.visibility = if (availableCategories.contains("기타")) View.VISIBLE else View.GONE
+
+        Log.d("MyRecordsFragment", "사용 가능한 카테고리: $availableCategories")
+    }
+
+    /**
      * 사진 로드 (서버 + 로컬 통합)
      */
     fun loadPhotos() {
@@ -426,6 +445,9 @@ class MyRecordsFragment : Fragment() {
                 // 전체 사진 개수 계산 (카테고리 필터링 전)
                 totalPhotoCount = calculateTotalPhotoCount()
 
+                // 사용 가능한 카테고리 업데이트
+                updateAvailableCategories()
+
                 // 4. UI 업데이트
                 if (allPhotos.isEmpty()) {
                     showEmptyState()
@@ -434,10 +456,15 @@ class MyRecordsFragment : Fragment() {
                     hideEmptyState()
                 }
 
+                // 카테고리 표시 업데이트
+                updateCategoryVisibility()
+
                 Log.d("MyRecordsFragment", "전체 사진 ${allPhotos.size}개 표시 (서버: ${serverPhotos.size}, 로컬: ${localPhotos.size})")
             } catch (e: Exception) {
                 Log.e("MyRecordsFragment", "사진 로드 오류", e)
                 totalPhotoCount = 0
+                availableCategories.clear()
+                updateCategoryVisibility()
                 showEmptyState()
             }
         }
@@ -463,6 +490,37 @@ class MyRecordsFragment : Fragment() {
         count += localPhotos.size
 
         return count
+    }
+
+    /**
+     * 사용 가능한 카테고리 업데이트 (로그인 사용자)
+     */
+    private suspend fun updateAvailableCategories() {
+        availableCategories.clear()
+
+        // 서버 사진 카테고리
+        imageRepository.getMyImages(
+            category = null,
+            page = 0,
+            size = 100
+        ).onSuccess { response ->
+            response.images.forEach { imageItem ->
+                val categoryKorean = when (imageItem.category) {
+                    "STUDY" -> "공부"
+                    "EXERCISE" -> "운동"
+                    "FOOD" -> "음식"
+                    "ETC" -> "기타"
+                    else -> "기타"
+                }
+                availableCategories.add(categoryKorean)
+            }
+        }
+
+        // 로컬 사진 카테고리 (서버에 업로드되지 않은 것만)
+        val localPhotos = loadLocalPhotosForLoggedInUser(null, photoMetadataManager)
+        localPhotos.forEach { photo ->
+            availableCategories.add(photo.category)
+        }
     }
 
     /**
@@ -539,6 +597,8 @@ class MyRecordsFragment : Fragment() {
 
         if (!picturesDir.exists() || !picturesDir.isDirectory) {
             totalPhotoCount = 0
+            availableCategories.clear()
+            updateCategoryVisibility()
             showEmptyState()
             updatePhotoLimitBanner(0)  // 배너 업데이트
             return
@@ -596,6 +656,19 @@ class MyRecordsFragment : Fragment() {
         // 전체 사진 개수 저장 (배너용)
         totalPhotoCount = nonLoginPhotoManager.getPhotoCount()
 
+        // 사용 가능한 카테고리 업데이트 (비로그인 사용자)
+        availableCategories.clear()
+        photoMetadataManager.getAllMetadata().forEach { metadata ->
+            val categoryKorean = when (metadata.category) {
+                "STUDY" -> "공부"
+                "EXERCISE" -> "운동"
+                "FOOD" -> "음식"
+                "ETC" -> "기타"
+                else -> "기타"
+            }
+            availableCategories.add(categoryKorean)
+        }
+
         // 4. UI 업데이트
         if (photos.isEmpty()) {
             showEmptyState()
@@ -603,6 +676,9 @@ class MyRecordsFragment : Fragment() {
             hideEmptyState()
             photoAdapter.setPhotos(photos)
         }
+
+        // 카테고리 표시 업데이트
+        updateCategoryVisibility()
 
         // 배너 업데이트 (전체 사진 개수 기준)
         updatePhotoLimitBanner(totalPhotoCount)
