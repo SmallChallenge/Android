@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import com.project.stampy.R
 
 /**
@@ -46,32 +46,39 @@ class TemplateAdapter(
         private val onTemplateClick: (Template) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
 
-        private val container: ConstraintLayout = itemView.findViewById(R.id.template_container)
+        private val container: View = itemView.findViewById(R.id.template_card)
+        private val card: MaterialCardView = itemView.findViewById(R.id.template_card)
         private val templatePreview: ImageView = itemView.findViewById(R.id.iv_template_preview)
 
         fun bind(template: Template, isSelected: Boolean) {
-            // 선택 상태에 따른 배경 변경
-            if (isSelected) {
-                container.setBackgroundResource(R.drawable.bg_template_item_selected)
-            } else {
-                container.setBackgroundResource(R.drawable.bg_template_item)
-            }
-
             // 썸네일 이미지 설정
             templatePreview.setImageResource(template.thumbnailResId)
             templatePreview.visibility = View.VISIBLE
 
-            // 크기 조정 (375px 기준)
-            val size = DesignUtils.dpToPxInt(itemView.context, 90f)
-            container.layoutParams = container.layoutParams.apply {
-                width = size
-                height = size
+            // 선택 stroke
+            val ctx = itemView.context
+            if (isSelected) {
+                card.strokeWidth = DesignUtils.dpToPxInt(ctx, 2f)
+                card.strokeColor = ContextCompat.getColor(ctx, R.color.gray_50)
+            } else {
+                card.strokeWidth = DesignUtils.dpToPxInt(ctx, 1f)
+                card.strokeColor = ContextCompat.getColor(ctx, R.color.gray_700)
             }
+
+            // 크기 조정 (375px 기준)
+            val size = DesignUtils.dpToPxInt(ctx, 90f)
+            val lp = container.layoutParams
+            lp.width = size
+            lp.height = size
+            container.layoutParams = lp
 
             // 클릭 이벤트
             itemView.setOnClickListener {
-                setSelectedPosition(bindingAdapterPosition)
-                onTemplateClick(template)
+                val pos = bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    setSelectedPosition(pos)
+                    onTemplateClick(template)
+                }
             }
         }
     }

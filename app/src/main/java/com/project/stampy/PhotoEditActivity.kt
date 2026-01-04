@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import com.project.stampy.template.Template
@@ -155,8 +156,12 @@ class PhotoEditActivity : AppCompatActivity() {
                 false
             )
             adapter = templateAdapter
+
+            // 동시에 눌리는 느낌 제거
+            (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         }
     }
+
 
     /**
      * 사진 로드
@@ -227,13 +232,15 @@ class PhotoEditActivity : AppCompatActivity() {
      */
     private fun loadTemplatesForCategory(category: TemplateCategory) {
         val templates = TemplateManager.getTemplatesByCategory(category)
-        templateAdapter.submitList(templates)
 
-        // 첫 번째 템플릿 자동 선택
-        if (templates.isNotEmpty()) {
-            onTemplateSelected(templates[0])
+        templateAdapter.setSelectedPosition(0)
+        templateAdapter.submitList(templates) {
+            if (templates.isNotEmpty()) {
+                onTemplateSelected(templates[0])
+            }
         }
     }
+
 
     /**
      * 템플릿 선택

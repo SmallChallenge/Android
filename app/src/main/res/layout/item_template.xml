@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 템플릿 아이템 레이아웃 -->
-<androidx.constraintlayout.widget.ConstraintLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/template_container"
+    android:id="@+id/template_card"
     android:layout_width="90dp"
     android:layout_height="90dp"
     android:layout_marginEnd="8dp"
-    android:background="@drawable/bg_template_item"
-    android:clickable="true"
-    android:focusable="true">
+    app:cardCornerRadius="8dp"
+    app:cardBackgroundColor="@color/gray_800"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/gray_700"
+    app:cardUseCompatPadding="false"
+    app:cardPreventCornerOverlap="false">
 
     <!-- 템플릿 프리뷰 이미지 -->
     <ImageView
         android:id="@+id/iv_template_preview"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:contentDescription="템플릿 프리뷰"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:contentDescription="템플릿 프리뷰" />
+</com.google.android.material.card.MaterialCardView>
