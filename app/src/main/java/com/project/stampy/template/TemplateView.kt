@@ -46,7 +46,9 @@ class TemplateView(context: Context) : FrameLayout(context) {
             "moody_1" -> bindMoody1Template(showLogo)
             "moody_2" -> bindMoody2Template(showLogo)
             "active_1" -> bindActive1Template(showLogo)
+            "active_2" -> bindActive2Template(showLogo)
             "digital_1" -> bindDigital1Template(showLogo)
+            "digital_2" -> bindDigital2Template(showLogo)
         }
     }
 
@@ -515,6 +517,99 @@ class TemplateView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * Active 2 템플릿 데이터 바인딩
+     */
+    private fun bindActive2Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // Partial Sans KR 폰트 로드
+            val partialSansKrFont = try {
+                ResourcesCompat.getFont(context, R.font.partial_sans_kr)
+            } catch (e: Exception) {
+                null  // 폰트 로드 실패 시 null (시스템 기본 폰트 사용)
+            }
+
+            val calendar = Calendar.getInstance()
+
+            // === 시간 설정 (HH:mm AM/PM) ===
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val amPm = if (hour < 12) "AM" else "PM"
+            val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+            val timeText = String.format("%02d:%02d %s", displayHour, minute, amPm)
+
+            tvTime?.apply {
+                text = timeText
+                partialSansKrFont?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 28f))
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === 날짜 설정 (December DDth YYYY) ===
+            val tvDate = root.findViewById<TextView>(R.id.tv_date)
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // 날짜 서수 접미사 (1st, 2nd, 3rd, 4th 등)
+            val daySuffix = when {
+                day in 11..13 -> "th"
+                day % 10 == 1 -> "st"
+                day % 10 == 2 -> "nd"
+                day % 10 == 3 -> "rd"
+                else -> "th"
+            }
+
+            val dateText = "$month ${day}${daySuffix} $year"
+
+            tvDate?.apply {
+                text = dateText
+                partialSansKrFont?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 18f))
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === Stampic 로고 이미지 ===
+            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+            ivStampicLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // === 여백 조정 ===
+            adjustActive2Margins(root)
+        }
+    }
+
+    /**
+     * Active 2 템플릿 여백 조정
+     */
+    private fun adjustActive2Margins(root: View) {
+        val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+
+        // 로고: 상단 16px
+        (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 16f)
+            ivStampicLogo.layoutParams = this
+        }
+
+        // 날짜: 하단 24px
+        (tvDate?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            bottomMargin = DesignUtils.dpToPxInt(context, 24f)
+            tvDate.layoutParams = this
+        }
+    }
+
+    /**
      * Digital 1 템플릿 데이터 바인딩
      */
     private fun bindDigital1Template(showLogo: Boolean) {
@@ -668,6 +763,99 @@ class TemplateView(context: Context) : FrameLayout(context) {
         val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
         (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
             topMargin = DesignUtils.dpToPxInt(context, 16f)
+            ivStampicLogo.layoutParams = this
+        }
+    }
+
+    /**
+     * Digital 2 템플릿 데이터 바인딩
+     */
+    private fun bindDigital2Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // DungGeunMo 폰트 로드
+            val dunggeunmoFont = try {
+                ResourcesCompat.getFont(context, R.font.dunggeunmo)
+            } catch (e: Exception) {
+                null  // 폰트 로드 실패 시 null (시스템 기본 폰트 사용)
+            }
+
+            val calendar = Calendar.getInstance()
+
+            // === 시간 설정 (HH:mm AM/PM) ===
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val amPm = if (hour < 12) "AM" else "PM"
+            val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+            val timeText = String.format("%02d:%02d %s", displayHour, minute, amPm)
+
+            tvTime?.apply {
+                text = timeText
+                dunggeunmoFont?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 50f))
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === 날짜 설정 (December DDth YYYY) ===
+            val tvDate = root.findViewById<TextView>(R.id.tv_date)
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // 날짜 서수 접미사 (1st, 2nd, 3rd, 4th 등)
+            val daySuffix = when {
+                day in 11..13 -> "th"
+                day % 10 == 1 -> "st"
+                day % 10 == 2 -> "nd"
+                day % 10 == 3 -> "rd"
+                else -> "th"
+            }
+
+            val dateText = "$month ${day}${daySuffix} $year"
+
+            tvDate?.apply {
+                text = dateText
+                dunggeunmoFont?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 24f))
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === Stampic 로고 이미지 ===
+            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+            ivStampicLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // === 여백 조정 ===
+            adjustDigital2Margins(root)
+        }
+    }
+
+    /**
+     * Digital 2 템플릿 여백 조정
+     */
+    private fun adjustDigital2Margins(root: View) {
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+
+        // 시간: 상단 40px
+        (tvTime?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 40f)
+            tvTime.layoutParams = this
+        }
+
+        // 로고: 하단 16px
+        (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            bottomMargin = DesignUtils.dpToPxInt(context, 16f)
             ivStampicLogo.layoutParams = this
         }
     }
