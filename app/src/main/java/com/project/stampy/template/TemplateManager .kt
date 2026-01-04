@@ -29,6 +29,15 @@ object TemplateManager {
             )
         )
 
+        templates.add(
+            Template(
+                id = "basic_3",
+                category = TemplateCategory.BASIC,
+                name = "Basic 3",
+                layoutResId = R.layout.template_basic_3
+            )
+        )
+
         // Moody 카테고리 템플릿
         templates.add(
             Template(
@@ -45,6 +54,15 @@ object TemplateManager {
                 category = TemplateCategory.MOODY,
                 name = "Moody 2",
                 layoutResId = R.layout.template_moody_2
+            )
+        )
+
+        templates.add(
+            Template(
+                id = "moody_3",
+                category = TemplateCategory.MOODY,
+                name = "Moody 3",
+                layoutResId = R.layout.template_moody_3
             )
         )
 

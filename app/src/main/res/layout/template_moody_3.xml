@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Moody 3 템플릿 - 폴라로이드 스타일 (테두리 방식) -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 상단 흰색 테두리 (10dp) -->
+    <View
+        android:id="@+id/border_top"
+        android:layout_width="0dp"
+        android:layout_height="10dp"
+        android:background="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 좌측 흰색 테두리 (10dp) -->
+    <View
+        android:id="@+id/border_left"
+        android:layout_width="10dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/border_top"
+        app:layout_constraintBottom_toTopOf="@id/border_bottom"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 우측 흰색 테두리 (10dp) -->
+    <View
+        android:id="@+id/border_right"
+        android:layout_width="10dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/border_top"
+        app:layout_constraintBottom_toTopOf="@id/border_bottom"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 하단 흰색 테두리 (65dp) -->
+    <View
+        android:id="@+id/border_bottom"
+        android:layout_width="0dp"
+        android:layout_height="65dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 사진 영역 (테두리 사이, 회색 배경 제거!) -->
+    <ImageView
+        android:id="@+id/iv_photo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Photo"
+        app:layout_constraintTop_toBottomOf="@id/border_top"
+        app:layout_constraintBottom_toTopOf="@id/border_bottom"
+        app:layout_constraintStart_toEndOf="@id/border_left"
+        app:layout_constraintEnd_toStartOf="@id/border_right" />
+
+    <!-- Stampic 로고 (흰 테두리 위, 우측상단 16dp) -->
+    <ImageView
+        android:id="@+id/iv_stampic_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/stampic_tem"
+        android:contentDescription="Stampic Logo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 시간 (하단 흰 테두리 위, 좌측 16dp, 아래 16dp) -->
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/partial_sans_kr"
+        app:fontFamily="@font/partial_sans_kr"
+        android:textSize="30sp"
+        android:letterSpacing="0"
+        android:includeFontPadding="false"
+        tools:text="pm 02:12"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 날짜 (하단 흰 테두리 위, 우측 16dp, 아래 16dp) -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/suit_heavy"
+        app:fontFamily="@font/suit_heavy"
+        android:textSize="14sp"
+        android:letterSpacing="0"
+        android:includeFontPadding="false"
+        tools:text="2026.01.04.SUN"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.project.stampy.template
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -43,8 +44,10 @@ class TemplateView(context: Context) : FrameLayout(context) {
         when (template.id) {
             "basic_1" -> bindBasic1Template(showLogo)
             "basic_2" -> bindBasic2Template(showLogo)
+            "basic_3" -> bindBasic3Template(showLogo)
             "moody_1" -> bindMoody1Template(showLogo)
             "moody_2" -> bindMoody2Template(showLogo)
+            "moody_3" -> bindMoody3Template(showLogo)
             "active_1" -> bindActive1Template(showLogo)
             "active_2" -> bindActive2Template(showLogo)
             "digital_1" -> bindDigital1Template(showLogo)
@@ -255,6 +258,95 @@ class TemplateView(context: Context) : FrameLayout(context) {
     }
 
     /**
+     * Basic 3 템플릿 데이터 바인딩
+     */
+    private fun bindBasic3Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // SUIT Heavy 폰트 로드
+            val suitHeavy = try {
+                ResourcesCompat.getFont(context, R.font.suit_heavy)
+            } catch (e: Exception) {
+                null
+            }
+
+            val calendar = Calendar.getInstance()
+
+            // === 시간 설정 (오전/오후 HH:mm) ===
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val amPm = if (hour < 12) "오전" else "오후"
+            val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+            val timeText = String.format("%s %02d:%02d", amPm, displayHour, minute)
+
+            tvTime?.apply {
+                text = timeText
+                suitHeavy?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 40f))
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === 날짜 설정 (YYYY년 MM월 DD일 (요일)) ===
+            val tvDate = root.findViewById<TextView>(R.id.tv_date)
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH) + 1
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // 요일 구하기 (한글)
+            val dayOfWeek = when (calendar.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.SUNDAY -> "일"
+                Calendar.MONDAY -> "월"
+                Calendar.TUESDAY -> "화"
+                Calendar.WEDNESDAY -> "수"
+                Calendar.THURSDAY -> "목"
+                Calendar.FRIDAY -> "금"
+                Calendar.SATURDAY -> "토"
+                else -> ""
+            }
+
+            val dateText = "${year}년 ${month}월 ${day}일 (${dayOfWeek})"
+
+            tvDate?.apply {
+                text = dateText
+                suitHeavy?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 20f))
+                setShadowLayer(
+                    DesignUtils.dpToPx(this@TemplateView.context, 5f),
+                    0f,
+                    0f,
+                    0x73000000.toInt()
+                )
+            }
+
+            // === Stampic 로고 이미지 ===
+            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+            ivStampicLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // === 여백 조정 ===
+            adjustBasic3Margins(root)
+        }
+    }
+
+    /**
+     * Basic 3 템플릿 여백 조정
+     */
+    private fun adjustBasic3Margins(root: View) {
+        val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+
+        // 로고: 하단 16px
+        (ivStampicLogo?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            ivStampicLogo.layoutParams = this
+        }
+    }
+
+    /**
      * Moody 1 템플릿 데이터 바인딩
      */
     private fun bindMoody1Template(showLogo: Boolean) {
@@ -444,6 +536,90 @@ class TemplateView(context: Context) : FrameLayout(context) {
         }
 
         // 숫자 간격 6px (Space로 이미 설정됨)
+    }
+
+    /**
+     * Moody 3 템플릿 데이터 바인딩 (폴라로이드 스타일)
+     */
+    private fun bindMoody3Template(showLogo: Boolean) {
+        templateRootView?.let { root ->
+            // Partial Sans KR 폰트 로드
+            val partialSansKrFont = try {
+                ResourcesCompat.getFont(context, R.font.partial_sans_kr)
+            } catch (e: Exception) {
+                null
+            }
+
+            // SUIT Heavy 폰트 로드
+            val suitHeavy = try {
+                ResourcesCompat.getFont(context, R.font.suit_heavy)
+            } catch (e: Exception) {
+                null
+            }
+
+            val calendar = Calendar.getInstance()
+
+            // === 시간 설정 (am/pm HH:mm) ===
+            val tvTime = root.findViewById<TextView>(R.id.tv_time)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val amPm = if (hour < 12) "am" else "pm"
+            val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+            val timeText = String.format("%s %02d:%02d", amPm, displayHour, minute)
+
+            tvTime?.apply {
+                text = timeText
+                partialSansKrFont?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 30f))
+            }
+
+            // === 날짜 설정 (YYYY.MM.DD.요일) ===
+            val tvDate = root.findViewById<TextView>(R.id.tv_date)
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH) + 1
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // 요일 구하기 (영문 대문자)
+            val dayOfWeek = when (calendar.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.SUNDAY -> "SUN"
+                Calendar.MONDAY -> "MON"
+                Calendar.TUESDAY -> "TUE"
+                Calendar.WEDNESDAY -> "WED"
+                Calendar.THURSDAY -> "THU"
+                Calendar.FRIDAY -> "FRI"
+                Calendar.SATURDAY -> "SAT"
+                else -> ""
+            }
+
+            val dateText = String.format("%d.%02d.%02d.%s", year, month, day, dayOfWeek)
+
+            tvDate?.apply {
+                text = dateText
+                suitHeavy?.let { typeface = it }
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(this@TemplateView.context, 14f))
+            }
+
+            // === Stampic 로고 이미지 ===
+            val ivStampicLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+            ivStampicLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // 여백은 XML에서 다 처리되므로 별도 조정 불필요!
+        }
+    }
+
+    /**
+     * 사진 설정 (모든 템플릿에서 사용 가능)
+     * @param bitmap 설정할 사진 비트맵
+     */
+    fun setPhoto(bitmap: Bitmap?) {
+        templateRootView?.let { root ->
+            // Moody 3 템플릿의 경우
+            val ivPhoto = root.findViewById<ImageView>(R.id.iv_photo)
+            ivPhoto?.setImageBitmap(bitmap)
+
+            // 다른 템플릿에서도 iv_photo를 사용한다면 동일하게 작동
+        }
     }
 
     /**

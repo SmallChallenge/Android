@@ -798,11 +798,33 @@ class PhotoSaveActivity : AppCompatActivity() {
      */
     private fun loadPhoto() {
         photoUri?.let { uri ->
+            Log.d(TAG, "Loading photo: $uri")
+
+            // 배경 ivPhoto에 로드
             Glide.with(this)
                 .load(uri)
                 .centerCrop()
                 .into(ivPhoto)
-        }
+
+            // TemplateView의 iv_photo에도 로드 (Moody 3 폴라로이드용)
+            Glide.with(this)
+                .asBitmap()
+                .load(uri)
+                .centerCrop()
+                .into(object : com.bumptech.glide.request.target.CustomTarget<Bitmap>() {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
+                    ) {
+                        templateView.setPhoto(resource)
+                        Log.d(TAG, "Template photo loaded for save: ${resource.width}x${resource.height}")
+                    }
+
+                    override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {
+                        // Do nothing
+                    }
+                })
+        } ?: Log.e(TAG, "photoUri is null")
     }
 
     /**
