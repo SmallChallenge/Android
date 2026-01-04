@@ -5,9 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#1A000000">
-    <!-- 배경색: #000000 10% 투명도 -->
+    android:layout_height="match_parent">
 
     <!-- 시간 표시 (중앙 상단, 상단 여백 24px) -->
     <TextView
