@@ -11,6 +11,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.amplitude.android.Amplitude
+import com.amplitude.android.Configuration
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import com.project.stampy.data.local.PhotoMetadataManager
@@ -25,6 +27,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class PhotoUpdateActivity : AppCompatActivity() {
+
+    // 앰플리튜드
+    private lateinit var amplitude: Amplitude
 
     // 상단바
     private lateinit var btnBackTouchArea: FrameLayout
@@ -93,6 +98,21 @@ class PhotoUpdateActivity : AppCompatActivity() {
         RetrofitClient.initialize(tokenManager)
         imageRepository = ImageRepository(tokenManager)
         photoMetadataManager = PhotoMetadataManager(this)
+
+        amplitude = Amplitude(
+            Configuration(
+            apiKey = getString(R.string.amplitude_api_key),
+            context = applicationContext
+        )
+        )
+
+        // 유저 식별 (로그인 상태인 경우)
+        if (tokenManager.isLoggedIn()) {
+            val savedUserId = tokenManager.getUserId()
+            if (savedUserId != -1L) {
+                amplitude.setUserId("user_$savedUserId")
+            }
+        }
 
         // Intent로 전달받은 데이터
         photoFile = intent.getSerializableExtra(EXTRA_PHOTO_FILE) as? File
@@ -381,6 +401,17 @@ class PhotoUpdateActivity : AppCompatActivity() {
 
             withContext(Dispatchers.Main) {
                 result.onSuccess {
+                    // 공개였다가 전체 공개로 변경된 경우 게시물 생성 이벤트 전송
+                    // originalVisibility가 PRIVATE이고 현재 visibility가 PUBLIC인 경우
+                    if (originalVisibility == "PRIVATE" && visibility == "PUBLIC") {
+                        Log.d(TAG, "비공개 -> 전체 공개 전환: 커뮤니티 게시물 생성 이벤트 전송")
+                        amplitude.track("post_create_complete", mapOf(
+                            "is_logged_in" to true,
+                            "platform" to "android",
+                            "trigger" to "update" // 수정 페이지에서 발생했음을 구분하기 위한 속성 (선택사항)
+                        ))
+                    }
+
                     Log.d(TAG, "서버 사진 수정 성공")
                     showToast("수정이 완료되었어요.")
                     navigateToPhotoDetail()

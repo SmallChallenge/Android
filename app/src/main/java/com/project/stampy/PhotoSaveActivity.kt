@@ -39,8 +39,13 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import com.amplitude.android.Amplitude
+import com.amplitude.android.Configuration
 
 class PhotoSaveActivity : AppCompatActivity() {
+
+    // 앰플리튜드
+    private lateinit var amplitude: Amplitude
 
     // 상단바
     private lateinit var btnBackTouchArea: FrameLayout
@@ -129,6 +134,15 @@ class PhotoSaveActivity : AppCompatActivity() {
         nonLoginPhotoManager = NonLoginPhotoManager(this)
         photoMetadataManager = PhotoMetadataManager(this)
 
+        // 앰플리튜드 초기화 및 유저 식별
+        amplitude = Amplitude(Configuration(getString(R.string.amplitude_api_key), applicationContext))
+        if (tokenManager.isLoggedIn()) {
+            val savedUserId = tokenManager.getUserId()
+            if (savedUserId != -1L) {
+                amplitude.setUserId("user_$savedUserId")
+            }
+        }
+
         // Intent로 전달받은 데이터
         photoUri = intent.getParcelableExtra(EXTRA_PHOTO_URI)
         templateName = intent.getStringExtra(EXTRA_TEMPLATE_NAME)
@@ -141,6 +155,20 @@ class PhotoSaveActivity : AppCompatActivity() {
         setupListeners()
         loadPhoto()
         applyTemplate()
+    }
+
+    private fun trackPhotoSaveComplete() {
+        val commonProps = mutableMapOf(
+            "is_logged_in" to tokenManager.isLoggedIn(),
+            "platform" to "android",
+            "app_version" to "1.0.0",
+            "category" to (selectedCategory ?: "기타"),
+            "save_scope" to if (isPublic == true) "public" else "private",
+            "template_id" to (templateId ?: "none"),
+            "is_logo_shown" to showLogo
+        )
+
+        amplitude.track("photo_save_complete", commonProps)
     }
 
     private fun initViews() {
@@ -382,6 +410,9 @@ class PhotoSaveActivity : AppCompatActivity() {
         nonLoginPhotoManager.incrementPhotoCount()
 
         Log.d(TAG, "비로그인 저장 완료: ${nonLoginPhotoManager.getPhotoCount()}/${nonLoginPhotoManager.getMaxPhotos()}")
+
+        // 앰플리튜드 이벤트 전송
+        trackPhotoSaveComplete()
 
         withContext(Dispatchers.Main) {
             showToast("저장이 완료되었어요.")
@@ -699,6 +730,18 @@ class PhotoSaveActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 result.onSuccess { response ->
                     Log.d(TAG, "서버 업로드 성공: imageId=${response.imageId}")
+
+                    // 1. 앰플리튜드 이벤트 전송 (공통 저장 완료)
+                    trackPhotoSaveComplete()
+
+                    // 2. 전체 공개인 경우 '커뮤니티 게시물 생성' 이벤트 추가 전송
+                    if (visibility == "PUBLIC") {
+                        Log.d(TAG, "전체 공개 - 커뮤니티에 자동 게시됨")
+                        amplitude.track("post_create_complete", mapOf(
+                            "is_logged_in" to true,
+                            "platform" to "android"
+                        ))
+                    }
 
                     // 메타데이터 업데이트
                     photoMetadataManager.updateServerUploadStatus(fileName, true)
