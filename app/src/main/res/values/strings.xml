@@ -10,4 +10,6 @@
     <string name="admob_banner_unit_id">ca-app-pub-7896890737820919/5504231162</string>
     <string name="admob_reward_unit_id">ca-app-pub-7896890737820919/2343807248</string>
 
+    <!-- 앰플리튜드 API 키 -->
+    <string name="amplitude_api_key">1f0951318fc0d23dea1fae935c017be9</string>
 </resources>

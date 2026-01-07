@@ -147,4 +147,7 @@ dependencies {
 
     // google admob
     implementation("com.google.android.gms:play-services-ads:22.6.0")
+
+    // 앰플리튜드 SDK
+    implementation("com.amplitude:analytics-android:1.+")
 }

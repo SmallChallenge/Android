@@ -20,6 +20,8 @@ import com.project.stampy.etc.DoubleButtonDialog
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.amplitude.android.Amplitude
+import com.amplitude.android.Configuration
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,6 +35,9 @@ class MainActivity : AppCompatActivity() {
 
     // 스플래시 화면 유지 플래그
     private var keepSplashScreen = true
+
+    // 앰플리튜드
+    private lateinit var amplitude: Amplitude
 
     companion object {
         private const val TAG = "MainActivity"
@@ -104,6 +109,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // 앰플리튜드 초기화
+        amplitude = Amplitude(
+            Configuration(
+                apiKey = getString(R.string.amplitude_api_key),
+                context = applicationContext
+            )
+        )
+
+        amplitude.track("app_start")
+
+        // 초기화 성공 시 테스트 이벤트 전송
+        amplitude.track("app_initialized")
+
         // 플로팅 액션 버튼 클릭 리스너 (비회원 20장 제한 체크)
         setupFabListener()
 
@@ -111,12 +129,12 @@ class MainActivity : AppCompatActivity() {
         MobileAds.initialize(this)
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
 
         // 새로운 Intent 확인하여 커뮤니티 탭으로 이동
-        if (intent?.getBooleanExtra(EXTRA_NAVIGATE_TO_COMMUNITY, false) == true) {
+        if (intent.getBooleanExtra(EXTRA_NAVIGATE_TO_COMMUNITY, false)) {
             Log.d(TAG, "onNewIntent: 커뮤니티 탭으로 이동")
             loadFragment(CommunityFragment())
             bottomNav.selectedItemId = R.id.navigation_community
