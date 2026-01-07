@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.project.stampy.auth.LoginActivity
 import com.project.stampy.community.CommunityFragment
@@ -105,6 +106,9 @@ class MainActivity : AppCompatActivity() {
 
         // 플로팅 액션 버튼 클릭 리스너 (비회원 20장 제한 체크)
         setupFabListener()
+
+        // 구글 애드몹
+        MobileAds.initialize(this)
     }
 
     override fun onNewIntent(intent: Intent?) {

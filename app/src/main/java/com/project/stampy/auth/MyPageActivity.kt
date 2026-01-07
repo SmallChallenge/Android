@@ -12,6 +12,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.button.MaterialButton
 import com.project.stampy.MainActivity
 import com.project.stampy.R
@@ -45,6 +48,9 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var tokenManager: TokenManager
     private lateinit var authRepository: AuthRepository
 
+    // 애드몹
+    private lateinit var mAdView: AdView
+
     companion object {
         private const val TAG = "MyPageActivity"
         private const val TERMS_URL = "https://sage-hare-ff7.notion.site/2d5f2907580d80df9a21f95acd343d3f?source=copy_link"
@@ -61,14 +67,32 @@ class MyPageActivity : AppCompatActivity() {
         RetrofitClient.initialize(tokenManager)
         authRepository = AuthRepository(tokenManager)
 
+        // 애드몹 Mobile SDK 초기화
+        MobileAds.initialize(this) {}
+        // 뷰 초기화 및 광고 로드
+        mAdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+
         initViews()
         setupListeners()
         setupPublicFeatureText()
         updateUI()
     }
 
+    override fun onPause() {
+        mAdView.pause()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        mAdView.destroy()
+        super.onDestroy()
+    }
+
     override fun onResume() {
         super.onResume()
+        mAdView.resume()
         updateUI()
     }
 

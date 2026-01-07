@@ -131,6 +131,9 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.1")
     implementation("androidx.camera:camera-view:1.3.1")
 
+    implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
+    implementation("com.google.guava:guava:31.1-android")
+
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
@@ -141,4 +144,7 @@ dependencies {
     implementation("androidx.exifinterface:exifinterface:1.3.6")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // google admob
+    implementation("com.google.android.gms:play-services-ads:22.6.0")
 }
