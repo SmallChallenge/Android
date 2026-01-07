@@ -50,6 +50,7 @@ class PhotoEditActivity : AppCompatActivity() {
     // 애드몹
     private var rewardedAd: RewardedAd? = null
     private var isAdLoading = false // 중복 로딩 방지
+    private var isRewardEarned = false // 광고 시청 완료 여부 저장
 
     // 템플릿 RecyclerView
     private lateinit var templateRecyclerView: RecyclerView
@@ -85,11 +86,15 @@ class PhotoEditActivity : AppCompatActivity() {
 
     // 애드몹 광고 불러오는 함수
     private fun loadRewardedAd() {
-        if (isAdLoading || rewardedAd != null) return
+        if (isAdLoading || rewardedAd != null || isRewardEarned) return // 이미 보상을 얻었다면 로드 안 함
         isAdLoading = true
 
         val adRequest = AdRequest.Builder().build()
-        RewardedAd.load(this, "ca-app-pub-7896890737820919/2343807248", adRequest, object : RewardedAdLoadCallback() {
+
+        // strings.xml에서 ID 가져오기
+        val adUnitId = getString(R.string.admob_reward_unit_id)
+
+        RewardedAd.load(this, adUnitId, adRequest, object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 Log.e(TAG, "보상형 광고 로드 실패: ${adError.message}")
                 rewardedAd = null
@@ -158,17 +163,20 @@ class PhotoEditActivity : AppCompatActivity() {
             selectCategory(TemplateCategory.DIGITAL, btnCategoryDigital)
         }
 
-        // 로고 토글
         switchLogo.setOnClickListener {
             val isChecked = switchLogo.isChecked
 
-            // 체크를 해제하려고 할 때 (워터마크를 지우려고 할 때)
-            if (!isChecked) {
-                // 일단 스위치가 꺼지지 않게 막고 다이얼로그를 띄움
-                switchLogo.isChecked = true
-                showLogoOffDialog()
-            } else {
-                // 다시 켤 때는 광고 없이 바로 켬
+            if (!isChecked) { // 로고를 끄려고 할 때
+                if (isRewardEarned) {
+                    // 이미 광고를 봤다면 바로 끄기 가능
+                    showLogo = false
+                    templateView.setLogoVisibility(false)
+                } else {
+                    // 광고를 아직 안 봤다면 다이얼로그 띄우기
+                    switchLogo.isChecked = true
+                    showLogoOffDialog()
+                }
+            } else { // 로고를 다시 켤 때
                 showLogo = true
                 templateView.setLogoVisibility(true)
             }
@@ -307,17 +315,15 @@ class PhotoEditActivity : AppCompatActivity() {
     private fun showRewardAd() {
         rewardedAd?.let { ad ->
             ad.show(this) { rewardItem ->
-                // 사용자가 광고 시청 완료
-                Log.d(TAG, "보상 획득: ${rewardItem.amount}")
+                // 보상 획득 성공 시 플래그 true로 변경
+                isRewardEarned = true
 
                 showLogo = false
                 switchLogo.isChecked = false
                 templateView.setLogoVisibility(false)
-                showToast("워터마크가 제거되었습니다.")
+                showToast("워터마크 제거 권한을 획득했습니다.")
 
-                // 다음 광고를 위해 다시 로드
-                rewardedAd = null
-                loadRewardedAd()
+                rewardedAd = null // 사용한 광고 객체 비우기
             }
         } ?: run {
             showToast("광고를 불러오는 중입니다. 잠시 후 다시 시도해주세요.")
