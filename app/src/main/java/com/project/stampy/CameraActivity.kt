@@ -30,6 +30,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.amplitude.android.Amplitude
+import com.amplitude.android.Configuration
+import com.project.stampy.data.local.TokenManager
 
 class CameraActivity : AppCompatActivity() {
 
@@ -71,6 +74,9 @@ class CameraActivity : AppCompatActivity() {
     private val CAMERA_PERMISSION_CODE = 101
     private val GALLERY_PERMISSION_CODE = 102
 
+    private lateinit var amplitude: Amplitude
+    private lateinit var tokenManager: TokenManager // 로그인 상태 확인용
+
     companion object {
         private const val TAG = "CameraActivity"
         private const val TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss"
@@ -105,6 +111,26 @@ class CameraActivity : AppCompatActivity() {
                 CAMERA_PERMISSION_CODE
             )
         }
+
+        tokenManager = TokenManager(this)
+
+        // 1. 앰플리튜드 초기화
+        amplitude = Amplitude(Configuration(getString(R.string.amplitude_api_key), applicationContext))
+
+        // 2. 유저 식별 (메인과 동일하게)
+        if (tokenManager.isLoggedIn()) {
+            val savedUserId = tokenManager.getUserId()
+            if (savedUserId != -1L) {
+                amplitude.setUserId("user_$savedUserId")
+            }
+        }
+
+        // 3. photo_view_enter 이벤트 전송
+        amplitude.track("photo_view_enter", mapOf(
+            "is_logged_in" to tokenManager.isLoggedIn(),
+            "platform" to "android",
+            "app_version" to "1.0.0"
+        ))
     }
 
     private fun initViews() {

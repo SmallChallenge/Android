@@ -36,6 +36,8 @@ import com.project.stampy.data.repository.AuthRepository
 import com.project.stampy.etc.SingleButtonDialog
 import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
+import com.amplitude.android.Amplitude
+import com.amplitude.android.Configuration
 
 class LoginActivity : AppCompatActivity() {
 
@@ -57,6 +59,8 @@ class LoginActivity : AppCompatActivity() {
     // 회원탈퇴 후 진입했는지 여부
     private var isFromWithdrawal = false
 
+    private lateinit var amplitude: Amplitude
+
     companion object {
         private const val TAG = "LoginActivity"
         private const val RC_GOOGLE_SIGN_IN = 9001
@@ -76,6 +80,9 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        // 앰플리튜드 초기화
+        amplitude = Amplitude(Configuration(getString(R.string.amplitude_api_key), applicationContext))
 
         // 사진 저장 화면에서 왔는지 확인
         shouldReturnToPhotoSave = intent.getBooleanExtra(EXTRA_RETURN_TO_PHOTO_SAVE, false)
@@ -358,7 +365,19 @@ class LoginActivity : AppCompatActivity() {
                 val result = authRepository.socialLogin(socialType, accessToken)
 
                 result.onSuccess { response ->
-                    Log.d(TAG, "로그인 성공: ${response.nickname}, status: ${response.userStatus}, needNickname: ${response.needNickname}")
+                    // 유저 ID 연결 (Long 타입을 String으로 변환하여 전달)
+                    response.userId?.let {
+                        val formattedId = "user_$it"
+                        amplitude.setUserId(formattedId)
+                    }
+
+                    // 공통 속성 정의
+                    val commonProps = mapOf(
+                        "is_logged_in" to true,
+                        "platform" to "android",
+                        "app_version" to "1.0.0", // 필요시 BuildConfig.VERSION_NAME 등으로 자동화 가능
+                        "login_method" to socialType.lowercase() // kakao, google 등
+                    )
 
                     when {
                         // 1. 상태가 PENDING이면 약관 동의가 최우선
@@ -371,12 +390,16 @@ class LoginActivity : AppCompatActivity() {
                         //    (needNickname 플래그 대신 실제 닉네임 값으로 판단)
                         response.nickname.isNullOrEmpty() -> {
                             Log.d(TAG, "닉네임 없음 (nickname=${response.nickname}) → 닉네임 설정으로 이동")
+                            // 로그인 성공 로그 전송
+                            amplitude.track("login_success", commonProps)
                             navigateToNickname()
                         }
 
                         // 3. 상태가 ACTIVE이고 닉네임도 있다면 메인으로
                         else -> {
                             Log.d(TAG, "기존 가입자 (닉네임: ${response.nickname}) → MainActivity로 이동")
+                            // 로그인 성공 로그 전송
+                            amplitude.track("login_success", commonProps)
                             navigateToMain()
                         }
                     }

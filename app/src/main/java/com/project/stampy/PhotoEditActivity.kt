@@ -26,6 +26,9 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.AdRequest
+import com.amplitude.android.Amplitude
+import com.amplitude.android.Configuration
+import com.project.stampy.data.local.TokenManager
 
 class PhotoEditActivity : AppCompatActivity() {
 
@@ -61,6 +64,9 @@ class PhotoEditActivity : AppCompatActivity() {
     private var showLogo = true
     private var photoUri: Uri? = null
 
+    private lateinit var amplitude: Amplitude
+    private lateinit var tokenManager: TokenManager
+
     companion object {
         const val TAG = "PhotoEditActivity"
         const val EXTRA_PHOTO_URI = "extra_photo_uri"
@@ -82,6 +88,17 @@ class PhotoEditActivity : AppCompatActivity() {
 
         // 기본 카테고리 선택
         selectCategory(TemplateCategory.BASIC, btnCategoryBasic)
+
+        tokenManager = TokenManager(this)
+        amplitude = Amplitude(Configuration(getString(R.string.amplitude_api_key), applicationContext))
+
+        // 유저 식별
+        if (tokenManager.isLoggedIn()) {
+            val savedUserId = tokenManager.getUserId()
+            if (savedUserId != -1L) {
+                amplitude.setUserId("user_$savedUserId")
+            }
+        }
     }
 
     // 애드몹 광고 불러오는 함수
@@ -317,6 +334,13 @@ class PhotoEditActivity : AppCompatActivity() {
             ad.show(this) { rewardItem ->
                 // 보상 획득 성공 시 플래그 true로 변경
                 isRewardEarned = true
+
+                // 광고 시청 완료 이벤트 전송
+                // amplitude.track("complete_reward_ad", mapOf(
+                //     "is_logged_in" to tokenManager.isLoggedIn(),
+                //    "platform" to "android",
+                //    "ad_type" to "remove_watermark"
+                //))
 
                 showLogo = false
                 switchLogo.isChecked = false

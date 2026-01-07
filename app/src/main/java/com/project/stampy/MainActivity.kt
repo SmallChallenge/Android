@@ -93,16 +93,22 @@ class MainActivity : AppCompatActivity() {
 
         // 하단 네비게이션 리스너
         bottomNav.setOnItemSelectedListener { item ->
+            val commonProps = mapOf(
+                "is_logged_in" to tokenManager.isLoggedIn(),
+                "platform" to "android",
+                "app_version" to "1.0.0"
+            )
+
             when(item.itemId) {
                 R.id.navigation_storage -> {
                     loadFragment(MyRecordsFragment())
+                    // amplitude.track("storage_view_enter", commonProps)
                     true
                 }
-                R.id.navigation_add -> {
-                    false
-                }
+                R.id.navigation_add -> false
                 R.id.navigation_community -> {
                     loadFragment(CommunityFragment())
+                    amplitude.track("community_view_enter", commonProps)
                     true
                 }
                 else -> false
@@ -117,10 +123,12 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        amplitude.track("app_start")
-
-        // 초기화 성공 시 테스트 이벤트 전송
-        amplitude.track("app_initialized")
+        if (tokenManager.isLoggedIn()) {
+            val savedUserId = tokenManager.getUserId()
+            if (savedUserId != -1L) {
+                amplitude.setUserId("user_$savedUserId")
+            }
+        }
 
         // 플로팅 액션 버튼 클릭 리스너 (비회원 20장 제한 체크)
         setupFabListener()
@@ -163,6 +171,12 @@ class MainActivity : AppCompatActivity() {
      * 20장 도달 시 로그인 유도 모달
      */
     private fun showPhotoLimitDialog() {
+        // 한도 모달 로그 전송
+        amplitude.track("view_limit_dialog", mapOf(
+            "is_logged_in" to false,
+            "platform" to "android"
+        ))
+
         DoubleButtonDialog(this)
             .setTitle("기록 한도에 도달했어요.\n로그인하면 계속 기록할 수 있어요.")
             .setCancelButtonText("취소")
