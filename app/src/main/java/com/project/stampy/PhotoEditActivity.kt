@@ -22,6 +22,10 @@ import com.project.stampy.template.TemplateAdapter
 import com.project.stampy.template.TemplateManager
 import com.project.stampy.template.TemplateView
 import com.project.stampy.utils.showToast
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.AdRequest
 
 class PhotoEditActivity : AppCompatActivity() {
 
@@ -42,6 +46,10 @@ class PhotoEditActivity : AppCompatActivity() {
 
     // 로고 토글
     private lateinit var switchLogo: SwitchCompat
+
+    // 애드몹
+    private var rewardedAd: RewardedAd? = null
+    private var isAdLoading = false // 중복 로딩 방지
 
     // 템플릿 RecyclerView
     private lateinit var templateRecyclerView: RecyclerView
@@ -69,9 +77,31 @@ class PhotoEditActivity : AppCompatActivity() {
         setupListeners()
         loadPhoto()
         setupTemplateRecyclerView()
+        loadRewardedAd()    // 보상형 광고 미리 불러옴
 
         // 기본 카테고리 선택
         selectCategory(TemplateCategory.BASIC, btnCategoryBasic)
+    }
+
+    // 애드몹 광고 불러오는 함수
+    private fun loadRewardedAd() {
+        if (isAdLoading || rewardedAd != null) return
+        isAdLoading = true
+
+        val adRequest = AdRequest.Builder().build()
+        RewardedAd.load(this, "ca-app-pub-7896890737820919/2343807248", adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                Log.e(TAG, "보상형 광고 로드 실패: ${adError.message}")
+                rewardedAd = null
+                isAdLoading = false
+            }
+
+            override fun onAdLoaded(ad: RewardedAd) {
+                Log.d(TAG, "보상형 광고 로드 완료")
+                rewardedAd = ad
+                isAdLoading = false
+            }
+        })
     }
 
     private fun initViews() {
@@ -128,18 +158,17 @@ class PhotoEditActivity : AppCompatActivity() {
             selectCategory(TemplateCategory.DIGITAL, btnCategoryDigital)
         }
 
-        // TODO: 광고 도입하면서 수정
         // 로고 토글
-        switchLogo.setOnCheckedChangeListener { _, isChecked ->
-            if (!isChecked) {
-                // OFF로 변경 시 모달 표시 - 주석처리
-                // showLogoOffDialog()
+        switchLogo.setOnClickListener {
+            val isChecked = switchLogo.isChecked
 
-                // 바로 로고 숨김 처리
-                showLogo = false
-                templateView.setLogoVisibility(false)
+            // 체크를 해제하려고 할 때 (워터마크를 지우려고 할 때)
+            if (!isChecked) {
+                // 일단 스위치가 꺼지지 않게 막고 다이얼로그를 띄움
+                switchLogo.isChecked = true
+                showLogoOffDialog()
             } else {
-                // ON으로 변경
+                // 다시 켤 때는 광고 없이 바로 켬
                 showLogo = true
                 templateView.setLogoVisibility(true)
             }
@@ -268,17 +297,32 @@ class PhotoEditActivity : AppCompatActivity() {
             .setOnCancelListener {
                 // 취소 - 토글 다시 ON
                 switchLogo.isChecked = true
-                showLogo = true
             }
             .setOnConfirmListener {
-                // 광고 시청 (TODO: 광고 연결)
-                showToast("광고 기능은 곧 추가될 예정이에요.")
-                // 광고 성공 후 OFF 유지
+                showRewardAd()
+            }
+            .show()
+    }
+
+    private fun showRewardAd() {
+        rewardedAd?.let { ad ->
+            ad.show(this) { rewardItem ->
+                // 사용자가 광고 시청 완료
+                Log.d(TAG, "보상 획득: ${rewardItem.amount}")
+
                 showLogo = false
                 switchLogo.isChecked = false
                 templateView.setLogoVisibility(false)
+                showToast("워터마크가 제거되었습니다.")
+
+                // 다음 광고를 위해 다시 로드
+                rewardedAd = null
+                loadRewardedAd()
             }
-            .show()
+        } ?: run {
+            showToast("광고를 불러오는 중입니다. 잠시 후 다시 시도해주세요.")
+            loadRewardedAd()
+        }
     }
 
     /**
