@@ -12,6 +12,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.amplitude.android.Amplitude
+import com.amplitude.android.Configuration
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
@@ -51,6 +53,9 @@ class MyPageActivity : AppCompatActivity() {
     // 애드몹
     private lateinit var mAdView: AdView
 
+    // 앰플리튜드
+    private lateinit var amplitude: Amplitude
+
     companion object {
         private const val TAG = "MyPageActivity"
         private const val TERMS_URL = "https://sage-hare-ff7.notion.site/2d5f2907580d80df9a21f95acd343d3f?source=copy_link"
@@ -66,6 +71,19 @@ class MyPageActivity : AppCompatActivity() {
         tokenManager = TokenManager(this)
         RetrofitClient.initialize(tokenManager)
         authRepository = AuthRepository(tokenManager)
+
+        // Amplitude 초기화
+        amplitude = Amplitude(
+            Configuration(
+            apiKey = getString(R.string.amplitude_api_key),
+            context = applicationContext
+        )
+        )
+
+        // 로그인 상태라면 사용자 식별 (이후 로그아웃 이벤트와 연결하기 위함)
+        if (tokenManager.isLoggedIn()) {
+            amplitude.setUserId("user_${tokenManager.getUserId()}")
+        }
 
         // 애드몹 Mobile SDK 초기화
         MobileAds.initialize(this) {}
@@ -275,6 +293,15 @@ class MyPageActivity : AppCompatActivity() {
 
                 result.onSuccess {
                     Log.d(TAG, "로그아웃 성공")
+
+                    // 1. 로그아웃 성공 이벤트 전송 (명시적 액션)
+                    amplitude.track("logout_success", mapOf(
+                        "platform" to "android",
+                        "user_id" to tokenManager.getUserId() // 마지막 기록용
+                    ))
+
+                    // 2. Amplitude 사용자 식별 해제 (이후 데이터는 익명 수집)
+                    amplitude.setUserId(null)
 
                     // 내 기록 화면으로 이동
                     navigateToMyRecords()
