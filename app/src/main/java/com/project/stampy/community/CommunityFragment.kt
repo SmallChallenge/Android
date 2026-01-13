@@ -138,11 +138,17 @@ class CommunityFragment : Fragment() {
             }
         }
 
-        // 스크롤 리스너 (페이징)
+        // 스크롤 리스너 (페이징 + 팝오버 닫기)
         rvCommunity.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
+                // 스크롤 시 열려있는 팝오버 닫기
+                if (dy != 0) {  // 실제로 스크롤이 발생했을 때만
+                    communityAdapter.closeAllPopovers()
+                }
+
+                // 페이징 처리
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                 val visibleItemCount = layoutManager.childCount
                 val totalItemCount = layoutManager.itemCount

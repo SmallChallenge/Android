@@ -23,6 +23,9 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
     private var onLikeClickListener: ((FeedItem, Int) -> Unit)? = null
     private var onMenuClickListener: ((FeedItem) -> Unit)? = null
 
+    // 현재 열려있는 팝오버의 ViewHolder 추적
+    private var currentOpenPopoverHolder: FeedViewHolder? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_community_feed, parent, false)
@@ -81,6 +84,14 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
         onMenuClickListener = listener
     }
 
+    /**
+     * 모든 팝오버 닫기 (외부에서 호출 가능)
+     */
+    fun closeAllPopovers() {
+        currentOpenPopoverHolder?.hidePopover()
+        currentOpenPopoverHolder = null
+    }
+
     inner class FeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val ivProfile: ImageView = itemView.findViewById(R.id.iv_profile)
         private val tvNickname: TextView = itemView.findViewById(R.id.tv_nickname)
@@ -112,8 +123,24 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
             // 팝오버 초기화 (닫힌 상태)
             popoverMenu.visibility = View.GONE
 
+            // 아이템 전체 클릭 (다른 아이템 클릭 시 팝오버 닫기)
+            itemView.setOnClickListener {
+                // 다른 ViewHolder의 팝오버가 열려있으면 닫기
+                if (currentOpenPopoverHolder != null && currentOpenPopoverHolder != this@FeedViewHolder) {
+                    closeAllPopovers()
+                }
+                // 자신의 팝오버가 열려있으면 닫기
+                else if (popoverMenu.visibility == View.VISIBLE) {
+                    hidePopover()
+                }
+            }
+
             // 메뉴 버튼 클릭 (팝오버 토글)
             btnMenu.setOnClickListener {
+                // 다른 팝오버가 열려있으면 먼저 닫기
+                if (currentOpenPopoverHolder != null && currentOpenPopoverHolder != this@FeedViewHolder) {
+                    closeAllPopovers()
+                }
                 togglePopover()
             }
 
@@ -125,7 +152,16 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
 
             // 좋아요 버튼 클릭
             btnLike.setOnClickListener {
+                // 다른 팝오버가 열려있으면 먼저 닫기
+                if (currentOpenPopoverHolder != null && currentOpenPopoverHolder != this@FeedViewHolder) {
+                    closeAllPopovers()
+                }
                 onLikeClickListener?.invoke(feed, adapterPosition)
+            }
+
+            // 팝오버 자체 클릭 시 이벤트 전파 중지 (팝오버 내부 클릭 시 닫히지 않도록)
+            popoverMenu.setOnClickListener {
+                // 이벤트 전파 중지 (아무 동작 하지 않음)
             }
         }
 
@@ -145,13 +181,17 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
          */
         private fun showPopover() {
             popoverMenu.visibility = View.VISIBLE
+            currentOpenPopoverHolder = this
         }
 
         /**
          * 팝오버 숨김
          */
-        private fun hidePopover() {
+        fun hidePopover() {
             popoverMenu.visibility = View.GONE
+            if (currentOpenPopoverHolder == this) {
+                currentOpenPopoverHolder = null
+            }
         }
 
         /**
