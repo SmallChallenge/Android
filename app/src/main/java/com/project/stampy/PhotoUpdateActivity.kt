@@ -177,7 +177,7 @@ class PhotoUpdateActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        // 뒤로가기
+        // 뒤로가기 - 단순히 현재 액티비티만 종료
         btnBackTouchArea.setOnClickListener {
             finish()
         }
@@ -431,18 +431,10 @@ class PhotoUpdateActivity : AppCompatActivity() {
     }
 
     /**
-     * 사진 상세 화면으로 이동 (수정된 데이터 전달)
+     * 사진 상세 화면으로 돌아가기 (수정된 데이터 전달)
      */
     private fun navigateToPhotoDetail() {
-        val intent = Intent(this, PhotoDetailActivity::class.java).apply {
-            // 기존 액티비티 스택 정리
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-
-            photoFile?.let { putExtra(PhotoDetailActivity.EXTRA_PHOTO_FILE, it) }
-            photoUrl?.let { putExtra(PhotoDetailActivity.EXTRA_PHOTO_URL, it) }
-            imageId?.let { putExtra(PhotoDetailActivity.EXTRA_IMAGE_ID, it) }
-
-            // 수정된 카테고리와 공개여부 전달
+        val resultIntent = Intent().apply {
             selectedCategory?.let {
                 val categoryCode = mapCategoryToCode(it)
                 putExtra(PhotoDetailActivity.EXTRA_CATEGORY, categoryCode)
@@ -453,7 +445,7 @@ class PhotoUpdateActivity : AppCompatActivity() {
             }
         }
 
-        startActivity(intent)
+        setResult(RESULT_OK, resultIntent)
         finish()
     }
 

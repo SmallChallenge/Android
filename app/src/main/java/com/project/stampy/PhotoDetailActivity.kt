@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.FileProvider
@@ -61,6 +62,28 @@ class PhotoDetailActivity : AppCompatActivity() {
     private var imageId: Long? = null
     private var category: String? = null
     private var visibility: String? = null
+
+    private val updatePhotoLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            result.data?.let { data ->
+                // 수정된 데이터 받아오기
+                val updatedCategory = data.getStringExtra(EXTRA_CATEGORY)
+                val updatedVisibility = data.getStringExtra(EXTRA_VISIBILITY)
+
+                Log.d(TAG, "수정 완료 - category: $updatedCategory, visibility: $updatedVisibility")
+
+                // 데이터 업데이트
+                updatedCategory?.let { category = it }
+                updatedVisibility?.let { visibility = it }
+
+                // UI 갱신
+                category?.let { setCategoryUI(it) }
+                visibility?.let { setVisibilityUI(it) }
+            }
+        }
+    }
 
     companion object {
         private const val TAG = "PhotoDetailActivity"
@@ -116,9 +139,6 @@ class PhotoDetailActivity : AppCompatActivity() {
 
         // 공유하기 버튼
         btnShare = findViewById(R.id.btn_share)
-
-        // 로컬 사진(로그인 전에 올린 사진)일 경우 경고 메시지 표시
-        val isLocalPhoto = imageId == null  // 서버 imageId가 없으면 로컬 사진
     }
 
     private fun setupListeners() {
@@ -267,8 +287,7 @@ class PhotoDetailActivity : AppCompatActivity() {
             category?.let { putExtra(PhotoUpdateActivity.EXTRA_CATEGORY, it) }
             visibility?.let { putExtra(PhotoUpdateActivity.EXTRA_VISIBILITY, it) }
         }
-        startActivity(intent)
-        finish()  // 현재 상세 화면 종료(수정 후 업데이트 된 새로운 상세 화면이 열림)
+        updatePhotoLauncher.launch(intent)
     }
 
     /**
