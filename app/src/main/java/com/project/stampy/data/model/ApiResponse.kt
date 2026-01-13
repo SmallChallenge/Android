@@ -7,13 +7,13 @@ import com.google.gson.annotations.SerializedName
  */
 data class ApiResponse<T>(
     @SerializedName("success")
-    val success: Boolean,
+    val success: Boolean = false,
 
     @SerializedName("data")
-    val data: T?,
+    val data: T? = null,
 
     @SerializedName("timestamp")
-    val timestamp: String,
+    val timestamp: String = "",
 
     // 에러 응답용 필드
     @SerializedName("code")
