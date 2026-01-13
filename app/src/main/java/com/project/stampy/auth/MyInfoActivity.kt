@@ -8,12 +8,14 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.project.stampy.MainActivity
 import com.project.stampy.R
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.network.RetrofitClient
 import com.project.stampy.data.repository.AuthRepository
 import com.project.stampy.etc.DoubleButtonDialog
 import com.project.stampy.etc.SingleButtonDialog
+import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
 class MyInfoActivity : AppCompatActivity() {
@@ -94,12 +96,10 @@ class MyInfoActivity : AppCompatActivity() {
             val result = authRepository.withdrawal()  // ACTIVE 상태에서 회원탈퇴
 
             result.onSuccess {
-                // 성공 시 로그인 화면으로 (탈퇴 후임을 표시)
-                val intent = Intent(this@MyInfoActivity, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                intent.putExtra(LoginActivity.EXTRA_FROM_WITHDRAWAL, true)  // 탈퇴 후 진입임을 표시
-                startActivity(intent)
-                finish()
+                showToast("탈퇴가 완료되었어요.")
+
+                // 내 기록 화면으로 이동
+                navigateToMyRecords()
             }.onFailure {
                 showWithdrawErrorDialog()
             }
@@ -110,5 +110,15 @@ class MyInfoActivity : AppCompatActivity() {
         SingleButtonDialog(this)
             .setTitle("탈퇴에 실패했어요.\n다시 시도해주세요.")
             .show()
+    }
+
+    /**
+     * 내 기록 화면으로 이동
+     */
+    private fun navigateToMyRecords() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
     }
 }

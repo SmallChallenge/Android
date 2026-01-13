@@ -26,6 +26,7 @@ import com.project.stampy.data.repository.AuthRepository
 import com.project.stampy.etc.DoubleButtonDialog
 import com.project.stampy.etc.SingleButtonDialog
 import com.project.stampy.etc.WebViewActivity
+import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 
 class MyPageActivity : AppCompatActivity() {
@@ -75,9 +76,9 @@ class MyPageActivity : AppCompatActivity() {
         // Amplitude 초기화
         amplitude = Amplitude(
             Configuration(
-            apiKey = getString(R.string.amplitude_api_key),
-            context = applicationContext
-        )
+                apiKey = getString(R.string.amplitude_api_key),
+                context = applicationContext
+            )
         )
 
         // 로그인 상태라면 사용자 식별 (이후 로그아웃 이벤트와 연결하기 위함)
@@ -302,6 +303,9 @@ class MyPageActivity : AppCompatActivity() {
 
                     // 2. Amplitude 사용자 식별 해제 (이후 데이터는 익명 수집)
                     amplitude.setUserId(null)
+
+                    // 토스트 메시지 표시
+                    showToast("로그아웃이 완료되었어요.")
 
                     // 내 기록 화면으로 이동
                     navigateToMyRecords()
