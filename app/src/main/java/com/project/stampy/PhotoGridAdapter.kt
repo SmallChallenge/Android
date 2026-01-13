@@ -43,12 +43,16 @@ class PhotoGridAdapter : RecyclerView.Adapter<PhotoGridAdapter.PhotoViewHolder>(
         private val ivPhoto: ImageView = itemView.findViewById(R.id.iv_photo)
 
         fun bind(photo: Photo) {
+            // 서버 URL이 있으면 서버에서, 없으면 로컬 파일에서 로드
+            val imageSource = photo.serverUrl ?: photo.file
+
             // Glide로 이미지 로드
             Glide.with(itemView.context)
-                .load(photo.file)
+                .load(imageSource)  // URL 또는 File 자동 인식
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
                 .placeholder(android.R.color.darker_gray)
+                .error(android.R.drawable.ic_menu_gallery)  // 로드 실패 시
                 .into(ivPhoto)
 
             // 클릭 리스너

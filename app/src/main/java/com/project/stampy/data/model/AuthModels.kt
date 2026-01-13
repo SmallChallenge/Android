@@ -39,7 +39,10 @@ data class SocialLoginResponse(
     val isNewUser: Boolean,
 
     @SerializedName("needNickname")
-    val needNickname: Boolean
+    val needNickname: Boolean,
+
+    @SerializedName("userStatus")
+    val userStatus: String  // "PENDING", "ACTIVE", "WITHDRAWN"
 )
 
 /**
@@ -118,6 +121,17 @@ data class LogoutResponse(
 
     @SerializedName("logoutTime")
     val logoutTime: String
+)
+
+/**
+ * 가입 취소 응답 (cancel-registration)
+ */
+data class CancelRegistrationResponse(
+    @SerializedName("userId")
+    val userId: Long,
+
+    @SerializedName("deletedAt")
+    val deletedAt: String
 )
 
 /**

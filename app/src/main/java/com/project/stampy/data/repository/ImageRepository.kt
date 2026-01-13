@@ -8,6 +8,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * 이미지 관련 Repository
@@ -15,8 +17,13 @@ import java.io.File
 class ImageRepository(
     private val tokenManager: TokenManager
 ) {
+    // 일반 API 서비스
     private val imageApi: ImageApiService =
         RetrofitClient.createService(ImageApiService::class.java)
+
+    // S3 전용 API 서비스 (iOS와 동일한 최소 헤더)
+    private val s3Api: ImageApiService =
+        RetrofitClient.createS3Service(ImageApiService::class.java)
 
     /**
      * 공통 API(서버 오류) 호출 처리
@@ -42,20 +49,25 @@ class ImageRepository(
      * 1. Presigned URL 생성
      * 2. S3에 업로드
      * 3. 메타데이터 저장
+     *
+     * CRITICAL: Content-Type을 image/jpeg로 통일! (백엔드 Presigned URL 서명과 일치)
      */
     suspend fun uploadImage(
         imageFile: File,
         category: String = "ETC", // "STUDY", "EXERCISE", "FOOD", "ETC"
         visibility: String = "PRIVATE", // "PRIVATE", "PUBLIC"
-        contentType: String = "image/jpeg"
+        takenAtTimestamp: Long = System.currentTimeMillis()
     ): Result<ImageSaveResponse> {
         return try {
             val token = "Bearer ${tokenManager.getAccessToken()}"
 
+            // CRITICAL: contentType을 image/jpeg로 고정 (백엔드 Presigned URL 서명과 일치)
+            val contentType = "image/jpeg"
+
             // 1. Presigned URL 요청
             val presignedRequest = PresignedUrlRequest(
                 filename = imageFile.name,
-                contentType = contentType,
+                contentType = contentType,  // image/jpeg
                 fileSize = imageFile.length()
             )
 
@@ -67,11 +79,12 @@ class ImageRepository(
 
             val presignedData = presignedResponse.body()!!.data!!
 
-            // 2. S3에 이미지 업로드
+            // 2. S3에 이미지 업로드 (iOS와 동일한 최소 헤더)
             val requestBody = imageFile.asRequestBody(contentType.toMediaType())
-            val uploadResponse = imageApi.uploadToS3(
+            val uploadResponse = s3Api.uploadToS3(  // s3Api 사용
                 url = presignedData.uploadUrl,
-                contentType = contentType,
+                contentType = contentType,  // image/jpeg (백엔드 서명과 일치)
+                acl = "public-read",  // ACL 헤더 포함 (iOS와 동일)
                 file = requestBody
             )
 
@@ -83,16 +96,41 @@ class ImageRepository(
             val saveRequest = ImageSaveRequest(
                 originalFilename = imageFile.name,
                 objectKey = presignedData.objectKey,
-                contentType = contentType,
+                contentType = contentType,  // image/jpeg
                 fileSize = imageFile.length(),
                 category = category,
-                visibility = visibility
+                visibility = visibility,
+                originalTakenAt = formatTimestamp(takenAtTimestamp)
             )
 
             safeApiCall { imageApi.saveImage(token, saveRequest) }
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    /**
+     * Unix timestamp를 iOS와 동일한 ISO 8601 포맷으로 변환
+     *
+     * @param timestamp Unix timestamp (밀리초)
+     * @return "yyyy-MM-dd'T'HH:mm:ss" 포맷 (예: "2026-01-03T19:27:35")
+     *
+     * CRITICAL:
+     * - iOS와 동일한 포맷: "yyyy-MM-dd'T'HH:mm:ss"
+     * - Locale.US 사용 (iOS와 일관성)
+     * - 기기 시간대 사용 (iOS와 동일)
+     * - 밀리초 제거 (초까지만)
+     */
+    private fun formatTimestamp(timestamp: Long): String {
+        val sdf = SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss",  // iOS와 동일한 포맷
+            Locale.US  // iOS와 일관성을 위해 US Locale 사용
+        )
+        // TimeZone은 기기의 시스템 시간대 사용 (iOS와 동일)
+        // 만약 iOS가 특정 TimeZone을 사용한다면 여기서 설정:
+        // sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+
+        return sdf.format(Date(timestamp))
     }
 
     /**

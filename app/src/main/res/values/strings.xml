@@ -1,8 +1,15 @@
 <resources>
-    <string name="app_name">Stampy</string>
+    <string name="app_name">스탬픽</string>
 
     <!-- Google OAuth 클라이언트 ID -->
     <string name="google_client_id">18886173344-i69n30rhbvvusl76gvnpec54eckcrqvg.apps.googleusercontent.com</string>
     <string name="google_web_client_id">18886173344-f2or6k591dm19k0ntl2ib5kec3obm2f1.apps.googleusercontent.com</string>
 
+    <!-- Google 애드몹 ID -->
+    <string name="admob_app_id">ca-app-pub-7896890737820919~3880906738</string>
+    <string name="admob_banner_unit_id">ca-app-pub-7896890737820919/5504231162</string>
+    <string name="admob_reward_unit_id">ca-app-pub-7896890737820919/2343807248</string>
+
+    <!-- 앰플리튜드 API 키 -->
+    <string name="amplitude_api_key">1f0951318fc0d23dea1fae935c017be9</string>
 </resources>

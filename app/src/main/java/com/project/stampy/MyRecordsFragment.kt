@@ -3,24 +3,38 @@ package com.project.stampy
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.project.stampy.auth.MyPageActivity
+import com.project.stampy.data.local.NonLoginPhotoManager
+import com.project.stampy.data.local.PhotoMetadataManager
+import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.model.Photo
+import com.project.stampy.data.network.RetrofitClient
+import com.project.stampy.data.repository.ImageRepository
+import kotlinx.coroutines.launch
 import java.io.File
+import android.widget.HorizontalScrollView
 
 class MyRecordsFragment : Fragment() {
 
     // 카테고리 뷰들
+    private lateinit var categoryScroll: HorizontalScrollView
     private lateinit var categoryAll: LinearLayout
     private lateinit var categoryStudy: LinearLayout
     private lateinit var categoryExercise: LinearLayout
@@ -40,11 +54,40 @@ class MyRecordsFragment : Fragment() {
     private lateinit var tvCategoryEtc: TextView
 
     private lateinit var rvPhotos: RecyclerView
+    private lateinit var emptyStateContainer: ConstraintLayout
+    private lateinit var ivEmptyCharacter: ImageView
     private lateinit var tvEmptyState: TextView
     private lateinit var btnProfile: ImageView
 
+    // 18장 도달 배너
+    private lateinit var bannerPhotoLimit: View
+    private lateinit var btnCloseBanner: ImageView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var tvPhotoCount: TextView
+    private lateinit var tvBannerText: TextView
+
     private lateinit var photoAdapter: PhotoGridAdapter
     private var selectedCategory = "전체"
+
+    // 서버 API 관련
+    private lateinit var tokenManager: TokenManager
+    private lateinit var imageRepository: ImageRepository
+    private lateinit var nonLoginPhotoManager: NonLoginPhotoManager
+
+    private lateinit var photoMetadataManager: PhotoMetadataManager
+
+    // 배너 닫힘 상태 저장
+    private var isBannerDismissed = false
+
+    // 전체 사진 개수 추적
+    private var totalPhotoCount = 0
+
+    // 현재 존재하는 카테고리 추적
+    private val availableCategories = mutableSetOf<String>()
+
+    companion object {
+        private const val PHOTO_LIMIT_BANNER_THRESHOLD = 18
+    }
 
     // 카테고리 뷰 맵
     private val categoryViews by lazy {
@@ -68,6 +111,13 @@ class MyRecordsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 서버 API 초기화
+        tokenManager = TokenManager(requireContext())
+        RetrofitClient.initialize(tokenManager)
+        imageRepository = ImageRepository(tokenManager)
+        nonLoginPhotoManager = NonLoginPhotoManager(requireContext())
+        photoMetadataManager = PhotoMetadataManager(requireContext())
+
         // View 초기화
         initViews(view)
 
@@ -80,11 +130,18 @@ class MyRecordsFragment : Fragment() {
         // 프로필 버튼 클릭 리스너
         setupProfileButton()
 
+        // 배너 클릭 리스너
+        setupBannerListeners()
+
+        // 빈 상태 텍스트 볼드 처리
+        setupEmptyStateText()
+
         // 사진 로드
         loadPhotos()
     }
 
     private fun initViews(view: View) {
+        categoryScroll = view.findViewById(R.id.category_scroll)
         categoryAll = view.findViewById(R.id.category_all)
         categoryStudy = view.findViewById(R.id.category_study)
         categoryExercise = view.findViewById(R.id.category_exercise)
@@ -104,8 +161,72 @@ class MyRecordsFragment : Fragment() {
         tvCategoryEtc = view.findViewById(R.id.tv_category_etc)
 
         rvPhotos = view.findViewById(R.id.rv_photos)
+        emptyStateContainer = view.findViewById(R.id.empty_state_container)
+        ivEmptyCharacter = view.findViewById(R.id.iv_empty_character)
         tvEmptyState = view.findViewById(R.id.tv_empty_state)
         btnProfile = view.findViewById(R.id.btn_profile)
+
+        // 배너 뷰들
+        bannerPhotoLimit = view.findViewById(R.id.banner_photo_limit)
+        btnCloseBanner = bannerPhotoLimit.findViewById(R.id.btn_close_banner)
+        progressBar = bannerPhotoLimit.findViewById(R.id.progress_bar)
+        tvPhotoCount = bannerPhotoLimit.findViewById(R.id.tv_photo_count)
+        tvBannerText = bannerPhotoLimit.findViewById(R.id.tv_banner_text)
+
+        // 텍스트 볼드 처리 ("최대 20개")
+        setupBannerText()
+    }
+
+    /**
+     * 배너 텍스트 설정 ("최대 20개" 볼드 처리)
+     */
+    private fun setupBannerText() {
+        val fullText = "게스트는 기록을 최대 20개까지 남길 수 있습니다."
+        val boldText = "최대 20개"
+        val spannableString = SpannableString(fullText)
+
+        val startIndex = fullText.indexOf(boldText)
+        if (startIndex >= 0) {
+            spannableString.setSpan(
+                StyleSpan(android.graphics.Typeface.BOLD),
+                startIndex,
+                startIndex + boldText.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        tvBannerText.text = spannableString
+    }
+
+    /**
+     * 빈 상태 텍스트 설정 ("+버튼" 볼드 처리)
+     */
+    private fun setupEmptyStateText() {
+        val fullText = "아직 남긴 기록이 없어요.\n+버튼을 눌러 기록을 시작해보세요!"
+        val boldText = "+버튼"
+        val spannableString = SpannableString(fullText)
+
+        val startIndex = fullText.indexOf(boldText)
+        if (startIndex >= 0) {
+            spannableString.setSpan(
+                StyleSpan(android.graphics.Typeface.BOLD),
+                startIndex,
+                startIndex + boldText.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        tvEmptyState.text = spannableString
+    }
+
+    /**
+     * 배너 클릭 리스너
+     */
+    private fun setupBannerListeners() {
+        btnCloseBanner.setOnClickListener {
+            hideBanner()
+            isBannerDismissed = true
+        }
     }
 
     private fun setupRecyclerView() {
@@ -121,8 +242,7 @@ class MyRecordsFragment : Fragment() {
 
         // 사진 클릭 리스너
         photoAdapter.setOnPhotoClickListener { photo ->
-            // TODO: 사진 상세보기 화면으로 이동
-            Toast.makeText(requireContext(), "사진 클릭: ${photo.file.name}", Toast.LENGTH_SHORT).show()
+            navigateToPhotoDetail(photo)
         }
     }
 
@@ -165,11 +285,7 @@ class MyRecordsFragment : Fragment() {
         // 미선택 상태: opacity 40%
         container.alpha = 0.4f
 
-        imageView.setBackgroundResource(R.drawable.category_circle_unselected)
-        imageView.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.gray_500)
-        )
-
+        // 텍스트: gray_500, btn2(Medium)
         textView.setTextColor(
             ContextCompat.getColor(requireContext(), R.color.gray_500)
         )
@@ -182,11 +298,7 @@ class MyRecordsFragment : Fragment() {
         // 선택 상태: opacity 100%
         container.alpha = 1.0f
 
-        imageView.setBackgroundResource(R.drawable.category_circle_selected)
-        imageView.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.gray_primary)
-        )
-
+        // 텍스트: gray_50, btn2_B(Large)
         textView.setTextColor(
             ContextCompat.getColor(requireContext(), R.color.gray_50)
         )
@@ -196,29 +308,382 @@ class MyRecordsFragment : Fragment() {
     }
 
     /**
-     * 사진 로드
+     * 사용 가능한 카테고리만 표시
+     */
+    private fun updateCategoryVisibility() {
+        // 전체는 항상 표시 (사진이 1장이라도 있으면)
+        categoryAll.visibility = if (availableCategories.isNotEmpty()) View.VISIBLE else View.GONE
+
+        // 각 카테고리는 해당 카테고리에 사진이 있을 때만 표시
+        categoryStudy.visibility = if (availableCategories.contains("공부")) View.VISIBLE else View.GONE
+        categoryExercise.visibility = if (availableCategories.contains("운동")) View.VISIBLE else View.GONE
+        categoryFood.visibility = if (availableCategories.contains("음식")) View.VISIBLE else View.GONE
+        categoryEtc.visibility = if (availableCategories.contains("기타")) View.VISIBLE else View.GONE
+
+        Log.d("MyRecordsFragment", "사용 가능한 카테고리: $availableCategories")
+    }
+
+    /**
+     * 사진 로드 (서버 + 로컬 통합)
      */
     fun loadPhotos() {
-        val picturesDir = File(requireContext().filesDir, "Pictures")
+        // 로그인 상태에 따라 다르게 처리
+        if (tokenManager.isLoggedIn()) {
+            loadServerAndLocalPhotos()  // 로그인: 서버 사진 + 로컬 사진
+        } else {
+            loadLocalPhotos()   // 비로그인: 로컬 사진만
+        }
+    }
 
-        if (!picturesDir.exists() || !picturesDir.isDirectory) {
-            showEmptyState()
+    /**
+     * 18장 도달 시 배너 표시
+     */
+    private fun updatePhotoLimitBanner(photoCount: Int) {
+        // 로그인 상태면 배너 숨김
+        if (tokenManager.isLoggedIn()) {
+            hideBanner()
             return
         }
 
-        val photoFiles = picturesDir.listFiles { file ->
-            file.isFile && file.name.startsWith("STAMPY_") && file.extension == "jpg"
-        }?.sortedByDescending { it.lastModified() } ?: emptyList()
+        // 배너가 이미 닫혔으면 숨김 유지
+        if (isBannerDismissed) {
+            hideBanner()
+            return
+        }
 
-        if (photoFiles.isEmpty()) {
+        // 18장 이상이면 배너 표시
+        if (photoCount >= PHOTO_LIMIT_BANNER_THRESHOLD) {
+            showBanner(photoCount)
+        } else {
+            hideBanner()
+        }
+    }
+
+    /**
+     * 배너 표시
+     */
+    private fun showBanner(photoCount: Int) {
+        bannerPhotoLimit.visibility = View.VISIBLE
+
+        // 프로그레스 바 업데이트
+        progressBar.progress = photoCount
+
+        // 사진 개수 텍스트 업데이트
+        tvPhotoCount.text = "$photoCount/20"
+    }
+
+    /**
+     * 배너 숨김
+     */
+    private fun hideBanner() {
+        bannerPhotoLimit.visibility = View.GONE
+    }
+
+    /**
+     * 서버 + 로컬 사진 통합 로드 (로그인 사용자)
+     */
+    private fun loadServerAndLocalPhotos() {
+        // 카테고리 매핑
+        val categoryCode = when (selectedCategory) {
+            "공부" -> "STUDY"
+            "운동" -> "EXERCISE"
+            "음식" -> "FOOD"
+            "기타" -> "ETC"
+            else -> null  // 전체
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val photoMetadataManager = PhotoMetadataManager(requireContext())
+
+                // 1. 서버 사진 로드
+                val serverPhotos = mutableListOf<Photo>()
+
+                imageRepository.getMyImages(
+                    category = categoryCode,
+                    page = 0,
+                    size = 100
+                ).onSuccess { response ->
+                    Log.d("MyRecordsFragment", "서버 사진 ${response.images.size}개 로드됨")
+
+                    serverPhotos.addAll(response.images.map { imageItem ->
+                        // 서버의 originalTakenAt을 timestamp로 변환
+                        val timestamp = parseIsoToTimestamp(imageItem.originalTakenAt)
+
+                        // 서버에서 받은 카테고리를 한글로 변환
+                        val categoryKorean = when (imageItem.category) {
+                            "STUDY" -> "공부"
+                            "EXERCISE" -> "운동"
+                            "FOOD" -> "음식"
+                            "ETC" -> "기타"
+                            else -> "기타"
+                        }
+
+                        Photo(
+                            file = File(imageItem.imageId.toString()),
+                            category = categoryKorean,
+                            serverUrl = imageItem.accessUrl,
+                            imageId = imageItem.imageId,
+                            timestamp = timestamp,
+                            visibility = imageItem.visibility
+                        )
+                    })
+                }.onFailure { error ->
+                    Log.e("MyRecordsFragment", "서버 사진 로드 실패", error)
+                }
+
+                // 2. 로컬 사진 로드
+                val localPhotos = loadLocalPhotosForLoggedInUser(categoryCode, photoMetadataManager)
+
+                Log.d("MyRecordsFragment", "로컬 사진 ${localPhotos.size}개 로드됨")
+
+                // 3. 서버 사진 + 로컬 사진 합치기
+                // timestamp 기준으로 최신순 정렬
+                val allPhotos = (serverPhotos + localPhotos)
+                    .sortedByDescending { it.timestamp }
+
+                // 전체 사진 개수 계산 (카테고리 필터링 전)
+                totalPhotoCount = calculateTotalPhotoCount()
+
+                // 사용 가능한 카테고리 업데이트
+                updateAvailableCategories()
+
+                // 4. UI 업데이트
+                if (allPhotos.isEmpty()) {
+                    showEmptyState()
+                } else {
+                    photoAdapter.setPhotos(allPhotos)
+                    hideEmptyState()
+                }
+
+                // 카테고리 표시 업데이트
+                updateCategoryVisibility()
+
+                Log.d("MyRecordsFragment", "전체 사진 ${allPhotos.size}개 표시 (서버: ${serverPhotos.size}, 로컬: ${localPhotos.size})")
+            } catch (e: Exception) {
+                Log.e("MyRecordsFragment", "사진 로드 오류", e)
+                totalPhotoCount = 0
+                availableCategories.clear()
+                updateCategoryVisibility()
+                showEmptyState()
+            }
+        }
+    }
+
+    /**
+     * 전체 사진 개수 계산 (로그인 사용자)
+     */
+    private suspend fun calculateTotalPhotoCount(): Int {
+        var count = 0
+
+        // 서버 사진 개수
+        imageRepository.getMyImages(
+            category = null,  // 전체
+            page = 0,
+            size = 100
+        ).onSuccess { response ->
+            count += response.images.size
+        }
+
+        // 로컬 사진 개수 (서버에 업로드되지 않은 것만)
+        val localPhotos = loadLocalPhotosForLoggedInUser(null, photoMetadataManager)
+        count += localPhotos.size
+
+        return count
+    }
+
+    /**
+     * 사용 가능한 카테고리 업데이트 (로그인 사용자)
+     */
+    private suspend fun updateAvailableCategories() {
+        availableCategories.clear()
+
+        // 서버 사진 카테고리
+        imageRepository.getMyImages(
+            category = null,
+            page = 0,
+            size = 100
+        ).onSuccess { response ->
+            response.images.forEach { imageItem ->
+                val categoryKorean = when (imageItem.category) {
+                    "STUDY" -> "공부"
+                    "EXERCISE" -> "운동"
+                    "FOOD" -> "음식"
+                    "ETC" -> "기타"
+                    else -> "기타"
+                }
+                availableCategories.add(categoryKorean)
+            }
+        }
+
+        // 로컬 사진 카테고리 (서버에 업로드되지 않은 것만)
+        val localPhotos = loadLocalPhotosForLoggedInUser(null, photoMetadataManager)
+        localPhotos.forEach { photo ->
+            availableCategories.add(photo.category)
+        }
+    }
+
+    /**
+     * ISO 8601 날짜 문자열을 timestamp(밀리초)로 변환
+     * 예: "2024-12-30T12:00:00" → 1735516800000
+     */
+    private fun parseIsoToTimestamp(isoString: String): Long {
+        return try {
+            val formatter = java.time.format.DateTimeFormatter.ISO_DATE_TIME
+            val dateTime = java.time.LocalDateTime.parse(isoString, formatter)
+            dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        } catch (e: Exception) {
+            Log.e("MyRecordsFragment", "날짜 파싱 실패: $isoString", e)
+            System.currentTimeMillis()  // 파싱 실패 시 현재 시간
+        }
+    }
+
+    /**
+     * 로그인 사용자용 로컬 사진 로드
+     * (서버에 업로드되지 않은 비회원 시절 사진)
+     */
+    private fun loadLocalPhotosForLoggedInUser(
+        categoryCode: String?,
+        photoMetadataManager: PhotoMetadataManager
+    ): List<Photo> {
+        val picturesDir = File(requireContext().filesDir, "Pictures")
+
+        if (!picturesDir.exists() || !picturesDir.isDirectory) {
+            return emptyList()
+        }
+
+        // 1. 선택된 카테고리에 맞는 메타데이터 필터링
+        val filteredMetadata = if (categoryCode == null) {
+            // 전체 카테고리
+            photoMetadataManager.getAllMetadata()
+        } else {
+            // 특정 카테고리
+            photoMetadataManager.getMetadataByCategory(categoryCode)
+        }
+
+        // 2. 서버에 업로드되지 않은 로컬 사진만 필터링
+        val localOnlyMetadata = filteredMetadata.filter { !it.isServerUploaded }
+
+        // 3. 메타데이터에 해당하는 실제 파일만 로드
+        return localOnlyMetadata.mapNotNull { metadata ->
+            val file = File(picturesDir, metadata.fileName)
+            if (file.exists()) {
+                // 메타데이터의 실제 카테고리를 한글로 변환
+                val categoryKorean = when (metadata.category) {
+                    "STUDY" -> "공부"
+                    "EXERCISE" -> "운동"
+                    "FOOD" -> "음식"
+                    "ETC" -> "기타"
+                    else -> "기타"
+                }
+
+                Photo(
+                    file = file,
+                    category = categoryKorean,  //메타데이터의 실제 카테고리 사용
+                    timestamp = metadata.createdAt,
+                    visibility = metadata.visibility
+                )
+            } else {
+                null
+            }
+        }
+    }
+
+    /**
+     * 로컬에서 사진 로드 (비로그인 사용자)
+     */
+    private fun loadLocalPhotos() {
+        val picturesDir = File(requireContext().filesDir, "Pictures")
+
+        if (!picturesDir.exists() || !picturesDir.isDirectory) {
+            totalPhotoCount = 0
+            availableCategories.clear()
+            updateCategoryVisibility()
+            showEmptyState()
+            updatePhotoLimitBanner(0)  // 배너 업데이트
+            return
+        }
+
+        // 1. 메타데이터 가져오기
+        val photoMetadataManager = PhotoMetadataManager(requireContext())
+
+        // 2. 선택된 카테고리에 맞는 메타데이터 필터링
+        val filteredMetadata = if (selectedCategory == "전체") {
+            photoMetadataManager.getAllMetadata()
+        } else {
+            // 카테고리 한글 → 영문 변환
+            val categoryCode = when (selectedCategory) {
+                "공부" -> "STUDY"
+                "운동" -> "EXERCISE"
+                "음식" -> "FOOD"
+                "기타" -> "ETC"
+                else -> null
+            }
+
+            if (categoryCode != null) {
+                photoMetadataManager.getMetadataByCategory(categoryCode)
+            } else {
+                emptyList()
+            }
+        }
+
+        // 3. 메타데이터에 해당하는 실제 파일만 로드
+        val photos = filteredMetadata
+            .mapNotNull { metadata ->
+                val file = File(picturesDir, metadata.fileName)
+                if (file.exists()) {
+                    // 메타데이터의 실제 카테고리를 한글로 변환
+                    val categoryKorean = when (metadata.category) {
+                        "STUDY" -> "공부"
+                        "EXERCISE" -> "운동"
+                        "FOOD" -> "음식"
+                        "ETC" -> "기타"
+                        else -> "기타"
+                    }
+
+                    Photo(
+                        file = file,
+                        category = categoryKorean,  //메타데이터의 실제 카테고리 사용
+                        timestamp = metadata.createdAt,
+                        visibility = metadata.visibility
+                    )
+                } else {
+                    null
+                }
+            }
+            .sortedByDescending { it.timestamp }  // 최신순 정렬
+
+        // 전체 사진 개수 저장 (배너용)
+        totalPhotoCount = nonLoginPhotoManager.getPhotoCount()
+
+        // 사용 가능한 카테고리 업데이트 (비로그인 사용자)
+        availableCategories.clear()
+        photoMetadataManager.getAllMetadata().forEach { metadata ->
+            val categoryKorean = when (metadata.category) {
+                "STUDY" -> "공부"
+                "EXERCISE" -> "운동"
+                "FOOD" -> "음식"
+                "ETC" -> "기타"
+                else -> "기타"
+            }
+            availableCategories.add(categoryKorean)
+        }
+
+        // 4. UI 업데이트
+        if (photos.isEmpty()) {
             showEmptyState()
         } else {
             hideEmptyState()
-            val photos = photoFiles.map { Photo(it, category = selectedCategory) }
             photoAdapter.setPhotos(photos)
-
-            Log.d("MyRecordsFragment", "사진 ${photos.size}개 로드됨")
         }
+
+        // 카테고리 표시 업데이트
+        updateCategoryVisibility()
+
+        // 배너 업데이트 (전체 사진 개수 기준)
+        updatePhotoLimitBanner(totalPhotoCount)
+
+        Log.d("MyRecordsFragment", "비회원 로컬 사진 ${photos.size}개 로드됨 (전체: $totalPhotoCount)")
     }
 
     /**
@@ -230,12 +695,78 @@ class MyRecordsFragment : Fragment() {
 
     private fun showEmptyState() {
         rvPhotos.visibility = View.GONE
-        tvEmptyState.visibility = View.VISIBLE
+        emptyStateContainer.visibility = View.VISIBLE
+
+        // 전체 사진이 0장이면 캐릭터와 텍스트 보이고 카테고리 숨김
+        if (totalPhotoCount == 0) {
+            ivEmptyCharacter.visibility = View.VISIBLE
+            tvEmptyState.visibility = View.VISIBLE
+            categoryScroll.visibility = View.GONE
+        } else {
+            // 사진은 있는데 선택한 카테고리에는 없는 경우
+            ivEmptyCharacter.visibility = View.GONE
+            tvEmptyState.visibility = View.GONE
+            categoryScroll.visibility = View.VISIBLE
+        }
     }
 
     private fun hideEmptyState() {
         rvPhotos.visibility = View.VISIBLE
-        tvEmptyState.visibility = View.GONE
+        emptyStateContainer.visibility = View.GONE
+        categoryScroll.visibility = View.VISIBLE
+    }
+
+    /**
+     * 사진 상세 화면으로 이동
+     */
+    private fun navigateToPhotoDetail(photo: Photo) {
+        val intent = Intent(requireContext(), PhotoDetailActivity::class.java)
+
+        // 서버 사진인 경우
+        if (photo.imageId != null && photo.serverUrl != null) {
+            intent.putExtra(PhotoDetailActivity.EXTRA_PHOTO_URL, photo.serverUrl)
+            intent.putExtra(PhotoDetailActivity.EXTRA_IMAGE_ID, photo.imageId)
+
+            // 서버 사진의 카테고리를 한글→영문으로 변환해서 전달
+            val categoryCode = when (photo.category) {
+                "공부" -> "STUDY"
+                "운동" -> "EXERCISE"
+                "음식" -> "FOOD"
+                "기타" -> "ETC"
+                else -> "ETC"
+            }
+            intent.putExtra(PhotoDetailActivity.EXTRA_CATEGORY, categoryCode)
+
+            // 서버 사진의 공개 여부 전달 (이미 "PUBLIC" 또는 "PRIVATE" 형식)
+            photo.visibility?.let { vis ->
+                intent.putExtra(PhotoDetailActivity.EXTRA_VISIBILITY, vis)
+            }
+        }
+        // 로컬 사진인 경우
+        else if (photo.file.exists()) {
+            intent.putExtra(PhotoDetailActivity.EXTRA_PHOTO_FILE, photo.file)
+
+            // 메타데이터에서 카테고리 조회
+            val metadata = photoMetadataManager.getMetadataByFileName(photo.file.name)
+
+            if (metadata != null) {
+                intent.putExtra(PhotoDetailActivity.EXTRA_CATEGORY, metadata.category)
+                intent.putExtra(PhotoDetailActivity.EXTRA_VISIBILITY, metadata.visibility)
+            } else {
+                // 메타데이터가 없으면 Photo 객체의 카테고리 사용
+                val categoryCode = when (photo.category) {
+                    "공부" -> "STUDY"
+                    "운동" -> "EXERCISE"
+                    "음식" -> "FOOD"
+                    "기타" -> "ETC"
+                    else -> "ETC"
+                }
+                intent.putExtra(PhotoDetailActivity.EXTRA_CATEGORY, categoryCode)
+                intent.putExtra(PhotoDetailActivity.EXTRA_VISIBILITY, "PRIVATE")
+            }
+        }
+
+        startActivity(intent)
     }
 }
 

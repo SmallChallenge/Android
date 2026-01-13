@@ -26,7 +26,7 @@ object RetrofitClient {
     }
 
     /**
-     * OkHttpClient 생성
+     * OkHttpClient 생성 (일반 API용)
      */
     private fun createOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -51,7 +51,25 @@ object RetrofitClient {
     }
 
     /**
-     * Retrofit 인스턴스
+     * S3 전용 OkHttpClient 생성 (최소 헤더, iOS와 동일)
+     */
+    private fun createS3OkHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        return OkHttpClient.Builder()
+            .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
+            .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
+            .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
+            .addInterceptor(loggingInterceptor)
+            // ⚠️ CRITICAL: S3 업로드에는 인터셉터/인증 제거!
+            // iOS처럼 최소 헤더만 사용
+            .build()
+    }
+
+    /**
+     * Retrofit 인스턴스 (일반 API용)
      */
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
@@ -62,9 +80,27 @@ object RetrofitClient {
     }
 
     /**
+     * S3 전용 Retrofit 인스턴스
+     */
+    val s3Retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://kr.object.ncloudstorage.com/")  // S3 base URL
+            .client(createS3OkHttpClient())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    /**
      * API 서비스 생성
      */
     fun <T> createService(serviceClass: Class<T>): T {
         return retrofit.create(serviceClass)
+    }
+
+    /**
+     * S3 전용 API 서비스 생성
+     */
+    fun <T> createS3Service(serviceClass: Class<T>): T {
+        return s3Retrofit.create(serviceClass)
     }
 }

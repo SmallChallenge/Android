@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_primary">
+
+    <!-- 상단바 -->
+    <include
+        android:id="@+id/top_bar"
+        layout="@layout/top_bar_with_back"
+        android:layout_width="0dp"
+        android:layout_height="66dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 완료 버튼 (top_bar 위에 오버레이) -->
+    <include
+        android:id="@+id/btn_complete"
+        layout="@layout/button_small_primary"
+        android:layout_width="50dp"
+        android:layout_height="34dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toTopOf="@id/top_bar"
+        app:layout_constraintEnd_toEndOf="@id/top_bar" />
+
+    <!-- 사진 (1:1 정사각형, 상단바 아래 28dp, 양옆 20dp) -->
+    <ImageView
+        android:id="@+id/iv_photo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_photo_rounded"
+        android:clipToOutline="true"
+        android:contentDescription="사진"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="1:1" />
+
+    <!-- 스크롤 영역 -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/iv_photo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <!-- 카테고리 선택 타이틀 영역 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp">
+
+                <TextView
+                    android:id="@+id/tv_category_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="카테고리 선택"
+                    android:textAppearance="@style/TextAppearance.App.Subtitle2"
+                    app:fontFamily="@font/pretendard_semibold"
+                    android:textColor="@color/gray_50" />
+
+                <!-- 카테고리 에러 메시지 -->
+                <TextView
+                    android:id="@+id/tv_category_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="* 필수 선택"
+                    android:textAppearance="@style/TextAppearance.App.Caption"
+                    android:textColor="#FF2334"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- 카테고리 아이콘 영역 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp">
+
+                <!-- 공부 -->
+                <LinearLayout
+                    android:id="@+id/category_study"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/iv_category_study"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_category_study"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="공부" />
+
+                    <TextView
+                        android:id="@+id/tv_category_study"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="공부"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        app:fontFamily="@font/pretendard_semibold"
+                        android:textColor="@color/gray_300"
+                        android:layout_marginTop="8dp" />
+                </LinearLayout>
+
+                <!-- 운동 -->
+                <LinearLayout
+                    android:id="@+id/category_exercise"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/iv_category_exercise"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_category_exercise"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="운동" />
+
+                    <TextView
+                        android:id="@+id/tv_category_exercise"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="운동"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        app:fontFamily="@font/pretendard_semibold"
+                        android:textColor="@color/gray_300"
+                        android:layout_marginTop="8dp" />
+                </LinearLayout>
+
+                <!-- 음식 -->
+                <LinearLayout
+                    android:id="@+id/category_food"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/iv_category_food"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_category_food"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="음식" />
+
+                    <TextView
+                        android:id="@+id/tv_category_food"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="음식"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        app:fontFamily="@font/pretendard_semibold"
+                        android:textColor="@color/gray_300"
+                        android:layout_marginTop="8dp" />
+                </LinearLayout>
+
+                <!-- 기타 -->
+                <LinearLayout
+                    android:id="@+id/category_etc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/iv_category_etc"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_category_etc"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="기타" />
+
+                    <TextView
+                        android:id="@+id/tv_category_etc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="기타"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                        app:fontFamily="@font/pretendard_semibold"
+                        android:textColor="@color/gray_300"
+                        android:layout_marginTop="8dp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- 공개 여부 선택 타이틀 영역 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:id="@+id/tv_privacy_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="공개 여부 선택"
+                    android:textAppearance="@style/TextAppearance.App.Subtitle2"
+                    app:fontFamily="@font/pretendard_semibold"
+                    android:textColor="@color/gray_50" />
+
+                <!-- 공개 여부 에러 메시지 -->
+                <TextView
+                    android:id="@+id/tv_privacy_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="* 필수 선택"
+                    android:textAppearance="@style/TextAppearance.App.Caption"
+                    android:textColor="#FF2334"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- 태그 버튼 영역 -->
+            <LinearLayout
+                android:id="@+id/tag_button_area"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp">
+
+                <!-- 전체 공개 태그 -->
+                <com.project.stampy.etc.TagView
+                    android:id="@+id/tag_public"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="전체 공개"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                    app:fontFamily="@font/pretendard_medium" />
+
+                <!-- 비공개 태그 -->
+                <com.project.stampy.etc.TagView
+                    android:id="@+id/tag_private"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="비공개"
+                    android:layout_marginStart="8dp"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                    app:fontFamily="@font/pretendard_medium" />
+
+            </LinearLayout>
+
+            <!-- 비로그인 경고 메시지 (게스트만 보임) -->
+            <LinearLayout
+                android:id="@+id/warning_container"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_tag_pressed"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_warning"
+                    android:contentDescription="경고"
+                    app:tint="@color/gray_500"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="게스트 게시물은 공개 범위를 수정할 수 없어요."
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_500"
+                    android:textAppearance="@style/TextAppearance.App.Body2" />
+            </LinearLayout>
+
+            <!-- 안내 문구 (로그인 유저만) -->
+            <TextView
+                android:id="@+id/tv_privacy_guide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👆 전체 공개 설정하고 커뮤니티 활동을 시작해보세요!"
+                android:textAppearance="@style/TextAppearance.App.Body2"
+                android:textColor="@color/gray_500"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:visibility="visible" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

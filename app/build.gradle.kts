@@ -1,30 +1,59 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     kotlin("kapt")
 }
 
+// local.properties 읽기
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
 android {
     namespace = "com.project.stampy"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.project.stampy"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 1
+        targetSdk = 35
+        versionCode = 3
         versionName = "1.0"
 
+        vectorDrawables.useSupportLibrary = true
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 카카오 앱 키를 BuildConfig에 추가
+        buildConfigField("String", "KAKAO_APP_KEY", "\"${localProperties.getProperty("KAKAO_APP_KEY")}\"")
+
+        buildConfigField("String", "BASE_URL", "\"https://api.stampy.kr/\"")
+
+        // manifestPlaceholders에도 추가 (AndroidManifest.xml에서 사용)
+        manifestPlaceholders["KAKAO_APP_KEY"] = localProperties.getProperty("KAKAO_APP_KEY")
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(localProperties.getProperty("RELEASE_STORE_FILE") ?: "")
+            storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD")
+            keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+            keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+        }
     }
 
     buildTypes {
         debug {
-            // 디버그 빌드에서 BuildConfig 생성
-            buildConfigField("String", "BASE_URL", "\"https://api.stampy.kr/\"")
+
         }
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")  // 서명 설정 적용
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -102,9 +131,23 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.1")
     implementation("androidx.camera:camera-view:1.3.1")
 
+    implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
+    implementation("com.google.guava:guava:31.1-android")
+
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
     // Kakao SDK
     implementation("com.kakao.sdk:v2-user:2.19.0") // 카카오 로그인
+
+    // ExifInterface
+    implementation("androidx.exifinterface:exifinterface:1.3.6")
+
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // google admob
+    implementation("com.google.android.gms:play-services-ads:22.6.0")
+
+    // 앰플리튜드 SDK
+    implementation("com.amplitude:analytics-android:1.+")
 }

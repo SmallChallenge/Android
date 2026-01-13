@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 디지털 시계 숫자 박스 배경 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Main Box: #FFFFFF 20% -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#33FFFFFF" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+</layer-list>

@@ -41,6 +41,10 @@ class AuthRepository(
 
     /**
      * 소셜 로그인
+     *
+     * 신규/기존 가입자 모두 토큰 저장
+     * - 신규 가입자(needNickname=true): 약관 동의 후 ACTIVE
+     * - 기존 가입자(needNickname=false): 바로 메인으로
      */
     suspend fun socialLogin(
         socialType: String,
@@ -48,20 +52,52 @@ class AuthRepository(
     ): Result<SocialLoginResponse> {
         val request = SocialLoginRequest(socialType, accessToken)
         return safeApiCall { authApi.socialLogin(request) }.onSuccess { data ->
-            // 토큰 저장
+
+            // 무조건 토큰 저장 (약관 동의 API에 필요)
             tokenManager.saveAccessToken(data.accessToken)
             tokenManager.saveRefreshToken(data.refreshToken)
             tokenManager.saveUserId(data.userId)
 
-            // needNickname이 false면 이미 닉네임이 있음
-            if (!data.needNickname && data.nickname != null) {
-                tokenManager.saveNickname(data.nickname)
-                Log.d(TAG, "소셜 로그인 성공 - 닉네임: ${data.nickname}")
+            if (data.needNickname) {
+                // 신규 가입자: 약관 동의 필요
+                Log.d(TAG, "소셜 로그인 성공 - 신규 가입자 (약관 동의 필요)")
+                Log.d(TAG, "userId: ${data.userId}, needNickname: true")
             } else {
-                Log.d(TAG, "소셜 로그인 성공 - 닉네임 설정 필요")
+                // 기존 가입자: 닉네임도 저장
+                if (data.nickname != null) {
+                    tokenManager.saveNickname(data.nickname)
+                }
+                Log.d(TAG, "소셜 로그인 성공 - 기존 가입자")
+                Log.d(TAG, "userId: ${data.userId}, nickname: ${data.nickname}")
             }
+        }
+    }
 
-            Log.d(TAG, "userId: ${data.userId}, needNickname: ${data.needNickname}")
+    /**
+     * 약관 동의
+     *
+     * POST /api/v1/auth/terms-agreement
+     *
+     * PENDING 상태 사용자가 약관 동의하여 ACTIVE로 전환
+     */
+    suspend fun agreeTerms(
+        agreedToPrivacyPolicy: Boolean = true,
+        agreedToTermsOfService: Boolean = true,
+        agreedToMarketing: Boolean = false
+    ): Result<TermsAgreementResponse> {
+        val token = "Bearer ${tokenManager.getAccessToken()}"
+
+        val request = TermsAgreementRequest(
+            agreedToPrivacyPolicy = agreedToPrivacyPolicy,
+            agreedToTermsOfService = agreedToTermsOfService,
+            agreedToMarketing = agreedToMarketing,
+            allRequiredTermsAgreed = agreedToPrivacyPolicy && agreedToTermsOfService
+        )
+
+        return safeApiCall<TermsAgreementResponse> {
+            authApi.agreeTerms(token, request)
+        }.onSuccess { data ->
+            Log.d(TAG, "약관 동의 성공 - userStatus: ${data.userStatus}")
         }
     }
 
@@ -169,18 +205,103 @@ class AuthRepository(
     }
 
     /**
-     * 회원탈퇴
+     * 가입 취소 (PENDING 상태 전용)
+     *
+     * 약관 동의 전에 뒤로가기/닫기 버튼으로 나가는 경우
+     * POST /api/v1/auth/cancel-registration
+     * Body 없음 - Authorization 헤더만 전송
+     */
+    suspend fun cancelRegistration(): Result<CancelRegistrationResponse> {
+        var token = "Bearer ${tokenManager.getAccessToken()}"
+
+        return try {
+            var response = authApi.cancelRegistration(token)
+
+            Log.d(TAG, "가입 취소 응답 코드: ${response.code()}")
+
+            // 토큰 만료(401, 403) 시 갱신 후 재시도
+            if (response.code() == 403 || response.code() == 401) {
+                val refreshResult = refreshToken()
+                if (refreshResult.isSuccess) {
+                    token = "Bearer ${tokenManager.getAccessToken()}"
+                    response = authApi.cancelRegistration(token)
+                } else {
+                    tokenManager.clearTokens()
+                    return Result.failure(Exception("토큰 갱신 실패"))
+                }
+            }
+
+            val result = if (response.isSuccessful) {
+                Log.d(TAG, "가입 취소 성공")
+                response.body()?.toResult() ?: Result.failure(Exception("응답 없음"))
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e(TAG, "가입 취소 실패 (${response.code()}): $errorBody")
+                Result.failure(Exception("서버 오류: ${response.code()}"))
+            }
+
+            // 성공 여부와 상관없이 로컬 데이터는 삭제
+            tokenManager.clearTokens()
+            result
+        } catch (e: Exception) {
+            Log.e(TAG, "가입 취소 API 호출 실패: ${e.message}")
+            tokenManager.clearTokens()
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 회원탈퇴 (ACTIVE 상태 전용)
+     *
+     * 정식 가입 완료 후 회원탈퇴
+     * POST /api/v1/auth/withdrawal
+     * Authorization 헤더 + refreshToken Body 필요
      */
     suspend fun withdrawal(): Result<WithdrawalResponse> {
-        val token = "Bearer ${tokenManager.getAccessToken()}"
-        val refreshToken = tokenManager.getRefreshToken()
-            ?: return Result.failure(Exception("Refresh Token이 없습니다"))
+        var token = "Bearer ${tokenManager.getAccessToken()}"
+        var currentRefreshToken = tokenManager.getRefreshToken()
 
-        val request = WithdrawalRequest(refreshToken)
-        return safeApiCall { authApi.withdrawal(token, request) }.onSuccess {
-            // 로컬 토큰 삭제
+        if (currentRefreshToken == null) {
             tokenManager.clearTokens()
-            Log.d(TAG, "회원탈퇴 성공 - 로컬 토큰 삭제")
+            return Result.failure(Exception("Refresh Token이 없습니다"))
+        }
+
+        return try {
+            var request = WithdrawalRequest(currentRefreshToken)
+            var response = authApi.withdrawal(token, request)
+
+            Log.d(TAG, "회원탈퇴 응답 코드: ${response.code()}")
+
+            // 토큰 만료(401, 403) 시 갱신 후 재시도
+            if (response.code() == 403 || response.code() == 401) {
+                val refreshResult = refreshToken()
+                if (refreshResult.isSuccess) {
+                    token = "Bearer ${tokenManager.getAccessToken()}"
+                    currentRefreshToken = tokenManager.getRefreshToken()!!
+                    request = WithdrawalRequest(currentRefreshToken)
+                    response = authApi.withdrawal(token, request)
+                } else {
+                    tokenManager.clearTokens()
+                    return Result.failure(Exception("토큰 갱신 실패"))
+                }
+            }
+
+            val result = if (response.isSuccessful) {
+                Log.d(TAG, "회원탈퇴 성공")
+                response.body()?.toResult() ?: Result.failure(Exception("응답 없음"))
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e(TAG, "회원탈퇴 실패 (${response.code()}): $errorBody")
+                Result.failure(Exception("서버 오류: ${response.code()}"))
+            }
+
+            // 성공 여부와 상관없이 탈퇴 시 로컬 데이터는 삭제
+            tokenManager.clearTokens()
+            result
+        } catch (e: Exception) {
+            Log.e(TAG, "회원탈퇴 API 호출 실패: ${e.message}")
+            tokenManager.clearTokens()
+            Result.failure(e)
         }
     }
 

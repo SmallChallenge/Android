@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog"
+    android:paddingTop="32dp"
+    android:paddingBottom="20dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:gravity="center">
+
+    <!-- 제목 (필수) -->
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.App.H3"
+        android:textColor="@color/gray_50"
+        android:gravity="center" />
+
+    <!-- 설명 (선택) -->
+    <TextView
+        android:id="@+id/tv_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.App.Body2"
+        android:textColor="@color/gray_300"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="8dp" />
+
+    <!-- 완료 버튼 -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="확인"
+        android:textSize="16sp"
+        android:fontFamily="@font/pretendard_semibold"
+        app:fontFamily="@font/pretendard_semibold"
+        android:textAppearance="@style/TextAppearance.App.Button.Large"
+        android:textColor="@color/gray_primary"
+        android:backgroundTint="@color/neon_primary"
+        android:layout_marginTop="24dp"
+        app:cornerRadius="16dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp" />
+
+</LinearLayout>

@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 스플래시 화면 테마 -->
+    <style name="Theme.Stampy.Splash" parent="Theme.SplashScreen">
+        <!-- 배경색 -->
+        <item name="windowSplashScreenBackground">@color/gray_primary</item>
+
+        <!-- 중앙 로고 아이콘 (크기 조절된 버전) -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+
+        <!-- 애니메이션 지속 시간 -->
+        <item name="windowSplashScreenAnimationDuration">500</item>
+
+        <!-- 스플래시 후 적용될 테마 -->
+        <item name="postSplashScreenTheme">@style/Theme.Stampy</item>
+    </style>
+
     <style name="Theme.Stampy" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- 상태바 투명 -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 상태바 검정색 -->
+        <item name="android:statusBarColor">@color/navigationBar</item>
         <item name="android:windowLightStatusBar">false</item>
+
+        <!-- ActionBar 완전히 숨기기 -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- Edge-to-Edge를 강제로 끄는 코드 (TODO: 마이그레이션 필요) -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
 
         <!-- 시스템 네비게이션 바 색상 설정 -->
         <item name="android:navigationBarColor">@color/navigationBar</item>
@@ -36,5 +58,14 @@
     <!-- 네비게이션 인디케이터 제거 -->
     <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@android:color/transparent</item>
+    </style>
+
+    <!-- 검정 배경 제거 -->
+    <style name="TransparentBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/TransparentBottomSheet</item>
+    </style>
+
+    <style name="TransparentBottomSheet" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
     </style>
 </resources>

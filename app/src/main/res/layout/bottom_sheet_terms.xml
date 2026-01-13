@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/transparent"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="16dp">
+
+    <!-- 전체 동의하고 시작 -->
+    <LinearLayout
+        android:id="@+id/layout_all_agree"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_terms_top"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="36dp"
+        android:paddingBottom="36dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/iv_check_all"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_checkbox_unchecked"
+            android:contentDescription="전체 동의" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:text="전체 동의하고 시작"
+            android:fontFamily="@font/pretendard_semibold"
+            app:fontFamily="@font/pretendard_semibold"
+            android:textColor="@color/neon_900"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- 구분선 (전체 너비) -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#F0F0F0"/>
+
+    <!-- 이용약관 (필수) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="21dp"
+        android:paddingBottom="11dp">
+
+        <!-- 체크박스 -->
+        <LinearLayout
+            android:id="@+id/btn_check_terms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/iv_check_terms"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_checkbox_unchecked"
+                android:contentDescription="이용약관 동의" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:fontFamily="@font/pretendard_regular"
+                app:fontFamily="@font/pretendard_regular"
+                android:text="이용약관 (필수)"
+                android:textColor="@color/neon_900"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <!-- 화살표 버튼 -->
+        <FrameLayout
+            android:id="@+id/btn_view_terms"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_right"
+                app:tint="@color/gray_primary"
+                android:contentDescription="이용약관 보기" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- 개인정보 수집 및 이용 (필수) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_terms_bottom"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="11dp"
+        android:paddingBottom="21dp">
+
+        <!-- 체크박스 -->
+        <LinearLayout
+            android:id="@+id/btn_check_privacy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <!-- 개인정보 체크박스 -->
+            <ImageView
+                android:id="@+id/iv_check_privacy"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_checkbox_unchecked"
+                android:contentDescription="개인정보 수집 및 이용 동의" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="개인정보 수집 및 이용 (필수)"
+                android:fontFamily="@font/pretendard_regular"
+                app:fontFamily="@font/pretendard_regular"
+                android:textColor="@color/neon_900"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <!-- 화살표 버튼 -->
+        <FrameLayout
+            android:id="@+id/btn_view_privacy"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_right"
+                app:tint="@color/gray_primary"
+                android:contentDescription="개인정보 수집 및 이용 보기" />
+        </FrameLayout>
+    </LinearLayout>
+
+</LinearLayout>

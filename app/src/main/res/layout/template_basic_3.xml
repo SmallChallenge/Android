@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Basic 3 템플릿 -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 시간 표시 (중앙) -->
+    <!-- 형식: 오전/오후 HH:mm (예: 오전 11:50) -->
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:fontFamily="@font/suit_heavy"
+        app:fontFamily="@font/suit_heavy"
+        android:textSize="40sp"
+        android:letterSpacing="-0.02"
+        android:includeFontPadding="false"
+        android:gravity="center"
+        android:shadowColor="#73000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        tools:text="오전 11:50"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <!-- 날짜 표시 (시간 바로 아래) -->
+    <!-- 형식: YYYY년 MM월 DD일 (요일) (예: 2026년 10월 15일 (수)) -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:fontFamily="@font/suit_heavy"
+        app:fontFamily="@font/suit_heavy"
+        android:textSize="20sp"
+        android:letterSpacing="-0.02"
+        android:includeFontPadding="false"
+        android:gravity="center"
+        android:shadowColor="#73000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        tools:text="2026년 10월 15일 (수)"
+        app:layout_constraintTop_toBottomOf="@id/tv_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Stampic 로고 이미지 (하단 중앙, 아래 여백 16px) -->
+    <ImageView
+        android:id="@+id/iv_stampic_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/stampic_tem"
+        android:contentDescription="Stampic Logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Moody 2 템플릿 -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Stampic 로고 (중앙 상단, 여백 16px) -->
+    <ImageView
+        android:id="@+id/iv_stampic_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/stampic_tem"
+        android:contentDescription="Stampic Logo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 원형 배경 아이콘 (중앙, 220x220dp) -->
+    <ImageView
+        android:id="@+id/iv_circle_bg"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:src="@drawable/ic_circle_bg"
+        android:contentDescription="Circle Background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 시간 컨테이너 (원형 위에 중앙 배치) -->
+    <LinearLayout
+        android:id="@+id/time_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@id/iv_circle_bg"
+        app:layout_constraintBottom_toBottomOf="@id/iv_circle_bg"
+        app:layout_constraintStart_toStartOf="@id/iv_circle_bg"
+        app:layout_constraintEnd_toEndOf="@id/iv_circle_bg">
+
+        <!-- 왼쪽 열: H와 m -->
+        <LinearLayout
+            android:id="@+id/left_column"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- 시간 첫째 자리 -->
+            <TextView
+                android:id="@+id/tv_hour_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="-17dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:fontFamily="@font/suit_extralight"
+                app:fontFamily="@font/suit_extralight"
+                android:textSize="100sp"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.02"
+                android:shadowColor="#4D000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="10"
+                tools:text="0" />
+
+            <!-- 분 첫째 자리 -->
+            <TextView
+                android:id="@+id/tv_minute_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-17dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:fontFamily="@font/suit_extralight"
+                app:fontFamily="@font/suit_extralight"
+                android:textSize="100sp"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.02"
+                android:shadowColor="#4D000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="10"
+                tools:text="0" />
+
+        </LinearLayout>
+
+        <!-- 좌우 간격 5dp -->
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="match_parent" />
+
+        <!-- 오른쪽 열: H와 m -->
+        <LinearLayout
+            android:id="@+id/right_column"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- 시간 둘째 자리 -->
+            <TextView
+                android:id="@+id/tv_hour_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="-17dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:fontFamily="@font/suit_extralight"
+                app:fontFamily="@font/suit_extralight"
+                android:textSize="100sp"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.02"
+                android:shadowColor="#4D000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="10"
+                tools:text="6" />
+
+            <!-- 분 둘째 자리 -->
+            <TextView
+                android:id="@+id/tv_minute_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-17dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:fontFamily="@font/suit_extralight"
+                app:fontFamily="@font/suit_extralight"
+                android:textSize="100sp"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.02"
+                android:shadowColor="#4D000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="10"
+                tools:text="0" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- 날짜 표시 (중앙 하단, 아래 여백 16px) -->
+    <!-- 형식: YYYY.MM.DD -->
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/suit_bold"
+        app:fontFamily="@font/suit_bold"
+        android:textSize="20sp"
+        android:includeFontPadding="false"
+        android:letterSpacing="-0.02"
+        tools:text="2026.01.04"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

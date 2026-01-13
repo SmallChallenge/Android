@@ -22,7 +22,10 @@ data class ImageSaveRequest(
     val category: String, // "STUDY", "EXERCISE", "FOOD", "ETC"
 
     @SerializedName("visibility")
-    val visibility: String = "PRIVATE" // "PRIVATE", "PUBLIC"
+    val visibility: String = "PRIVATE", // "PRIVATE", "PUBLIC"
+
+    @SerializedName("originalTakenAt")
+    val originalTakenAt: String  // "yyyy-MM-dd'T'HH:mm:ss" 포맷
 )
 
 /**
@@ -92,26 +95,40 @@ data class PresignedUrlResponse(
  * 이미지 리스트 조회 응답
  */
 data class ImageListResponse(
-    @SerializedName("content")
-    val content: List<ImageItem>,
+    @SerializedName("images")
+    val images: List<ImageItem>,
+
+    @SerializedName("pageInfo")
+    val pageInfo: PageInfo
+)
+
+/**
+ * 페이지 정보
+ */
+data class PageInfo(
+    @SerializedName("currentPage")
+    val currentPage: Int,
+
+    @SerializedName("pageSize")
+    val pageSize: Int,
 
     @SerializedName("totalElements")
-    val totalElements: Long,
+    val totalElements: Int,
 
     @SerializedName("totalPages")
     val totalPages: Int,
-
-    @SerializedName("size")
-    val size: Int,
-
-    @SerializedName("number")
-    val number: Int, // 현재 페이지 번호
 
     @SerializedName("first")
     val first: Boolean,
 
     @SerializedName("last")
-    val last: Boolean
+    val last: Boolean,
+
+    @SerializedName("hasNext")
+    val hasNext: Boolean,
+
+    @SerializedName("hasPrevious")
+    val hasPrevious: Boolean
 )
 
 /**
@@ -121,14 +138,8 @@ data class ImageItem(
     @SerializedName("imageId")
     val imageId: Long,
 
-    @SerializedName("originalFilename")
-    val originalFilename: String,
-
     @SerializedName("accessUrl")
     val accessUrl: String,
-
-    @SerializedName("thumbnailUrl")
-    val thumbnailUrl: String?,
 
     @SerializedName("category")
     val category: String,
@@ -136,14 +147,8 @@ data class ImageItem(
     @SerializedName("visibility")
     val visibility: String,
 
-    @SerializedName("fileSize")
-    val fileSize: Long,
-
-    @SerializedName("createdAt")
-    val createdAt: String,
-
-    @SerializedName("updatedAt")
-    val updatedAt: String
+    @SerializedName("originalTakenAt")
+    val originalTakenAt: String
 )
 
 /**

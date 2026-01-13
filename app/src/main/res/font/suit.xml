@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- SUIT ExtraLight -->
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="200"
+        android:font="@font/suit_extralight"
+        app:fontStyle="normal"
+        app:fontWeight="200"
+        app:font="@font/suit_extralight" />
+
+    <!-- SUIT Bold -->
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="700"
+        android:font="@font/suit_bold"
+        app:fontStyle="normal"
+        app:fontWeight="700"
+        app:font="@font/suit_bold" />
+
+    <!-- SUIT ExtraBold -->
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="800"
+        android:font="@font/suit_extrabold"
+        app:fontStyle="normal"
+        app:fontWeight="800"
+        app:font="@font/suit_extrabold" />
+
+    <!-- SUIT Heavy -->
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="900"
+        android:font="@font/suit_heavy"
+        app:fontStyle="normal"
+        app:fontWeight="900"
+        app:font="@font/suit_heavy" />
+
+</font-family>

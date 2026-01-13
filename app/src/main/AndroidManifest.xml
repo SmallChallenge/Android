@@ -29,20 +29,26 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.Stampy"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31" >
+        tools:targetApi="35" >
 
         <!-- 카카오 SDK 초기화 -->
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="cdcf8640c0483fccee4f1d8d51811081" />
+            android:value="${KAKAO_APP_KEY}" />
+
+        <!-- 구글 애드몹 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id"/>
 
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Stampy.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -55,22 +61,59 @@
             android:screenOrientation="portrait"
             android:exported="false" />
 
+        <!-- PhotoEditActivity -->
+        <activity
+            android:name=".PhotoEditActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- PhotoSaveActivity -->
+        <activity
+            android:name=".PhotoSaveActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- PhotoDetailActivity -->
+        <activity
+            android:name=".PhotoDetailActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- PhotoUpdateActivity -->
+        <activity
+            android:name=".PhotoUpdateActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+
         <!-- MyPageActivity -->
         <activity
-            android:name=".MyPageActivity"
+            android:name=".auth.MyPageActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- MyInfoActivity -->
+        <activity
+            android:name=".auth.MyInfoActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
 
         <!-- LoginActivity -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".auth.LoginActivity"
             android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <!-- WebViewActivity -->
+        <activity
+            android:name=".etc.WebViewActivity"
             android:exported="false" />
 
         <!-- NicknameActivity -->
         <activity
-            android:name=".NicknameActivity"
+            android:name=".auth.NicknameActivity"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
 
         <!-- FileProvider 설정 (사진 저장용) -->

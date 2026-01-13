@@ -27,7 +27,7 @@
     <color name="gray_100">#F0F0F0</color>
     <color name="gray_50">#FFFFFF</color> <!-- 메인 텍스트, 메인 아이콘 -->
 
-    <color name="navigationBar">#121212</color>
+    <color name="navigationBar">#171717</color>
 
     <!-- Semantic Colors -->
     <color name="background_primary">@color/gray_primary</color>
@@ -35,4 +35,12 @@
     <color name="text_primary">@color/white</color>
     <color name="text_secondary">@color/gray_600</color>
     <color name="accent">@color/neon_primary</color>
+
+    <!-- Large button Colors -->
+    <color name="button_primary_active">#C8FF00</color>
+    <color name="button_inactive">#686868</color>
+    <color name="button_press">#B4E600</color>
+    <color name="button_text_active">#171717</color>
+    <color name="button_text_inactive">#CECECE</color>
+    <color name="button_text_press">#171717</color>
 </resources>

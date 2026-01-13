@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_primary">
+
+    <!-- 상단바 -->
+    <include
+        android:id="@+id/top_bar"
+        layout="@layout/top_bar_with_back"
+        android:layout_width="0dp"
+        android:layout_height="66dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 다음 버튼 (top_bar 위에 오버레이) -->
+    <include
+        android:id="@+id/btn_next"
+        layout="@layout/button_small_primary"
+        android:layout_width="50dp"
+        android:layout_height="34dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toTopOf="@id/top_bar"
+        app:layout_constraintEnd_toEndOf="@id/top_bar" />
+
+    <!-- 편집 사진 (1:1 정사각형, 상단바 아래 40dp) -->
+    <FrameLayout
+        android:id="@+id/photo_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="1:1">
+
+        <!-- 배경 사진 -->
+        <ImageView
+            android:id="@+id/iv_photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="편집할 사진" />
+
+        <!-- 템플릿 오버레이는 TemplateView가 동적으로 추가됨 -->
+
+    </FrameLayout>
+
+    <!-- 카테고리 + 로고 토글 영역 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/category_logo_area"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        app:layout_constraintTop_toBottomOf="@id/photo_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 카테고리 스크롤 -->
+        <HorizontalScrollView
+            android:id="@+id/category_scroll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/logo_area">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="16dp">
+
+                <!-- Basic -->
+                <TextView
+                    android:id="@+id/btn_category_Basic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Basic"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"
+                    android:textColor="@color/gray_500"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <!-- Moody -->
+                <TextView
+                    android:id="@+id/btn_category_Moody"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Moody"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"
+                    android:textColor="@color/gray_500"
+                    android:layout_marginStart="16dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <!-- Active -->
+                <TextView
+                    android:id="@+id/btn_category_Active"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Active"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"
+                    android:textColor="@color/gray_500"
+                    android:layout_marginStart="16dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <!-- Digital -->
+                <TextView
+                    android:id="@+id/btn_category_Digital"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Digital"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"
+                    android:textColor="@color/gray_500"
+                    android:layout_marginStart="16dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Logo 토글 영역 -->
+        <LinearLayout
+            android:id="@+id/logo_area"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingEnd="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/tv_logo_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logo"
+                android:textColor="@color/gray_300"
+                android:textSize="14sp"
+                android:fontFamily="@font/pretendard_regular"
+                android:layout_marginEnd="0dp" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                app:thumbTint="@color/white"
+                app:trackTint="@color/switch_track_color" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 템플릿 목록 (RecyclerView) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/template_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/category_logo_area"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
