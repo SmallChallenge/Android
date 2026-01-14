@@ -163,11 +163,19 @@ class PhotoUpdateActivity : AppCompatActivity() {
             tagPublic.visibility = View.GONE
             warningContainer.visibility = View.VISIBLE
             tvPrivacyGuide.visibility = View.GONE
+
+            // 비공개 태그의 마진 제거
+            (tagPrivate.layoutParams as LinearLayout.LayoutParams).marginStart = 0
+
         } else if (!tokenManager.isLoggedIn()) {
             // 비로그인 유저 (서버 사진은 볼 수 없지만 방어 코드)
             tagPublic.visibility = View.GONE
             warningContainer.visibility = View.VISIBLE
             tvPrivacyGuide.visibility = View.GONE
+
+            // 비공개 태그의 마진 제거
+            (tagPrivate.layoutParams as LinearLayout.LayoutParams).marginStart = 0
+
         } else {
             // 로그인 유저 + 서버 사진: 전체 공개 가능
             tagPublic.visibility = View.VISIBLE
