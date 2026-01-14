@@ -23,6 +23,19 @@ class TemplateView(context: Context) : FrameLayout(context) {
 
     private var currentTemplate: Template? = null
     private var templateRootView: View? = null
+    private var currentShowLogo: Boolean = true
+    private var photoTakenAtTimestamp: Long = System.currentTimeMillis()
+
+    /**
+     * 사진 촬영 시간 설정
+     */
+    fun setPhotoTakenAt(timestamp: Long) {
+        photoTakenAtTimestamp = timestamp
+        // 템플릿이 이미 적용되어 있으면 시간 업데이트
+        currentTemplate?.let { template ->
+            applyTemplate(template, currentShowLogo)
+        }
+    }
 
     /**
      * 템플릿 적용
@@ -39,6 +52,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
         addView(templateRootView)
 
         currentTemplate = template
+        currentShowLogo = showLogo
 
         // 템플릿별 데이터 바인딩
         when (template.id) {
@@ -67,7 +81,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
 
             // === 시간 설정 ===
             val tvTime = root.findViewById<TextView>(R.id.tv_time)
-            val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+            val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(photoTakenAtTimestamp))
             tvTime?.apply {
                 text = currentTime
                 typeface = pretendardMedium
@@ -87,7 +101,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
 
             // === 날짜 + Stampic 설정 ===
             val tvDateStampic = root.findViewById<TextView>(R.id.tv_date_stampic)
-            val currentDate = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(Date())
+            val currentDate = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(Date(photoTakenAtTimestamp))
             tvDateStampic?.apply {
                 text = "$currentDate • Stampic"
                 typeface = pretendardMedium
@@ -168,6 +182,8 @@ class TemplateView(context: Context) : FrameLayout(context) {
             // === 날짜 설정 (YYYY년 MM월 DD일 (요일)) ===
             val tvDate = root.findViewById<TextView>(R.id.tv_date)
             val calendar = Calendar.getInstance()
+            calendar.timeInMillis = photoTakenAtTimestamp
+
             val year = calendar.get(Calendar.YEAR)
             val month = calendar.get(Calendar.MONTH) + 1
             val day = calendar.get(Calendar.DAY_OF_MONTH)
@@ -272,6 +288,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             }
 
             val calendar = Calendar.getInstance()
+            calendar.timeInMillis = photoTakenAtTimestamp
 
             // === 시간 설정 (오전/오후 HH:mm) ===
             val tvTime = root.findViewById<TextView>(R.id.tv_time)
@@ -363,7 +380,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             // === 날짜 설정 (E, d MMM) ===
             val tvDate = root.findViewById<TextView>(R.id.tv_date)
             val dateFormat = SimpleDateFormat("E, d MMM", Locale.US)
-            val currentDate = dateFormat.format(Date()).uppercase(Locale.US)
+            val currentDate = dateFormat.format(Date(photoTakenAtTimestamp)).uppercase(Locale.US)
             tvDate?.apply {
                 text = currentDate
                 movesansFont?.let { typeface = it }
@@ -380,7 +397,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             // === 시간 설정 (a hh:mm, Locale: US) ===
             val tvTime = root.findViewById<TextView>(R.id.tv_time)
             val timeFormat = SimpleDateFormat("a hh:mm", Locale.US)
-            val currentTime = timeFormat.format(Date()).uppercase(Locale.US)
+            val currentTime = timeFormat.format(Date(photoTakenAtTimestamp)).uppercase(Locale.US)
             tvTime?.apply {
                 text = currentTime
                 movesansFont?.let { typeface = it }
@@ -447,7 +464,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             }
 
             val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            val currentTime = timeFormat.format(Date())
+            val currentTime = timeFormat.format(Date(photoTakenAtTimestamp))
             val timeParts = currentTime.split(":")
             val hour = timeParts[0]
             val minute = timeParts[1]
@@ -495,7 +512,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             // 날짜 (YYYY.MM.DD)
             root.findViewById<TextView>(R.id.tv_date)?.apply {
                 val dateFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
-                text = dateFormat.format(Date())
+                text = dateFormat.format(Date(photoTakenAtTimestamp))
                 suiteBold?.let { typeface = it }
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledDateSize)
             }
@@ -560,6 +577,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             }
 
             val calendar = Calendar.getInstance()
+            calendar.timeInMillis = photoTakenAtTimestamp
 
             // === 시간 설정 (am/pm HH:mm) ===
             val tvTime = root.findViewById<TextView>(R.id.tv_time)
@@ -639,7 +657,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             // === 시간 설정 (HH:mm) ===
             val tvTime = root.findViewById<TextView>(R.id.tv_time)
             val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            val currentTime = timeFormat.format(Date())
+            val currentTime = timeFormat.format(Date(photoTakenAtTimestamp))
             tvTime?.apply {
                 text = currentTime
                 // 폰트 적용
@@ -656,7 +674,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             // === 날짜 설정 (E, d MMM) ===
             val tvDate = root.findViewById<TextView>(R.id.tv_date)
             val dateFormat = SimpleDateFormat("E, d MMM", Locale.US)
-            val currentDate = dateFormat.format(Date()).uppercase(Locale.US)
+            val currentDate = dateFormat.format(Date(photoTakenAtTimestamp)).uppercase(Locale.US)
             tvDate?.apply {
                 text = currentDate
                 // 폰트 적용
@@ -707,6 +725,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             }
 
             val calendar = Calendar.getInstance()
+            calendar.timeInMillis = photoTakenAtTimestamp
 
             // === 시간 설정 (HH:mm AM/PM) ===
             val tvTime = root.findViewById<TextView>(R.id.tv_time)
@@ -807,6 +826,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             }
 
             val calendar = Calendar.getInstance()
+            calendar.timeInMillis = photoTakenAtTimestamp
 
             // === 날짜 설정 (E, d MMM) ===
             val tvDate = root.findViewById<TextView>(R.id.tv_date)
@@ -930,7 +950,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             }
 
             val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            val currentTime = timeFormat.format(Date())
+            val currentTime = timeFormat.format(Date(photoTakenAtTimestamp))
             val timeParts = currentTime.split(":")
             val hour = timeParts[0]
             val minute = timeParts[1]
@@ -986,7 +1006,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             // 날짜
             root.findViewById<TextView>(R.id.tv_date)?.apply {
                 val dateFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
-                text = dateFormat.format(Date())
+                text = dateFormat.format(Date(photoTakenAtTimestamp))
                 suitBold?.let { typeface = it }
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledDateSize)
             }
@@ -1083,6 +1103,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             }
 
             val calendar = Calendar.getInstance()
+            calendar.timeInMillis = photoTakenAtTimestamp
 
             // === 시간 설정 (HH:mm AM/PM) ===
             val tvTime = root.findViewById<TextView>(R.id.tv_time)
@@ -1176,6 +1197,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
             }
 
             val calendar = Calendar.getInstance()
+            calendar.timeInMillis = photoTakenAtTimestamp
 
             // === 날짜 설정 (YYYY년MM월DD일(요일)) ===
             val tvDate = root.findViewById<TextView>(R.id.tv_date)
@@ -1244,6 +1266,7 @@ class TemplateView(context: Context) : FrameLayout(context) {
      * 로고 표시 상태 변경
      */
     fun setLogoVisibility(visible: Boolean) {
+        currentShowLogo = visible
         templateRootView?.let { root ->
             // Basic 1 템플릿의 ImageView 로고
             root.findViewById<ImageView>(R.id.iv_logo)?.visibility =

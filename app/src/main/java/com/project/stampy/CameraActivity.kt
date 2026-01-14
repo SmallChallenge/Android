@@ -205,10 +205,11 @@ class CameraActivity : AppCompatActivity() {
         rvGallery.addItemDecoration(CameraGridSpacingItemDecoration(3, 1, false))
 
         // 사진 클릭 리스너
-        galleryAdapter.setOnPhotoClickListener { uri ->
+        galleryAdapter.setOnPhotoClickListener { photo ->
             // 사진 편집 화면으로 이동
             val intent = Intent(this, PhotoEditActivity::class.java)
-            intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_URI, uri)
+            intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_URI, photo.uri)
+            intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_TAKEN_AT, photo.takenAt)  // 갤러리 사진의 촬영 시간 전달
             startActivity(intent)
         }
     }
@@ -276,14 +277,15 @@ class CameraActivity : AppCompatActivity() {
     }
 
     /**
-     * 갤러리 사진 로드
+     * 갤러리 사진 로드 (촬영 시간 포함)
      */
     private fun loadGalleryPhotos() {
-        val photos = mutableListOf<Uri>()
+        val photos = mutableListOf<GalleryPhoto>()
 
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DATE_ADDED
+            MediaStore.Images.Media.DATE_TAKEN,  // 촬영 시간
+            MediaStore.Images.Media.DATE_ADDED    // 추가 시간
         )
 
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
@@ -296,6 +298,8 @@ class CameraActivity : AppCompatActivity() {
             sortOrder
         )?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val dateTakenColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN)
+            val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
@@ -303,7 +307,16 @@ class CameraActivity : AppCompatActivity() {
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     id.toString()
                 )
-                photos.add(uri)
+
+                // 촬영 시간 가져오기 (DATE_TAKEN이 없으면 DATE_ADDED 사용)
+                val takenAt = if (dateTakenColumn >= 0 && !cursor.isNull(dateTakenColumn)) {
+                    cursor.getLong(dateTakenColumn)  // 밀리초 단위
+                } else {
+                    // DATE_TAKEN이 없으면 DATE_ADDED를 밀리초로 변환
+                    cursor.getLong(dateAddedColumn) * 1000
+                }
+
+                photos.add(GalleryPhoto(uri, takenAt))
             }
         }
 

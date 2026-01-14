@@ -84,6 +84,7 @@ class PhotoSaveActivity : AppCompatActivity() {
     private var templateName: String? = null
     private var templateId: String? = null
     private var showLogo: Boolean = true
+    private var photoTakenAt: Long = 0L
 
     private val categoryMap by lazy {
         mapOf(
@@ -100,6 +101,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         const val EXTRA_TEMPLATE_NAME = "extra_template_name"
         const val EXTRA_TEMPLATE_ID = "extra_template_id"
         const val EXTRA_SHOW_LOGO = "extra_show_logo"
+        const val EXTRA_PHOTO_TAKEN_AT = "extra_photo_taken_at"
 
         private const val TIMESTAMP_FORMAT = "yyyyMMdd_HHmmss"
         private const val FILE_PREFIX = "STAMPIC_"  // "Stampic" 파일명으로 저장
@@ -148,8 +150,9 @@ class PhotoSaveActivity : AppCompatActivity() {
         templateName = intent.getStringExtra(EXTRA_TEMPLATE_NAME)
         templateId = intent.getStringExtra(EXTRA_TEMPLATE_ID)
         showLogo = intent.getBooleanExtra(EXTRA_SHOW_LOGO, true)
+        photoTakenAt = intent.getLongExtra(EXTRA_PHOTO_TAKEN_AT, System.currentTimeMillis())
 
-        Log.d(TAG, "Received showLogo: $showLogo")  // 로그 추가
+        Log.d(TAG, "Received showLogo: $showLogo, photoTakenAt: $photoTakenAt")
 
         initViews()
         setupListeners()
@@ -717,14 +720,12 @@ class PhotoSaveActivity : AppCompatActivity() {
         try {
             Log.d(TAG, "서버 업로드 시작: category=$category, visibility=$visibility")
 
-            // 파일 이름에서 타임스탬프 추출
-            val timestamp = extractTimestampFromFileName(fileName)
-
+            // 갤러리/카메라에서 전달받은 실제 촬영 시간 사용
             val result = imageRepository.uploadImage(
                 imageFile = file,
                 category = category,
                 visibility = visibility,
-                takenAtTimestamp = timestamp
+                takenAtTimestamp = photoTakenAt
             )
 
             withContext(Dispatchers.Main) {
@@ -884,8 +885,10 @@ class PhotoSaveActivity : AppCompatActivity() {
         templateId?.let { id ->
             val template = TemplateManager.getTemplateById(id)
             template?.let {
-                templateView.applyTemplate(it, showLogo = showLogo)  // showLogo 변수 사용
-                Log.d(TAG, "템플릿 적용: ${it.name}, 로고 표시: $showLogo")
+                // 촬영 시간 설정
+                templateView.setPhotoTakenAt(photoTakenAt)
+                templateView.applyTemplate(it, showLogo = showLogo)
+                Log.d(TAG, "템플릿 적용: ${it.name}, 로고 표시: $showLogo, 촬영시간: $photoTakenAt")
             } ?: Log.e(TAG, "템플릿을 찾을 수 없습니다: $id")
         } ?: Log.w(TAG, "템플릿 ID가 없습니다")
     }

@@ -9,24 +9,32 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
 /**
+ * 갤러리 사진 데이터
+ */
+data class GalleryPhoto(
+    val uri: Uri,
+    val takenAt: Long  // 촬영 시간 (timestamp)
+)
+
+/**
  * 갤러리 사진 그리드 어댑터
  */
 class GalleryAdapter : RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder>() {
 
-    private val photos = mutableListOf<Uri>()
-    private var onPhotoClickListener: ((Uri) -> Unit)? = null
+    private val photos = mutableListOf<GalleryPhoto>()
+    private var onPhotoClickListener: ((GalleryPhoto) -> Unit)? = null
 
     inner class GalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.iv_gallery_photo)
 
-        fun bind(uri: Uri) {
+        fun bind(photo: GalleryPhoto) {
             Glide.with(itemView.context)
-                .load(uri)
+                .load(photo.uri)
                 .centerCrop()
                 .into(imageView)
 
             itemView.setOnClickListener {
-                onPhotoClickListener?.invoke(uri)
+                onPhotoClickListener?.invoke(photo)
             }
         }
     }
@@ -43,13 +51,13 @@ class GalleryAdapter : RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder>() 
 
     override fun getItemCount() = photos.size
 
-    fun setPhotos(newPhotos: List<Uri>) {
+    fun setPhotos(newPhotos: List<GalleryPhoto>) {
         photos.clear()
         photos.addAll(newPhotos)
         notifyDataSetChanged()
     }
 
-    fun setOnPhotoClickListener(listener: (Uri) -> Unit) {
+    fun setOnPhotoClickListener(listener: (GalleryPhoto) -> Unit) {
         onPhotoClickListener = listener
     }
 }

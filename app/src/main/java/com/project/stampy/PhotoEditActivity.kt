@@ -63,6 +63,7 @@ class PhotoEditActivity : AppCompatActivity() {
     private var selectedTemplate: Template? = null
     private var showLogo = true
     private var photoUri: Uri? = null
+    private var photoTakenAt: Long = 0L
 
     private lateinit var amplitude: Amplitude
     private lateinit var tokenManager: TokenManager
@@ -70,6 +71,7 @@ class PhotoEditActivity : AppCompatActivity() {
     companion object {
         const val TAG = "PhotoEditActivity"
         const val EXTRA_PHOTO_URI = "extra_photo_uri"
+        const val EXTRA_PHOTO_TAKEN_AT = "extra_photo_taken_at" // 갤러리 사진의 촬영 시간
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,15 +80,28 @@ class PhotoEditActivity : AppCompatActivity() {
 
         // Intent로 전달받은 사진 URI
         photoUri = intent.getParcelableExtra(EXTRA_PHOTO_URI)
-        Log.d(TAG, "onCreate - photoUri: $photoUri")
+        photoTakenAt = intent.getLongExtra(EXTRA_PHOTO_TAKEN_AT, System.currentTimeMillis())
+
+        Log.d(TAG, "onCreate - photoUri: $photoUri, takenAt: $photoTakenAt")
 
         initViews()
         setupListeners()
         loadPhoto()
         setupTemplateRecyclerView()
-        loadRewardedAd()    // 보상형 광고 미리 불러옴
+        loadRewardedAd()
 
-        // 기본 카테고리 선택
+        // 촬영 시간 설정
+        templateView.setPhotoTakenAt(photoTakenAt)
+
+        // 기본 템플릿 적용 (Basic 1)
+        val basicTemplate = TemplateManager.getTemplatesByCategory(TemplateCategory.BASIC).firstOrNull()
+        basicTemplate?.let {
+            selectedTemplate = it
+            templateView.applyTemplate(it, showLogo = true)
+            Log.d(TAG, "기본 템플릿 적용: ${it.name}")
+        }
+
+        // 기본 카테고리 선택 (이건 UI만 변경, 템플릿은 위에서 이미 적용됨)
         selectCategory(TemplateCategory.BASIC, btnCategoryBasic)
 
         tokenManager = TokenManager(this)
@@ -366,6 +381,7 @@ class PhotoEditActivity : AppCompatActivity() {
         try {
             val intent = Intent(this, PhotoSaveActivity::class.java)
             intent.putExtra(PhotoSaveActivity.EXTRA_PHOTO_URI, photoUri)
+            intent.putExtra(PhotoSaveActivity.EXTRA_PHOTO_TAKEN_AT, photoTakenAt)
 
             // 선택된 템플릿 정보 전달
             selectedTemplate?.let { template ->
@@ -376,7 +392,7 @@ class PhotoEditActivity : AppCompatActivity() {
 
             // 로고 표시 여부 전달 추가
             intent.putExtra(PhotoSaveActivity.EXTRA_SHOW_LOGO, showLogo)
-            Log.d(TAG, "Show logo: $showLogo")
+            Log.d(TAG, "Show logo: $showLogo, takenAt: $photoTakenAt")
 
             Log.d(TAG, "Starting PhotoSaveActivity...")
             startActivity(intent)
