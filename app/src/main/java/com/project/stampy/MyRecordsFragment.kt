@@ -407,10 +407,8 @@ class MyRecordsFragment : Fragment() {
                     Log.d("MyRecordsFragment", "서버 사진 ${response.images.size}개 로드됨")
 
                     serverPhotos.addAll(response.images.map { imageItem ->
-                        // 서버의 originalTakenAt을 timestamp로 변환
                         val timestamp = parseIsoToTimestamp(imageItem.originalTakenAt)
 
-                        // 서버에서 받은 카테고리를 한글로 변환
                         val categoryKorean = when (imageItem.category) {
                             "STUDY" -> "공부"
                             "EXERCISE" -> "운동"
@@ -419,12 +417,17 @@ class MyRecordsFragment : Fragment() {
                             else -> "기타"
                         }
 
+                        // imageId로 메타데이터 조회
+                        val metadata = photoMetadataManager.getMetadataByImageId(imageItem.imageId)
+                        val uploadedAt = metadata?.uploadedAt ?: timestamp
+
                         Photo(
                             file = File(imageItem.imageId.toString()),
                             category = categoryKorean,
                             serverUrl = imageItem.accessUrl,
                             imageId = imageItem.imageId,
                             timestamp = timestamp,
+                            uploadedAt = uploadedAt,  // 메타데이터의 업로드 시간 사용
                             visibility = imageItem.visibility
                         )
                     })
@@ -438,9 +441,9 @@ class MyRecordsFragment : Fragment() {
                 Log.d("MyRecordsFragment", "로컬 사진 ${localPhotos.size}개 로드됨")
 
                 // 3. 서버 사진 + 로컬 사진 합치기
-                // timestamp 기준으로 최신순 정렬
+                // uploadedAt 기준으로 최신순 정렬
                 val allPhotos = (serverPhotos + localPhotos)
-                    .sortedByDescending { it.timestamp }
+                    .sortedByDescending { it.uploadedAt }
 
                 // 전체 사진 개수 계산 (카테고리 필터링 전)
                 totalPhotoCount = calculateTotalPhotoCount()
@@ -580,7 +583,8 @@ class MyRecordsFragment : Fragment() {
                 Photo(
                     file = file,
                     category = categoryKorean,  //메타데이터의 실제 카테고리 사용
-                    timestamp = metadata.createdAt,
+                    timestamp = metadata.createdAt,  // 촬영 시간
+                    uploadedAt = metadata.uploadedAt,  // 업로드 시간
                     visibility = metadata.visibility
                 )
             } else {
@@ -644,14 +648,15 @@ class MyRecordsFragment : Fragment() {
                     Photo(
                         file = file,
                         category = categoryKorean,  //메타데이터의 실제 카테고리 사용
-                        timestamp = metadata.createdAt,
+                        timestamp = metadata.createdAt,  // 촬영 시간
+                        uploadedAt = metadata.uploadedAt,  // 업로드 시간
                         visibility = metadata.visibility
                     )
                 } else {
                     null
                 }
             }
-            .sortedByDescending { it.timestamp }  // 최신순 정렬
+            .sortedByDescending { it.uploadedAt }  // uploadedAt 기준 최신순 정렬
 
         // 전체 사진 개수 저장 (배너용)
         totalPhotoCount = nonLoginPhotoManager.getPhotoCount()

@@ -403,7 +403,8 @@ class PhotoSaveActivity : AppCompatActivity() {
             fileName = fileName,
             category = category,
             visibility = visibility,
-            createdAt = System.currentTimeMillis(),
+            createdAt = photoTakenAt,  // 촬영 시간
+            uploadedAt = System.currentTimeMillis(),  // 업로드 시간 (현재 시간)
             templateName = templateName,
             isServerUploaded = false
         )
@@ -460,7 +461,8 @@ class PhotoSaveActivity : AppCompatActivity() {
             fileName = fileName,
             category = category,
             visibility = visibility,
-            createdAt = System.currentTimeMillis(),
+            createdAt = photoTakenAt,  // 촬영 시간
+            uploadedAt = System.currentTimeMillis(),  // 업로드 시간 (현재 시간)
             templateName = templateName,
             isServerUploaded = false
         )
@@ -732,6 +734,19 @@ class PhotoSaveActivity : AppCompatActivity() {
                 result.onSuccess { response ->
                     Log.d(TAG, "서버 업로드 성공: imageId=${response.imageId}")
 
+                    // 메타데이터 업데이트 (isServerUploaded = true, imageId 저장)
+                    val currentMetadata = photoMetadataManager.getMetadataByFileName(fileName)
+                    if (currentMetadata != null) {
+                        val updatedMetadata = currentMetadata.copy(
+                            isServerUploaded = true,
+                            imageId = response.imageId  // imageId 저장
+                        )
+                        photoMetadataManager.saveMetadata(updatedMetadata)
+                    }
+
+                    // 임시 파일 삭제
+                    file.delete()
+
                     // 1. 앰플리튜드 이벤트 전송 (공통 저장 완료)
                     trackPhotoSaveComplete()
 
@@ -744,17 +759,6 @@ class PhotoSaveActivity : AppCompatActivity() {
                         ))
                     }
 
-                    // 메타데이터 업데이트
-                    photoMetadataManager.updateServerUploadStatus(fileName, true)
-
-                    // 임시 파일 삭제
-                    file.delete()
-
-                    // 전체 공개인 경우 자동으로 커뮤니티에 게시됨
-                    if (visibility == "PUBLIC") {
-                        Log.d(TAG, "전체 공개 - 커뮤니티에 자동 게시됨")
-                    }
-
                     showToast("저장이 완료되었어요.")
                     navigateToMain()
 
@@ -762,7 +766,7 @@ class PhotoSaveActivity : AppCompatActivity() {
                     Log.e(TAG, "서버 업로드 실패: ${error.message}", error)
                     // 서버 업로드 실패해도 갤러리는 저장됨
                     file.delete()
-                    showToast("갤러리 저장이 완료되었어요. (서버 업로드 실패)")
+                    showToast("서버 저장에 실패했어요. 다시 시도해 주세요.")  // 갤러리는 저장 완료
                     navigateToMain()
                 }
             }
@@ -770,7 +774,7 @@ class PhotoSaveActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 Log.e(TAG, "서버 업로드 오류", e)
                 file.delete()
-                showToast("갤러리 저장 완료이 완료되었어요. (서버 업로드 실패)")
+                showToast("서버 저장에 실패했어요. 다시 시도해 주세요.")  // 갤러리는 저장 완료
                 navigateToMain()
             }
         }

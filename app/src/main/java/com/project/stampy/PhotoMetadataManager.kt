@@ -28,7 +28,16 @@ class PhotoMetadataManager(context: Context) {
         val json = prefs.getString(KEY_METADATA_LIST, null) ?: return emptyList()
         val type = object : TypeToken<List<PhotoMetadata>>() {}.type
         return try {
-            gson.fromJson(json, type) ?: emptyList()
+            val metadataList: List<PhotoMetadata> = gson.fromJson(json, type) ?: emptyList()
+
+            // 구버전 데이터 마이그레이션: uploadedAt이 0이면 createdAt 값으로 설정
+            metadataList.map { metadata ->
+                if (metadata.uploadedAt == 0L) {
+                    metadata.copy(uploadedAt = metadata.createdAt)
+                } else {
+                    metadata
+                }
+            }
         } catch (e: Exception) {
             Log.e(TAG, "메타데이터 파싱 실패", e)
             emptyList()
@@ -48,7 +57,14 @@ class PhotoMetadataManager(context: Context) {
         currentList.add(metadata)
 
         saveAllMetadata(currentList)
-        Log.d(TAG, "메타데이터 저장: ${metadata.fileName}, 카테고리: ${metadata.category}")
+        Log.d(TAG, "메타데이터 저장: ${metadata.fileName}, 카테고리: ${metadata.category}, uploadedAt: ${metadata.uploadedAt}")
+    }
+
+    /**
+     * imageId로 메타데이터 조회
+     */
+    fun getMetadataByImageId(imageId: Long): PhotoMetadata? {
+        return getAllMetadata().find { it.imageId == imageId }
     }
 
     /**

@@ -7,9 +7,10 @@ import java.io.File
  */
 data class Photo(
     val file: File,
-    val timestamp: Long = file.lastModified(),
-    val category: String = "전체",    // 나중에 카테고리 기능 추가 시 사용
+    val category: String = "전체",
     val serverUrl: String? = null,   // 서버 URL (로그인 사용자)
     val imageId: Long? = null,       // 서버 이미지 ID
+    val timestamp: Long = 0L,  // 촬영 시간 (템플릿 표시용)
+    val uploadedAt: Long = System.currentTimeMillis(),  // 업로드 시간 (정렬용)
     val visibility: String? = null   // 공개 여부
 )
