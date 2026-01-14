@@ -345,7 +345,6 @@ class PhotoEditActivity : AppCompatActivity() {
                 showLogo = false
                 switchLogo.isChecked = false
                 templateView.setLogoVisibility(false)
-                showToast("워터마크 제거 권한을 획득했습니다.")
 
                 rewardedAd = null // 사용한 광고 객체 비우기
             }

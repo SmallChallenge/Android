@@ -789,11 +789,13 @@ class PhotoSaveActivity : AppCompatActivity() {
     }
 
     /**
-     * 메인 화면으로 이동
+     * 메인 화면으로 이동 (항상 내 기록 탭으로)
      */
     private fun navigateToMain() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        // 내 기록 탭으로 이동하도록 플래그 설정
+        intent.putExtra(MainActivity.EXTRA_NAVIGATE_TO_STORAGE, true)
         startActivity(intent)
         finish()
     }

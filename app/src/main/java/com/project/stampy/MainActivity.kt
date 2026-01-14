@@ -44,17 +44,20 @@ class MainActivity : AppCompatActivity() {
 
         // 커뮤니티 탭으로 이동할지 여부
         const val EXTRA_NAVIGATE_TO_COMMUNITY = "extra_navigate_to_community"
+
+        // 내 기록 탭으로 이동할지 여부
+        const val EXTRA_NAVIGATE_TO_STORAGE = "extra_navigate_to_storage"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // 스플래시 스크린 설치 (super.onCreate 전에 호출)
         val splashScreen = installSplashScreen()
 
-        // 스플래시 화면을 1초 동안 유지
+        // 스플래시 화면을 0.5초 동안 유지
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
 
         lifecycleScope.launch {
-            delay(500) // ( 100 = 0.1초, 1500 = 1.5초, 2000 = 2초)
+            delay(200) // ( 100 = 0.1초, 1500 = 1.5초, 2000 = 2초)
             keepSplashScreen = false
         }
 
@@ -238,10 +241,24 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         // 카메라에서 돌아왔을 때 프래그먼트 새로고침
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-        if (currentFragment is MyRecordsFragment) {
-            currentFragment.refreshPhotos()
-        } else if (currentFragment is CommunityFragment) {
-            currentFragment.refreshCommunity()
+
+        // PhotoSaveActivity에서 돌아온 경우 항상 MyRecordsFragment로 전환
+        val shouldNavigateToStorage = intent.getBooleanExtra(EXTRA_NAVIGATE_TO_STORAGE, false)
+
+        if (shouldNavigateToStorage) {
+            // 플래그 제거
+            intent.removeExtra(EXTRA_NAVIGATE_TO_STORAGE)
+
+            // 내 기록 탭으로 이동
+            loadFragment(MyRecordsFragment())
+            bottomNav.selectedItemId = R.id.navigation_storage
+        } else {
+            // 현재 프래그먼트 새로고침
+            if (currentFragment is MyRecordsFragment) {
+                currentFragment.refreshPhotos()
+            } else if (currentFragment is CommunityFragment) {
+                currentFragment.refreshCommunity()
+            }
         }
     }
 }
