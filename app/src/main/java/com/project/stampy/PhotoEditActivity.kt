@@ -292,14 +292,19 @@ class PhotoEditActivity : AppCompatActivity() {
     private fun loadTemplatesForCategory(category: TemplateCategory) {
         val templates = TemplateManager.getTemplatesByCategory(category)
 
-        templateAdapter.setSelectedPosition(0)
-        templateAdapter.submitList(templates) {
-            if (templates.isNotEmpty()) {
-                onTemplateSelected(templates[0])
-            }
-        }
-    }
+        // 현재 선택된 템플릿이 새 카테고리에 속하는지 확인
+        val selectedTemplateInCategory = templates.indexOfFirst { it.id == selectedTemplate?.id }
 
+        if (selectedTemplateInCategory >= 0) {
+            // 현재 선택된 템플릿이 새 카테고리에 있으면 선택 상태 유지
+            templateAdapter.setSelectedPosition(selectedTemplateInCategory)
+        } else {
+            // 현재 선택된 템플릿이 새 카테고리에 없으면 선택 해제 (-1)
+            templateAdapter.setSelectedPosition(-1)
+        }
+
+        templateAdapter.submitList(templates)
+    }
 
     /**
      * 템플릿 선택
