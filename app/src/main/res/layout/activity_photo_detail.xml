@@ -40,8 +40,10 @@
     <!-- 팝오버 메뉴 (초기에는 숨김) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/popover_menu"
-        android:layout_width="180dp"
-        android:layout_height="112dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="180dp"
+        android:minHeight="112dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_popover"
@@ -53,7 +55,7 @@
         <!-- 기록 수정 -->
         <LinearLayout
             android:id="@+id/menu_edit"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
@@ -70,15 +72,15 @@
             app:layout_constraintBottom_toTopOf="@id/divider">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="기록 수정"
                 android:textAppearance="@style/TextAppearance.App.Button.Large"
                 app:fontFamily="@font/pretendard_semibold"
                 android:textColor="@color/gray_300"
                 android:includeFontPadding="false"
-                android:textStyle="bold"/>
+                android:maxLines="1"
+                android:singleLine="true"/>
 
             <ImageView
                 android:layout_width="20dp"
@@ -103,7 +105,7 @@
         <!-- 기록 삭제 -->
         <LinearLayout
             android:id="@+id/menu_delete"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
@@ -120,15 +122,15 @@
             app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="기록 삭제"
                 android:textAppearance="@style/TextAppearance.App.Button.Large"
                 app:fontFamily="@font/pretendard_semibold"
                 android:textColor="@color/gray_300"
                 android:includeFontPadding="false"
-                android:textStyle="bold"/>
+                android:maxLines="1"
+                android:singleLine="true"/>
 
             <ImageView
                 android:layout_width="20dp"
