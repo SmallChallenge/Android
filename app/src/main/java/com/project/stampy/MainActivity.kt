@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         // 스플래시 스크린 설치 (super.onCreate 전에 호출)
         val splashScreen = installSplashScreen()
 
-        // 스플래시 화면을 0.5초 동안 유지
+        // 스플래시 화면을 0.2초 동안 유지
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
 
         lifecycleScope.launch {

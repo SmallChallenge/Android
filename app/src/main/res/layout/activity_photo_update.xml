@@ -50,6 +50,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="32dp"
         android:fillViewport="true"
+        android:scrollbars="vertical"
         app:layout_constraintTop_toBottomOf="@id/iv_photo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -286,12 +287,17 @@
             <LinearLayout
                 android:id="@+id/warning_container"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:layout_marginTop="8dp"
+                android:layout_height="wrap_content"
+                android:minHeight="46dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:orientation="horizontal"
                 android:gravity="center"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:paddingStart="29dp"
+                android:paddingEnd="29dp"
                 android:background="@drawable/bg_tag_pressed"
                 android:visibility="gone">
 
@@ -303,8 +309,9 @@
                     app:tint="@color/gray_500"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:text="게스트 게시물은 공개 범위를 수정할 수 없어요."
                     android:textSize="14sp"
