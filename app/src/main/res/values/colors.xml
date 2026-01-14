@@ -29,6 +29,9 @@
 
     <color name="navigationBar">#171717</color>
 
+    <!-- Error Colors -->
+    <color name="error_red">#FF2334</color>
+
     <!-- Semantic Colors -->
     <color name="background_primary">@color/gray_primary</color>
     <color name="surface_primary">@color/gray_800</color>

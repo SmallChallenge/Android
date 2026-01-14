@@ -136,7 +136,7 @@
             android:id="@+id/tv_error"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
-            android:textColor="#FF2334"
+            android:textColor="@color/error_red"
             android:textSize="12sp"
             android:fontFamily="@font/pretendard_regular"
             android:gravity="center"

@@ -175,8 +175,14 @@ class NicknameActivity : AppCompatActivity() {
 
         // 포커스 변경 감지
         etNickname.setOnFocusChangeListener { _, hasFocus ->
-            val hasInput = etNickname.text.toString().isNotEmpty()
-            updateColors(hasInput)
+            if (hasFocus) {
+                // 포커스 얻었을 때: 즉시 Active 색상으로 변경
+                updateColorsForFocus(true)
+            } else {
+                // 포커스 잃었을 때: 입력값 여부에 따라 색상 결정
+                val hasInput = etNickname.text.toString().isNotEmpty()
+                updateColors(hasInput)
+            }
         }
 
         btnComplete.setOnClickListener {
@@ -198,30 +204,38 @@ class NicknameActivity : AppCompatActivity() {
      * 닉네임 실시간 유효성 검사
      */
     private fun validateNickname(nickname: String) {
-        // 에러 메시지 초기화
+        // 에러 상태 초기화
+        val wasError = tvError.visibility == View.VISIBLE
         tvError.visibility = View.GONE
 
         when {
             // 빈 값
             nickname.isEmpty() -> {
                 btnComplete.isEnabled = false
-                updateColors(false)
+                // 포커스가 있으면 Active 색상 유지
+                if (etNickname.hasFocus()) {
+                    updateColorsForFocus(true)
+                } else {
+                    updateColors(false)
+                }
             }
             // 현재 닉네임과 동일 (수정 모드인 경우)
             isEditMode && nickname == currentNickname -> {
                 btnComplete.isEnabled = false
-                updateColors(false)
+                if (etNickname.hasFocus()) {
+                    updateColorsForFocus(true)
+                } else {
+                    updateColors(false)
+                }
             }
             // 2자 미만, 10자 초과
             nickname.length < 2 || nickname.length > 10 -> {
                 btnComplete.isEnabled = false
-                updateColors(false)
                 showError("닉네임은 2~10자로 입력해주세요.")
             }
             // 특수문자 또는 공백 포함 (한글, 영문, 숫자만 허용)
             !nickname.matches(Regex("^[가-힣a-zA-Z0-9]+$")) -> {
                 btnComplete.isEnabled = false
-                updateColors(false)
                 showError("닉네임은 공백 없이 한글, 영문, 숫자만 가능해요.")
             }
             // 유효한 닉네임
@@ -229,6 +243,11 @@ class NicknameActivity : AppCompatActivity() {
                 btnComplete.isEnabled = true
                 updateColors(true)
             }
+        }
+
+        // 에러가 사라진 경우 색상 복구
+        if (wasError && tvError.visibility == View.GONE && etNickname.hasFocus()) {
+            updateColorsForFocus(true)
         }
     }
 
@@ -238,34 +257,69 @@ class NicknameActivity : AppCompatActivity() {
     private fun showError(message: String) {
         tvError.text = message
         tvError.visibility = View.VISIBLE
+
+        // 에러 상태
+        viewUnderline.setBackgroundColor(
+            ContextCompat.getColor(this, R.color.error_red)
+        )
+
+        // 버튼은 비활성화 상태 유지
+        btnComplete.isEnabled = false
+        btnComplete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.button_inactive)
+        btnComplete.setTextColor(ContextCompat.getColor(this, R.color.button_text_inactive))
     }
 
     /**
-     * 밑줄과 버튼 색상 업데이트
+     * 포커스 상태에 따른 색상 업데이트 (에러 없을 때)
+     */
+    private fun updateColorsForFocus(hasFocus: Boolean) {
+        // 에러 메시지가 있으면 색상 변경 안 함
+        if (tvError.visibility == View.VISIBLE) {
+            return
+        }
+
+        if (hasFocus) {
+            // 포커스 있음: Active 색상 (네온)
+            viewUnderline.setBackgroundColor(
+                ContextCompat.getColor(this, R.color.neon_primary)
+            )
+
+            // 버튼도 Active 색상 (입력값과 무관)
+            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.neon_primary)
+            btnComplete.setTextColor(ContextCompat.getColor(this, R.color.button_text_active))
+        } else {
+            // 포커스 없음: 회색
+            viewUnderline.setBackgroundColor(
+                ContextCompat.getColor(this, R.color.gray_700)
+            )
+            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.button_inactive)
+            btnComplete.setTextColor(ContextCompat.getColor(this, R.color.button_text_inactive))
+        }
+    }
+
+    /**
+     * 밑줄과 버튼 색상 업데이트 (입력값 기준)
      */
     private fun updateColors(hasInput: Boolean) {
+        // 에러 메시지가 있으면 색상 변경 안 함
+        if (tvError.visibility == View.VISIBLE) {
+            return
+        }
+
         if (hasInput) {
             // 입력값 있으면 네온
             viewUnderline.setBackgroundColor(
                 ContextCompat.getColor(this, R.color.neon_primary)
             )
-            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this,
-                R.color.neon_primary
-            )
-            btnComplete.setTextColor(
-                ContextCompat.getColor(this, R.color.button_text_active)
-            )
+            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.neon_primary)
+            btnComplete.setTextColor(ContextCompat.getColor(this, R.color.button_text_active))
         } else {
             // 입력값 없으면 회색
             viewUnderline.setBackgroundColor(
                 ContextCompat.getColor(this, R.color.gray_700)
             )
-            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this,
-                R.color.button_inactive
-            )
-            btnComplete.setTextColor(
-                ContextCompat.getColor(this, R.color.button_text_inactive)
-            )
+            btnComplete.backgroundTintList = ContextCompat.getColorStateList(this, R.color.button_inactive)
+            btnComplete.setTextColor(ContextCompat.getColor(this, R.color.button_text_inactive))
         }
     }
 
