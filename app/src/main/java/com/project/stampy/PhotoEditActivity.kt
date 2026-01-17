@@ -4,6 +4,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -68,10 +70,15 @@ class PhotoEditActivity : AppCompatActivity() {
     private lateinit var amplitude: Amplitude
     private lateinit var tokenManager: TokenManager
 
+    // 실시간 시간 업데이트용
+    private val timeUpdateHandler = Handler(Looper.getMainLooper())
+    private var timeUpdateRunnable: Runnable? = null
+
     companion object {
         const val TAG = "PhotoEditActivity"
         const val EXTRA_PHOTO_URI = "extra_photo_uri"
         const val EXTRA_PHOTO_TAKEN_AT = "extra_photo_taken_at" // 갤러리 사진의 촬영 시간
+        private const val TIME_UPDATE_INTERVAL = 1000L // 1초마다 체크
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,6 +121,71 @@ class PhotoEditActivity : AppCompatActivity() {
                 amplitude.setUserId("user_$savedUserId")
             }
         }
+
+        // 실시간 시간 업데이트 시작
+        startTimeUpdate()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 화면 복귀 시 시간 업데이트 재시작
+        startTimeUpdate()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // 화면 벗어날 때 시간 업데이트 중지
+        stopTimeUpdate()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // 액티비티 종료 시 시간 업데이트 중지
+        stopTimeUpdate()
+    }
+
+    /**
+     * 실시간 시간 업데이트 시작
+     */
+    private fun startTimeUpdate() {
+        // 기존 Runnable이 있으면 제거
+        stopTimeUpdate()
+
+        var lastMinute = -1 // 마지막으로 업데이트한 분
+
+        timeUpdateRunnable = object : Runnable {
+            override fun run() {
+                val currentTime = System.currentTimeMillis()
+                val calendar = java.util.Calendar.getInstance().apply {
+                    timeInMillis = currentTime
+                }
+                val currentMinute = calendar.get(java.util.Calendar.MINUTE)
+
+                // 분이 바뀌었을 때만 템플릿 업데이트
+                if (currentMinute != lastMinute) {
+                    lastMinute = currentMinute
+                    photoTakenAt = currentTime
+                    templateView.setPhotoTakenAt(currentTime)
+                    Log.d(TAG, "시간 업데이트: ${calendar.get(java.util.Calendar.HOUR_OF_DAY)}:${currentMinute}")
+                }
+
+                // 1초 후 다시 실행
+                timeUpdateHandler.postDelayed(this, TIME_UPDATE_INTERVAL)
+            }
+        }
+
+        // 즉시 시작
+        timeUpdateRunnable?.let { timeUpdateHandler.post(it) }
+    }
+
+    /**
+     * 실시간 시간 업데이트 중지
+     */
+    private fun stopTimeUpdate() {
+        timeUpdateRunnable?.let {
+            timeUpdateHandler.removeCallbacks(it)
+        }
+        timeUpdateRunnable = null
     }
 
     // 애드몹 광고 불러오는 함수
@@ -235,7 +307,6 @@ class PhotoEditActivity : AppCompatActivity() {
             (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         }
     }
-
 
     /**
      * 사진 로드
