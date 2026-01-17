@@ -75,7 +75,7 @@ class CameraActivity : AppCompatActivity() {
     private val GALLERY_PERMISSION_CODE = 102
 
     private lateinit var amplitude: Amplitude
-    private lateinit var tokenManager: TokenManager
+    private lateinit var tokenManager: TokenManager // 로그인 상태 확인용
 
     companion object {
         private const val TAG = "CameraActivity"
@@ -218,7 +218,7 @@ class CameraActivity : AppCompatActivity() {
             // 사진 편집 화면으로 이동
             val intent = Intent(this, PhotoEditActivity::class.java)
             intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_URI, photo.uri)
-            intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_TAKEN_AT, photo.takenAt)
+            intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_TAKEN_AT, photo.takenAt)  // 갤러리 사진의 촬영 시간 전달
             startActivity(intent)
         }
     }
@@ -241,7 +241,7 @@ class CameraActivity : AppCompatActivity() {
         previewView.visibility = View.GONE
         captureArea.visibility = View.GONE
         rvGallery.visibility = View.VISIBLE
-        templateView.visibility = View.GONE
+        templateView.visibility = View.GONE  // 템플릿 숨기기
 
         // 버튼 상태 변경
         btnGallery.setTextColor(ContextCompat.getColor(this, R.color.gray_50))
@@ -305,8 +305,8 @@ class CameraActivity : AppCompatActivity() {
 
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DATE_TAKEN,
-            MediaStore.Images.Media.DATE_ADDED
+            MediaStore.Images.Media.DATE_TAKEN,  // 촬영 시간
+            MediaStore.Images.Media.DATE_ADDED    // 추가 시간
         )
 
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
@@ -329,9 +329,11 @@ class CameraActivity : AppCompatActivity() {
                     id.toString()
                 )
 
+                // 촬영 시간 가져오기 (DATE_TAKEN이 없으면 DATE_ADDED 사용)
                 val takenAt = if (dateTakenColumn >= 0 && !cursor.isNull(dateTakenColumn)) {
-                    cursor.getLong(dateTakenColumn)
+                    cursor.getLong(dateTakenColumn)  // 밀리초 단위
                 } else {
+                    // DATE_TAKEN이 없으면 DATE_ADDED를 밀리초로 변환
                     cursor.getLong(dateAddedColumn) * 1000
                 }
 
@@ -416,7 +418,7 @@ class CameraActivity : AppCompatActivity() {
                 ImageCapture.FLASH_MODE_OFF
             }
         }
-
+        // ImageCapture 플래시 모드 업데이트
         imageCapture?.flashMode = flashMode
     }
 
