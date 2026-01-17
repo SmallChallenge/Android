@@ -139,7 +139,7 @@
     <TextView
         android:id="@+id/tv_terms"
         android:layout_width="wrap_content"
-        android:layout_height="14dp"
+        android:layout_height="wrap_content"
         android:text="로그인하시면 이용약관에 동의하는 것으로 간주됩니다."
         android:textColor="@color/gray_600"
         android:textSize="12sp"
