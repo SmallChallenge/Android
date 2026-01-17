@@ -128,13 +128,23 @@ class CommunityFragment : Fragment() {
             }
         }
 
-        // 메뉴 클릭 리스너 (신고하기)
-        communityAdapter.setOnMenuClickListener { feed ->
+        // 신고 클릭 리스너
+        communityAdapter.setOnReportClickListener { feed ->
             // 비로그인 상태 체크
             if (!tokenManager.isLoggedIn()) {
                 showLoginRequiredDialog()
             } else {
                 showReportDialog(feed)
+            }
+        }
+
+        // 차단 클릭 리스너
+        communityAdapter.setOnBlockClickListener { feed ->
+            // 비로그인 상태 체크
+            if (!tokenManager.isLoggedIn()) {
+                showLoginRequiredDialog()
+            } else {
+                handleBlockClick(feed)
             }
         }
 
@@ -240,6 +250,63 @@ class CommunityFragment : Fragment() {
                         errorMsg.contains("DUPLICATE_REPORT") ||
                                 errorMsg.contains("이미") ->
                             "이미 신고한 게시물입니다"
+
+                        // 기타 에러
+                        else ->
+                            "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."
+                    }
+
+                    showToast(toastMessage)
+                }
+        }
+    }
+
+    /**
+     * 차단 클릭 처리
+     */
+    private fun handleBlockClick(feed: FeedItem) {
+        // 차단 확인 다이얼로그
+        DoubleButtonDialog(requireContext())
+            .setTitle("${feed.nickname}님을 차단하시겠습니까?")
+            .setDescription("차단하면 이 사용자의 게시물이 더이상 표시되지 않습니다.")
+            .setCancelButtonText("취소")
+            .setConfirmButtonText("차단")
+            .setOnConfirmListener {
+                performBlock(feed)
+            }
+            .show()
+    }
+
+    /**
+     * 실제 차단 수행
+     */
+    private fun performBlock(feed: FeedItem) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            communityRepository.blockUser(feed.nickname)
+                .onSuccess { response ->
+                    Log.d(TAG, "차단 성공: nickname=${feed.nickname}, blockedAt=${response.blockedAt}")
+                    showToast("게시자를 차단했습니다")
+
+                    // 차단된 사용자의 모든 게시물 제거
+                    communityAdapter.removeBlockedUserPosts(feed.nickname)
+                }
+                .onFailure { error ->
+                    Log.e(TAG, "차단 실패: ${error.message}", error)
+
+                    val errorMsg = error.message ?: ""
+
+                    // 에러 메시지 처리
+                    val toastMessage = when {
+                        // 본인 차단 시도
+                        errorMsg.contains("SELF_BLOCK_NOT_ALLOWED") ||
+                                errorMsg.contains("본인") ||
+                                errorMsg.contains("자신") ->
+                            "본인 게시물은 차단할 수 없어요."
+
+                        // 이미 차단한 사용자
+                        errorMsg.contains("DUPLICATE_BLOCK") ||
+                                errorMsg.contains("이미") ->
+                            "이미 차단한 사용자입니다"
 
                         // 기타 에러
                         else ->

@@ -39,4 +39,13 @@ interface CommunityApiService {
         @Header("Authorization") token: String,
         @Path("imageId") imageId: Long
     ): Response<ApiResponse<ReportResponse>>
+
+    /**
+     * 사용자 차단
+     */
+    @POST("/api/v1/community/{nickname}/block")
+    suspend fun blockUser(
+        @Header("Authorization") token: String,
+        @Path("nickname") nickname: String
+    ): Response<ApiResponse<BlockUserResponse>>
 }

@@ -91,4 +91,14 @@ class CommunityRepository(
             communityApi.reportPost(token, imageId)
         }
     }
+
+    /**
+     * 게시자 차단
+     */
+    suspend fun blockUser(nickname: String): Result<BlockUserResponse> {
+        val token = "Bearer ${tokenManager.getAccessToken()}"
+        return safeApiCall {
+            communityApi.blockUser(token, nickname)
+        }
+    }
 }

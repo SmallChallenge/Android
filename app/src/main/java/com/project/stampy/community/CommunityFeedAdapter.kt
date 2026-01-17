@@ -21,7 +21,8 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
 
     private val feeds = mutableListOf<FeedItem>()
     private var onLikeClickListener: ((FeedItem, Int) -> Unit)? = null
-    private var onMenuClickListener: ((FeedItem) -> Unit)? = null
+    private var onReportClickListener: ((FeedItem) -> Unit)? = null
+    private var onBlockClickListener: ((FeedItem) -> Unit)? = null
 
     // 현재 열려있는 팝오버의 ViewHolder 추적
     private var currentOpenPopoverHolder: FeedViewHolder? = null
@@ -71,6 +72,20 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
     }
 
     /**
+     * 차단된 사용자의 게시물 제거
+     */
+    fun removeBlockedUserPosts(nickname: String) {
+        val positionsToRemove = feeds.mapIndexedNotNull { index, feed ->
+            if (feed.nickname == nickname) index else null
+        }.reversed() // 역순으로 제거해야 인덱스 꼬이지 않음
+
+        positionsToRemove.forEach { position ->
+            feeds.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    /**
      * 좋아요 클릭 리스너 설정
      */
     fun setOnLikeClickListener(listener: (FeedItem, Int) -> Unit) {
@@ -78,10 +93,17 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
     }
 
     /**
-     * 메뉴 클릭 리스너 설정
+     * 신고 클릭 리스너 설정
      */
-    fun setOnMenuClickListener(listener: (FeedItem) -> Unit) {
-        onMenuClickListener = listener
+    fun setOnReportClickListener(listener: (FeedItem) -> Unit) {
+        onReportClickListener = listener
+    }
+
+    /**
+     * 차단 클릭 리스너 설정
+     */
+    fun setOnBlockClickListener(listener: (FeedItem) -> Unit) {
+        onBlockClickListener = listener
     }
 
     /**
@@ -98,6 +120,7 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
         private val btnMenu: FrameLayout = itemView.findViewById(R.id.btn_menu)
         private val popoverMenu: CardView = itemView.findViewById(R.id.popover_menu)
         private val menuReport: LinearLayout = itemView.findViewById(R.id.menu_report)
+        private val menuBlock: LinearLayout = itemView.findViewById(R.id.menu_block)
         private val ivFeedImage: ImageView = itemView.findViewById(R.id.iv_feed_image)
         private val btnLike: FrameLayout = itemView.findViewById(R.id.btn_like)
         private val ivLike: ImageView = itemView.findViewById(R.id.iv_like)
@@ -144,10 +167,16 @@ class CommunityFeedAdapter : RecyclerView.Adapter<CommunityFeedAdapter.FeedViewH
                 togglePopover()
             }
 
-            // 신고하기 클릭
+            // 게시물 신고 클릭
             menuReport.setOnClickListener {
                 hidePopover()
-                onMenuClickListener?.invoke(feed)
+                onReportClickListener?.invoke(feed)
+            }
+
+            // 게시자 차단 클릭
+            menuBlock.setOnClickListener {
+                hidePopover()
+                onBlockClickListener?.invoke(feed)
             }
 
             // 좋아요 버튼 클릭
