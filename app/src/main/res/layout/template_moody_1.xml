@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <!-- 날짜 표시 (중앙 상단, 상단 여백 24px) -->
     <!-- 형식: E, d MMM (예: WED, 22 SEPT) -->
@@ -18,6 +20,7 @@
         android:fontFamily="@font/movesans"
         app:fontFamily="@font/movesans"
         android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.0"
         android:letterSpacing="-0.02"
         android:textAllCaps="true"
         android:shadowColor="#73000000"
@@ -40,6 +43,7 @@
         android:fontFamily="@font/movesans"
         app:fontFamily="@font/movesans"
         android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.0"
         android:letterSpacing="-0.02"
         android:textAllCaps="true"
         android:shadowColor="#73000000"
@@ -52,6 +56,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Stampic 로고 이미지 (중앙 하단, 아래 여백 16px) -->
+    <!-- 로고 그림자는 코드에서 처리 -->
     <ImageView
         android:id="@+id/iv_stampic_logo"
         android:layout_width="wrap_content"

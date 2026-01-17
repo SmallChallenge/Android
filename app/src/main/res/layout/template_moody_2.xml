@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <!-- Stampic 로고 (중앙 상단, 여백 16px) -->
     <ImageView
@@ -38,6 +40,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
+        android:clipToPadding="false"
+        android:clipChildren="false"
         app:layout_constraintTop_toTopOf="@id/iv_circle_bg"
         app:layout_constraintBottom_toBottomOf="@id/iv_circle_bg"
         app:layout_constraintStart_toStartOf="@id/iv_circle_bg"
@@ -49,7 +53,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:clipToPadding="false"
+            android:clipChildren="false">
 
             <!-- 시간 첫째 자리 -->
             <TextView
@@ -60,9 +66,11 @@
                 android:gravity="center"
                 android:textColor="@color/white"
                 android:fontFamily="@font/suit_extralight"
+
                 app:fontFamily="@font/suit_extralight"
                 android:textSize="100sp"
                 android:includeFontPadding="false"
+                android:lineSpacingMultiplier="1.0"
                 android:letterSpacing="-0.02"
                 android:shadowColor="#4D000000"
                 android:shadowDx="0"
@@ -82,6 +90,7 @@
                 app:fontFamily="@font/suit_extralight"
                 android:textSize="100sp"
                 android:includeFontPadding="false"
+                android:lineSpacingMultiplier="1.0"
                 android:letterSpacing="-0.02"
                 android:shadowColor="#4D000000"
                 android:shadowDx="0"
@@ -102,7 +111,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:clipToPadding="false"
+            android:clipChildren="false">
 
             <!-- 시간 둘째 자리 -->
             <TextView
@@ -116,6 +127,7 @@
                 app:fontFamily="@font/suit_extralight"
                 android:textSize="100sp"
                 android:includeFontPadding="false"
+                android:lineSpacingMultiplier="1.0"
                 android:letterSpacing="-0.02"
                 android:shadowColor="#4D000000"
                 android:shadowDx="0"
@@ -135,6 +147,7 @@
                 app:fontFamily="@font/suit_extralight"
                 android:textSize="100sp"
                 android:includeFontPadding="false"
+                android:lineSpacingMultiplier="1.0"
                 android:letterSpacing="-0.02"
                 android:shadowColor="#4D000000"
                 android:shadowDx="0"
@@ -159,6 +172,10 @@
         android:textSize="20sp"
         android:includeFontPadding="false"
         android:letterSpacing="-0.02"
+        android:shadowColor="#73000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
         tools:text="2026.01.04"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

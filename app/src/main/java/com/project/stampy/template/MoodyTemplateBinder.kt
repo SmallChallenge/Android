@@ -1,6 +1,7 @@
 package com.project.stampy.template
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -30,36 +31,47 @@ class MoodyTemplateBinder(
     private fun bindMoody1(showLogo: Boolean, timestamp: Long) {
         val movesansFont = loadFont(R.font.movesans) // movesans 폰트 로드
 
-        // 날짜 설정 (E, d MMM)
+        // 날짜 설정 (E, d MMM), 행간 100%
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val currentDate = formatDate("E, d MMM", timestamp, Locale.US).uppercase(Locale.US)
         setupTextView(
             tvDate,
             currentDate,
             movesansFont,
-            DesignUtils.getScaledTextSize(context, 30f)
+            DesignUtils.getScaledTextSize(context, 30f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
         )
-        tvDate?.setLineSpacing(0f, 1.0f)
 
-        // 시간 설정 (a hh:mm, Locale: US)
+        // 시간 설정 (a hh:mm, Locale: US), 행간 100%
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val currentTime = formatDate("a hh:mm", timestamp, Locale.US).uppercase(Locale.US)
         setupTextView(
             tvTime,
             currentTime,
             movesansFont,
-            DesignUtils.getScaledTextSize(context, 16f)
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
         )
-        tvTime?.setLineSpacing(0f, 1.0f)
 
         // 로고
-        setLogoVisibility(R.id.iv_stampic_logo, showLogo)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // 로고 그림자 추가
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                elevation = DesignUtils.dpToPx(context, 4f)
+                outlineProvider = android.view.ViewOutlineProvider.BOUNDS
+            }
+        }
 
         // 여백 조정
         setMargin(tvDate, top = DesignUtils.dpToPxInt(context, 24f))    // 날짜: 상단에서 24px
         setMargin(tvTime, top = DesignUtils.dpToPxInt(context, 4f))     // 시간: 날짜 밑으로 4px
         setMargin(
-            root.findViewById(R.id.iv_stampic_logo),
+            ivLogo,
             bottom = DesignUtils.dpToPxInt(context, 16f)    // 로고: 하단 16px
         )
     }
@@ -84,39 +96,43 @@ class MoodyTemplateBinder(
         val shadowRadius = DesignUtils.dpToPx(context, 10f)
         val shadowColor = 0x4D000000.toInt() // 30%
 
-        // 시간 첫째 자리
+        // 시간 첫째 자리 (행간 100%)
         root.findViewById<TextView>(R.id.tv_hour_1)?.apply {
             text = hour[0].toString()
             suiteExtraLight?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledTimeSize)
+            setLineSpacing(0f, 1.0f)  // 행간 100%
             setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
         }
 
-        // 시간 둘째 자리
+        // 시간 둘째 자리 (행간 100%)
         root.findViewById<TextView>(R.id.tv_hour_2)?.apply {
             text = hour[1].toString()
             suiteExtraLight?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledTimeSize)
+            setLineSpacing(0f, 1.0f)  // 행간 100%
             setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
         }
 
-        // 분 첫째 자리
+        // 분 첫째 자리 (행간 100%)
         root.findViewById<TextView>(R.id.tv_minute_1)?.apply {
             text = minute[0].toString()
             suiteExtraLight?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledTimeSize)
+            setLineSpacing(0f, 1.0f)  // 행간 100%
             setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
         }
 
-        // 분 둘째 자리
+        // 분 둘째 자리 (행간 100%)
         root.findViewById<TextView>(R.id.tv_minute_2)?.apply {
             text = minute[1].toString()
             suiteExtraLight?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledTimeSize)
+            setLineSpacing(0f, 1.0f)  // 행간 100%
             setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
         }
 
-        // 날짜 (YYYY.MM.DD)
+        // 날짜 (YYYY.MM.DD) (행간 Auto - 설정 안 함)
         root.findViewById<TextView>(R.id.tv_date)?.apply {
             text = formatDate("yyyy.MM.dd", timestamp)
             suiteBold?.let { typeface = it }
@@ -157,7 +173,7 @@ class MoodyTemplateBinder(
         val suitHeavy = loadFont(R.font.suit_heavy)     // SUIT Heavy 폰트 로드
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 시간 설정 (am/pm HH:mm)
+        // 시간 설정 (am/pm HH:mm), 행간 Auto
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
@@ -170,10 +186,11 @@ class MoodyTemplateBinder(
             timeText,
             partialSansKrFont,
             DesignUtils.getScaledTextSize(context, 30f),
-            applyShadow = false
+            applyShadow = false,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
-        // 날짜 설정 (YYYY.MM.DD.요일)
+        // 날짜 설정 (YYYY.MM.DD.요일), 행간 Auto
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1
@@ -198,7 +215,8 @@ class MoodyTemplateBinder(
             dateText,
             suitHeavy,
             DesignUtils.getScaledTextSize(context, 14f),
-            applyShadow = false
+            applyShadow = false,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
         // 로고
