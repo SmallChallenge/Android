@@ -136,7 +136,8 @@
                         android:layout_height="48dp"
                         android:src="@drawable/ic_category_study"
                         android:scaleType="fitCenter"
-                        android:contentDescription="공부" />
+                        android:contentDescription="공부"
+                        android:alpha="0.4" />
 
                     <!-- 카테고리 이름 -->
                     <TextView
@@ -144,9 +145,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="공부"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
-                        app:fontFamily="@font/pretendard_semibold"
-                        android:textColor="@color/gray_300"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                        app:fontFamily="@font/pretendard_medium"
+                        android:textColor="@color/gray_500"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
 
@@ -167,17 +168,17 @@
                         android:layout_height="48dp"
                         android:src="@drawable/ic_category_exercise"
                         android:scaleType="fitCenter"
-                        android:contentDescription="운동" />
+                        android:contentDescription="운동"
+                        android:alpha="0.4" />
 
-                    <!-- 카테고리 이름 -->
                     <TextView
                         android:id="@+id/tv_category_exercise"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="운동"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
-                        app:fontFamily="@font/pretendard_semibold"
-                        android:textColor="@color/gray_300"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                        app:fontFamily="@font/pretendard_medium"
+                        android:textColor="@color/gray_500"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
 
@@ -198,17 +199,17 @@
                         android:layout_height="48dp"
                         android:src="@drawable/ic_category_food"
                         android:scaleType="fitCenter"
-                        android:contentDescription="음식" />
+                        android:contentDescription="음식"
+                        android:alpha="0.4" />
 
-                    <!-- 카테고리 이름 -->
                     <TextView
                         android:id="@+id/tv_category_food"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="음식"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
-                        app:fontFamily="@font/pretendard_semibold"
-                        android:textColor="@color/gray_300"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                        app:fontFamily="@font/pretendard_medium"
+                        android:textColor="@color/gray_500"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
 
@@ -229,17 +230,17 @@
                         android:layout_height="48dp"
                         android:src="@drawable/ic_category_etc"
                         android:scaleType="fitCenter"
-                        android:contentDescription="기타" />
+                        android:contentDescription="기타"
+                        android:alpha="0.4" />
 
-                    <!-- 카테고리 이름 -->
                     <TextView
                         android:id="@+id/tv_category_etc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="기타"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
-                        app:fontFamily="@font/pretendard_semibold"
-                        android:textColor="@color/gray_300"
+                        android:textAppearance="@style/TextAppearance.App.Button2.Medium"
+                        app:fontFamily="@font/pretendard_medium"
+                        android:textColor="@color/gray_500"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
 

@@ -11,7 +11,7 @@ import com.project.stampy.R
  *
  * 상태:
  * - Active (selected=true): Gray 50, Btn2_B, 배경 Gray 700
- * - Inactive (selected=false): Gray 300, Btn2, 배경 Gray 800 + 선 Gray 700
+ * - Inactive (selected=false): Gray 500, Btn2, 배경 Gray 800 + 선 Gray 700
  * - Pressed: Gray 300, Btn2_B, 배경 Gray 800
  *
  * 사용법:
@@ -39,12 +39,6 @@ class TagView @JvmOverloads constructor(
         // 배경 selector
         setBackgroundResource(R.drawable.bg_tag_selector)
 
-        // 텍스트 색상 selector
-        setTextColor(ContextCompat.getColorStateList(context, R.color.tag_text_color_selector))
-
-        // 기본 텍스트 스타일 (Inactive)
-        setTextAppearance(R.style.TextAppearance_App_Button2_Medium)
-
         // 중앙 정렬
         gravity = android.view.Gravity.CENTER
 
@@ -56,7 +50,14 @@ class TagView @JvmOverloads constructor(
         minWidth = 0
         minHeight = 0
 
-        // 상태 변경 리스너 (Active/Inactive에 따라 폰트 변경)
+        // 초기 상태는 비선택 (Inactive)
+        isSelected = false
+
+        // 텍스트 색상 selector 설정 (반드시 setTextAppearance 이후에)
+        updateTextAppearance()
+        setTextColor(ContextCompat.getColorStateList(context, R.color.tag_text_color_selector))
+
+        // 상태 변경 리스너
         setOnClickListener {
             isSelected = !isSelected
             updateTextAppearance()
@@ -66,6 +67,8 @@ class TagView @JvmOverloads constructor(
     override fun setSelected(selected: Boolean) {
         super.setSelected(selected)
         updateTextAppearance()
+        // selector가 제대로 적용되도록 다시 설정
+        setTextColor(ContextCompat.getColorStateList(context, R.color.tag_text_color_selector))
     }
 
     /**

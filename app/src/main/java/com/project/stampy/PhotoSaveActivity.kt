@@ -264,19 +264,33 @@ class PhotoSaveActivity : AppCompatActivity() {
             val (container, textViewId) = views
             val textView = findViewById<TextView>(textViewId)
 
+            // 각 카테고리의 ImageView ID 매핑
+            val imageViewId = when (name) {
+                "공부" -> R.id.iv_category_study
+                "운동" -> R.id.iv_category_exercise
+                "음식" -> R.id.iv_category_food
+                "기타" -> R.id.iv_category_etc
+                else -> null
+            }
+            val imageView = imageViewId?.let { findViewById<ImageView>(it) }
+
             if (name == category) {
-                // 선택된 카테고리: opacity 100%, gray_50, Bold
-                container.alpha = 1.0f
+                // 선택된 카테고리
+                // - 아이콘: opacity 100%
+                // - 텍스트: Gray 50, SemiBold (Button2.Large)
+                imageView?.alpha = 1.0f
                 textView?.apply {
+                    setTextAppearance(R.style.TextAppearance_App_Button2_Large)
                     setTextColor(ContextCompat.getColor(this@PhotoSaveActivity, R.color.gray_50))
-                    setTypeface(resources.getFont(R.font.pretendard_semibold))
                 }
             } else {
-                // 미선택 카테고리: opacity 40%, gray_500, Medium
-                container.alpha = 0.4f
+                // 미선택 카테고리
+                // - 아이콘: opacity 40%
+                // - 텍스트: Gray 500, Medium (Button2.Medium)
+                imageView?.alpha = 0.4f
                 textView?.apply {
+                    setTextAppearance(R.style.TextAppearance_App_Button2_Medium)
                     setTextColor(ContextCompat.getColor(this@PhotoSaveActivity, R.color.gray_500))
-                    setTypeface(resources.getFont(R.font.pretendard_medium))
                 }
             }
         }

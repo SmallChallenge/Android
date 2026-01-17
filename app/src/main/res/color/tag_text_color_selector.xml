@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Pressed 상태 (가장 먼저 체크) -->
+    <item android:state_pressed="true" android:color="@color/gray_300" />
+
     <!-- Active 상태 (selected) -->
     <item android:state_selected="true" android:color="@color/gray_50" />
 
-    <!-- Pressed 상태 -->
-    <item android:state_pressed="true" android:color="@color/gray_300" />
-
-    <!-- Inactive 상태 (기본) -->
-    <item android:color="@color/gray_300" />
+    <!-- Inactive 상태 (기본, 가장 마지막) -->
+    <item android:color="@color/gray_500" />
 </selector>
