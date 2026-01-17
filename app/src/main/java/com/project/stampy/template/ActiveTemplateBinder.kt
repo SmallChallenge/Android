@@ -3,6 +3,7 @@ package com.project.stampy.template
 import android.content.Context
 import android.os.Build
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import com.project.stampy.R
 import java.util.*
@@ -29,32 +30,50 @@ class ActiveTemplateBinder(
     private fun bindActive1(showLogo: Boolean, timestamp: Long) {
         val gihugwigiFont = loadFont(R.font.gihugwigi1990)  // 기후위기 폰트 로드
 
-        // 시간 설정 (HH:mm)
+        // 시간 설정 (HH:mm), 행간 Auto
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val currentTime = formatDate("HH:mm", timestamp)
         setupTextView(
             tvTime,
             currentTime,
             gihugwigiFont,
-            DesignUtils.getScaledTextSize(context, 50f)
+            DesignUtils.getScaledTextSize(context, 50f),
+            applyShadow = true,
+            lineSpacingMultiplier = null
         )
 
-        // 날짜 설정 (E, d MMM)
+        // 날짜 설정 (E, d MMM), 행간 Auto
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
-        val currentDate = formatDate("E, d MMM", timestamp, Locale.US).uppercase(Locale.US)
+        val rawDate = formatDate("E, d MMM", timestamp, Locale.US)
+        // 첫 글자만 대문자로 변환 (예: Wed, 8 Nov)
+        val formattedDate = rawDate.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
+        }
+
         setupTextView(
             tvDate,
-            currentDate,
+            formattedDate,
             gihugwigiFont,
-            DesignUtils.getScaledTextSize(context, 16f)
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true,
+            lineSpacingMultiplier = null
         )
 
         // 로고
-        setLogoVisibility(R.id.iv_stampic_logo, showLogo)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // 로고 그림자 추가
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                elevation = DesignUtils.dpToPx(context, 4f)
+                outlineProvider = android.view.ViewOutlineProvider.BOUNDS
+            }
+        }
 
         // 여백 조정
         setMargin(
-            root.findViewById(R.id.iv_stampic_logo),
+            ivLogo,
             bottom = DesignUtils.dpToPxInt(context, 16f) // 로고: 아래 16px
         )
     }
@@ -66,7 +85,7 @@ class ActiveTemplateBinder(
         val partialSansKrFont = loadFont(R.font.partial_sans_kr)    // Partial Sans KR 폰트 로드
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 시간 설정 (HH:mm AM/PM)
+        // 시간 설정 (HH:mm AM/PM), 행간 Auto
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
@@ -78,10 +97,12 @@ class ActiveTemplateBinder(
             tvTime,
             timeText,
             partialSansKrFont,
-            DesignUtils.getScaledTextSize(context, 28f)
+            DesignUtils.getScaledTextSize(context, 28f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
-        // 날짜 설정 (December DDth YYYY)
+        // 날짜 설정 (December DDth YYYY), 행간 Auto
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
@@ -93,7 +114,9 @@ class ActiveTemplateBinder(
             tvDate,
             dateText,
             partialSansKrFont,
-            DesignUtils.getScaledTextSize(context, 18f)
+            DesignUtils.getScaledTextSize(context, 18f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
         // 로고
@@ -118,7 +141,7 @@ class ActiveTemplateBinder(
         val ericaOne = loadFont(R.font.erica_one)   // Erica One 폰트 로드
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 날짜 설정 (E, d MMM)
+        // 날짜 설정 (E, d MMM), 행간 100%
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val dayOfWeek = getDayOfWeekEnglish(calendar) // 요일 (영문 약어)
         val day = calendar.get(Calendar.DAY_OF_MONTH) // 일 (숫자)
@@ -144,41 +167,39 @@ class ActiveTemplateBinder(
             tvDate,
             dateText,
             pretendardMedium,
-            DesignUtils.getScaledTextSize(context, 14f)
+            DesignUtils.getScaledTextSize(context, 14f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
         )
 
-        // 시간 설정 (HH\nmm)
+        // 시간 설정 (HH\nmm), 행간 100%
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
         val timeText = String.format("%02d\n%02d", hour, minute)
 
-        setupTextView(
-            tvTime,
-            timeText,
-            ericaOne,
-            DesignUtils.getScaledTextSize(context, 70f)
-        )
-        tvTime?.setLineSpacing(0f, 0.7f) // 행간 좁게 (0.7 배수)
+        tvTime?.apply {
+            text = timeText
+            ericaOne?.let { typeface = it }
+            setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 70f))
+            setLineSpacing(0f, 0.7f) // 행간 100%로 변경해야함.. 임시방편으로 행간 좁게(0.7 배수) 설정해둠
+            applyTextShadow(this)
+        }
 
-        // TODAY DONE 텍스트
+        // TODAY DONE 텍스트 (행간 100%)
         val tvText = root.findViewById<TextView>(R.id.tv_text)
         setupTextView(
             tvText,
             "TODAY DONE",
             pretendardMedium,
-            DesignUtils.getScaledTextSize(context, 14f)
+            DesignUtils.getScaledTextSize(context, 14f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
         )
 
-        // 로고 (그림자 포함)
+        // 로고
         root.findViewById<android.widget.ImageView>(R.id.iv_stampic_logo)?.apply {
             visibility = if (showLogo) View.VISIBLE else View.GONE
-
-            // ImageView에 그림자 효과 (elevation 사용)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                elevation = DesignUtils.dpToPx(context, 4f)
-                outlineProvider = android.view.ViewOutlineProvider.BOUNDS
-            }
         }
     }
 }

@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <!-- Stampic 로고 이미지 (상단 중앙, 위 여백 16px) -->
     <ImageView
@@ -30,7 +32,6 @@
         app:fontFamily="@font/partial_sans_kr"
         android:textSize="28sp"
         android:letterSpacing="0"
-        android:includeFontPadding="false"
         android:shadowColor="#73000000"
         android:shadowDx="0"
         android:shadowDy="0"
@@ -52,7 +53,6 @@
         app:fontFamily="@font/partial_sans_kr"
         android:textSize="18sp"
         android:letterSpacing="0"
-        android:includeFontPadding="false"
         android:gravity="center"
         android:shadowColor="#73000000"
         android:shadowDx="0"

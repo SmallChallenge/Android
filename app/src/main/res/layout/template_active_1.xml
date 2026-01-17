@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <!-- 시간 표시 (중앙) -->
     <!-- 형식: HH:mm (예: 12:53) -->
@@ -16,7 +18,6 @@
         android:textColor="@color/white"
         android:fontFamily="@font/gihugwigi1990"
         app:fontFamily="@font/gihugwigi1990"
-        android:includeFontPadding="false"
         android:shadowColor="#73000000"
         android:shadowDx="0"
         android:shadowDy="0"
@@ -37,18 +38,17 @@
         android:textColor="@color/white"
         android:fontFamily="@font/gihugwigi1990"
         app:fontFamily="@font/gihugwigi1990"
-        android:includeFontPadding="false"
-        android:textAllCaps="true"
         android:shadowColor="#73000000"
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="5"
-        tools:text="MON, 8 NOV"
+        tools:text="Mon, 8 Nov"
         app:layout_constraintTop_toBottomOf="@id/tv_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Stampic 로고 이미지 (중앙 하단, 아래 여백 16px) -->
+    <!-- 로고 그림자는 코드에서 처리 -->
     <ImageView
         android:id="@+id/iv_stampic_logo"
         android:layout_width="wrap_content"

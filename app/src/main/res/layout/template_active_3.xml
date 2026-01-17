@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <!-- 날짜 (좌측 중앙) -->
     <!-- 형식: E, d MMM (예: Wed, 28 Sept) -->
@@ -21,6 +23,7 @@
         android:textSize="14sp"
         android:letterSpacing="0"
         android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.0"
         android:shadowColor="#000000"
         android:shadowDx="0"
         android:shadowDy="0"
@@ -39,7 +42,6 @@
         app:fontFamily="@font/erica_one"
         android:textSize="70sp"
         android:lineSpacingMultiplier="0.7"
-        android:letterSpacing="-0.04"
         android:includeFontPadding="false"
         android:gravity="center"
         android:shadowColor="#000000"
@@ -62,12 +64,14 @@
         android:textSize="14sp"
         android:letterSpacing="0"
         android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.0"
         android:shadowColor="#000000"
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="5" />
 
-    <!-- Stampic 로고 (하단 중앙, 그림자 있음) -->
+    <!-- Stampic 로고 (하단 중앙) -->
+    <!-- 로고 그림자는 코드에서 처리 -->
     <ImageView
         android:id="@+id/iv_stampic_logo"
         android:layout_width="wrap_content"
@@ -75,8 +79,6 @@
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="16dp"
         android:src="@drawable/stampic_tem"
-        android:contentDescription="Stampic Logo"
-        android:outlineProvider="bounds"
-        android:elevation="4dp" />
+        android:contentDescription="Stampic Logo" />
 
 </FrameLayout>
