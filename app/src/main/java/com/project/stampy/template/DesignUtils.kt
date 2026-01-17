@@ -33,15 +33,19 @@ object DesignUtils {
     /**
      * 디자인 가이드의 텍스트 크기(px)를 기기에 맞는 sp로 변환
      * 디자인의 "px"는 실제로 dp를 의미하므로 375dp 기준으로 가변 계산
+     * 소수점 둘째 자리까지 정밀도 유지
      * @param context Context
      * @param designTextSize 디자인 가이드의 텍스트 크기 (예: 55)
-     * @return 기기에 맞게 조정된 sp 값
+     * @return 기기에 맞게 조정된 sp 값 (소수점 둘째 자리까지)
      */
     fun getScaledTextSize(context: Context, designTextSize: Float): Float {
         // 화면 너비를 dp로 변환
         val screenWidthDp = context.resources.displayMetrics.widthPixels /
                 context.resources.displayMetrics.density
         // (기기dp너비 / 375) * 디자인텍스트크기
-        return (screenWidthDp / DESIGN_WIDTH) * designTextSize
+        val scaled = (screenWidthDp / DESIGN_WIDTH) * designTextSize
+
+        // 소수점 둘째 자리까지 유지 (반올림)
+        return (scaled * 100).toInt() / 100f
     }
 }

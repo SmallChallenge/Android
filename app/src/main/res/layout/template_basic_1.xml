@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Basic 1 템플릿 - 디자인 가이드 정확히 준수 -->
+<!-- Basic 1 템플릿 -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipChildren="false">
 
     <!-- 시간 표시 (중앙 상단, 상단 여백 24px) -->
     <TextView
@@ -15,6 +16,7 @@
         android:textColor="@color/white"
         android:fontFamily="@font/pretendard_medium"
         android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.0"
         android:letterSpacing="-0.02"
         android:shadowColor="#73000000"
         android:shadowDx="0"
@@ -33,6 +35,7 @@
         android:textColor="@color/white"
         android:fontFamily="@font/pretendard_medium"
         android:includeFontPadding="false"
+        android:lineSpacingMultiplier="1.0"
         android:letterSpacing="-0.02"
         android:shadowColor="#73000000"
         android:shadowDx="0"

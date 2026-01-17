@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <!-- Stampic 아이콘 (우측 상단, 여백 16px) -->
     <ImageView
@@ -28,6 +30,8 @@
         android:layout_marginBottom="24dp"
         android:orientation="vertical"
         android:gravity="start"
+        android:clipToPadding="false"
+        android:clipChildren="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 

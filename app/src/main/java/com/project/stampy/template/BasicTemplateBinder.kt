@@ -31,19 +31,20 @@ class BasicTemplateBinder(
         // Pretendard Medium 폰트 로드
         val pretendardMedium = loadFont(R.font.pretendard_medium)
 
-        // 시간 설정
+        // 시간 설정 (행간 100%)
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val currentTime = formatDate("HH:mm", timestamp)
         setupTextView(
             tvTime,
             currentTime,
             pretendardMedium,
-            DesignUtils.getScaledTextSize(context, 55f)
+            DesignUtils.getScaledTextSize(context, 55f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f  // 행간 100%
         )
-        tvTime?.setLineSpacing(0f, 1.0f) // 행간 100%
         // 자간 -2%는 이미 XML에 letterSpacing="-0.02"로 설정됨
 
-        // 날짜 + Stampic 설정
+        // 날짜 + Stampic 설정 (행간 100%)
         val tvDateStampic = root.findViewById<TextView>(R.id.tv_date_stampic)
         val currentDate = formatDate("yyyy.MM.dd", timestamp)
         setupTextView(
@@ -51,9 +52,10 @@ class BasicTemplateBinder(
             "$currentDate • Stampic",
             pretendardMedium,
             // 디자인 가이드 15 (375 기준) → 기기에 맞춰 가변
-            DesignUtils.getScaledTextSize(context, 15f)
+            DesignUtils.getScaledTextSize(context, 15f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f  // 행간 100%
         )
-        tvDateStampic?.setLineSpacing(0f, 1.0f) // 행간 100%
         // 자간 -2%는 이미 XML에 letterSpacing="-0.02"로 설정됨
 
         // 로고 표시/숨김 및 크기 조정
@@ -62,9 +64,9 @@ class BasicTemplateBinder(
             visibility = if (showLogo) View.VISIBLE else View.GONE
 
             // 로고 크기를 기기에 맞춰 조정 (디자인 가이드에 따라 적절한 크기 설정)
-            // 예: 48px 기준으로 가변
+            // 38px 기준으로 가변
             layoutParams = layoutParams?.apply {
-                val logoSize = DesignUtils.dpToPxInt(context, 48f)
+                val logoSize = DesignUtils.dpToPxInt(context, 38f)
                 width = logoSize
                 height = logoSize
             }
@@ -87,7 +89,7 @@ class BasicTemplateBinder(
         val suitHeavy = loadFont(R.font.suit_heavy) // SUIT Heavy 폰트 로드
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 날짜 설정 (YYYY년 MM월 DD일 (요일))
+        // 날짜 설정 (YYYY년 MM월 DD일 (요일)), 행간 Auto
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1
@@ -99,10 +101,12 @@ class BasicTemplateBinder(
             tvDate,
             dateText,
             suitHeavy,
-            DesignUtils.getScaledTextSize(context, 24f)
+            DesignUtils.getScaledTextSize(context, 24f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
-        // 시간 설정 (오전/오후 HH:mm)
+        // 시간 설정 (오전/오후 HH:mm),행간 Auto
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
@@ -114,7 +118,9 @@ class BasicTemplateBinder(
             tvTime,
             timeText,
             suitHeavy,
-            DesignUtils.getScaledTextSize(context, 24f)
+            DesignUtils.getScaledTextSize(context, 24f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
         // 아이콘
@@ -152,7 +158,7 @@ class BasicTemplateBinder(
         val suitHeavy = loadFont(R.font.suit_heavy) // SUIT Heavy 폰트 로드
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 시간 설정 (오전/오후 HH:mm)
+        // 시간 설정 (오전/오후 HH:mm), 행간 Auto
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
@@ -164,10 +170,12 @@ class BasicTemplateBinder(
             tvTime,
             timeText,
             suitHeavy,
-            DesignUtils.getScaledTextSize(context, 40f)
+            DesignUtils.getScaledTextSize(context, 40f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
-        // 날짜 설정 (YYYY년 MM월 DD일 (요일))
+        // 날짜 설정 (YYYY년 MM월 DD일 (요일)), 행간 Auto
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1
@@ -179,7 +187,9 @@ class BasicTemplateBinder(
             tvDate,
             dateText,
             suitHeavy,
-            DesignUtils.getScaledTextSize(context, 20f)
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
         // 로고

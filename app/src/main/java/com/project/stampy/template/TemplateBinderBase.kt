@@ -6,7 +6,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
-import com.project.stampy.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -74,19 +73,26 @@ abstract class TemplateBinderBase(
     }
 
     /**
-     * TextView 설정 (폰트, 크기, 그림자)
+     * TextView 설정 (폰트, 크기, 그림자, 행간)
      */
     protected fun setupTextView(
         textView: TextView?,
         text: String,
         font: android.graphics.Typeface?,
         textSize: Float,
-        applyShadow: Boolean = true
+        applyShadow: Boolean = true,
+        lineSpacingMultiplier: Float? = null  // null이면 행간 설정 안 함 (행간 Auto)
     ) {
         textView?.apply {
             this.text = text
             font?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, textSize)
+
+            // 행간이 지정된 경우에만 적용
+            lineSpacingMultiplier?.let {
+                setLineSpacing(0f, it)
+            }
+
             if (applyShadow) {
                 applyTextShadow(this)
             }
