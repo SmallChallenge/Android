@@ -75,7 +75,7 @@ class CameraActivity : AppCompatActivity() {
     private val GALLERY_PERMISSION_CODE = 102
 
     private lateinit var amplitude: Amplitude
-    private lateinit var tokenManager: TokenManager // 로그인 상태 확인용
+    private lateinit var tokenManager: TokenManager
 
     companion object {
         private const val TAG = "CameraActivity"
@@ -131,6 +131,15 @@ class CameraActivity : AppCompatActivity() {
             "platform" to "android",
             "app_version" to "1.0.0"
         ))
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // 카메라 모드일 때만 템플릿 시간 업데이트
+        if (isCameraMode) {
+            updateTemplateTime()
+        }
     }
 
     private fun initViews() {
@@ -209,7 +218,7 @@ class CameraActivity : AppCompatActivity() {
             // 사진 편집 화면으로 이동
             val intent = Intent(this, PhotoEditActivity::class.java)
             intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_URI, photo.uri)
-            intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_TAKEN_AT, photo.takenAt)  // 갤러리 사진의 촬영 시간 전달
+            intent.putExtra(PhotoEditActivity.EXTRA_PHOTO_TAKEN_AT, photo.takenAt)
             startActivity(intent)
         }
     }
@@ -232,7 +241,7 @@ class CameraActivity : AppCompatActivity() {
         previewView.visibility = View.GONE
         captureArea.visibility = View.GONE
         rvGallery.visibility = View.VISIBLE
-        templateView.visibility = View.GONE  // 템플릿 숨기기
+        templateView.visibility = View.GONE
 
         // 버튼 상태 변경
         btnGallery.setTextColor(ContextCompat.getColor(this, R.color.gray_50))
@@ -258,6 +267,15 @@ class CameraActivity : AppCompatActivity() {
     }
 
     /**
+     * 템플릿 시간 업데이트 (현재 시간으로)
+     */
+    private fun updateTemplateTime() {
+        // 현재 시간으로 업데이트
+        templateView.setPhotoTakenAt(System.currentTimeMillis())
+        Log.d(TAG, "템플릿 시간 업데이트: ${System.currentTimeMillis()}")
+    }
+
+    /**
      * 카메라 모드로 전환
      */
     private fun switchToCameraMode() {
@@ -274,6 +292,9 @@ class CameraActivity : AppCompatActivity() {
         // 버튼 상태 변경
         btnCamera.setTextColor(ContextCompat.getColor(this, R.color.gray_50))
         btnGallery.setTextColor(ContextCompat.getColor(this, R.color.gray_500))
+
+        // 템플릿 시간 업데이트
+        updateTemplateTime()
     }
 
     /**
@@ -284,8 +305,8 @@ class CameraActivity : AppCompatActivity() {
 
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DATE_TAKEN,  // 촬영 시간
-            MediaStore.Images.Media.DATE_ADDED    // 추가 시간
+            MediaStore.Images.Media.DATE_TAKEN,
+            MediaStore.Images.Media.DATE_ADDED
         )
 
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
@@ -308,11 +329,9 @@ class CameraActivity : AppCompatActivity() {
                     id.toString()
                 )
 
-                // 촬영 시간 가져오기 (DATE_TAKEN이 없으면 DATE_ADDED 사용)
                 val takenAt = if (dateTakenColumn >= 0 && !cursor.isNull(dateTakenColumn)) {
-                    cursor.getLong(dateTakenColumn)  // 밀리초 단위
+                    cursor.getLong(dateTakenColumn)
                 } else {
-                    // DATE_TAKEN이 없으면 DATE_ADDED를 밀리초로 변환
                     cursor.getLong(dateAddedColumn) * 1000
                 }
 
@@ -398,7 +417,6 @@ class CameraActivity : AppCompatActivity() {
             }
         }
 
-        // ImageCapture 플래시 모드 업데이트
         imageCapture?.flashMode = flashMode
     }
 
