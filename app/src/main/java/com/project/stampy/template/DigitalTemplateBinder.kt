@@ -28,8 +28,8 @@ class DigitalTemplateBinder(
      * Digital 1 템플릿 데이터 바인딩
      */
     private fun bindDigital1(showLogo: Boolean, timestamp: Long) {
-        val suitExtraBold = loadFont(R.font.suit_extrabold)
-        val suitBold = loadFont(R.font.suit_bold)
+        val suitExtraBold = loadFont(R.font.suit_extrabold) //suit ExtraBold 폰트 로드
+        val suitHeavy = loadFont(R.font.suit_heavy) // suit Heavy 폰트 로드
 
         val currentTime = formatDate("HH:mm", timestamp)
         val timeParts = currentTime.split(":")
@@ -46,49 +46,60 @@ class DigitalTemplateBinder(
         val dropShadowDy = DesignUtils.dpToPx(context, 3f)
         val dropShadowColor = 0x66000000.toInt() // 40%
 
-        // 시간 첫째 자리
+        // 시간 첫째 자리 (행간 100%)
         root.findViewById<TextView>(R.id.tv_hour_1)?.apply {
             text = hour[0].toString()
             suitExtraBold?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledTextSize)
+            setLineSpacing(0f, 1.0f)
             setShadowLayer(dropShadowRadius, dropShadowDx, dropShadowDy, dropShadowColor)
         }
 
-        // 시간 둘째 자리
+        // 시간 둘째 자리 (행간 100%)
         root.findViewById<TextView>(R.id.tv_hour_2)?.apply {
             text = hour[1].toString()
             suitExtraBold?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledTextSize)
+            setLineSpacing(0f, 1.0f)
             setShadowLayer(dropShadowRadius, dropShadowDx, dropShadowDy, dropShadowColor)
         }
 
-        // 콜론
+        // 콜론 (행간 100%)
         root.findViewById<TextView>(R.id.tv_colon)?.apply {
             suitExtraBold?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledTextSize)
+            setLineSpacing(0f, 1.0f)
         }
 
-        // 분 첫째 자리
+        // 분 첫째 자리 (행간 100%)
         root.findViewById<TextView>(R.id.tv_minute_1)?.apply {
             text = minute[0].toString()
             suitExtraBold?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledTextSize)
+            setLineSpacing(0f, 1.0f)
             setShadowLayer(dropShadowRadius, dropShadowDx, dropShadowDy, dropShadowColor)
         }
 
-        // 분 둘째 자리
+        // 분 둘째 자리 (행간 100%)
         root.findViewById<TextView>(R.id.tv_minute_2)?.apply {
             text = minute[1].toString()
             suitExtraBold?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledTextSize)
+            setLineSpacing(0f, 1.0f)
             setShadowLayer(dropShadowRadius, dropShadowDx, dropShadowDy, dropShadowColor)
         }
 
         // 날짜
         root.findViewById<TextView>(R.id.tv_date)?.apply {
             text = formatDate("yyyy.MM.dd", timestamp)
-            suitBold?.let { typeface = it }
+            suitHeavy?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledDateSize)
+            setShadowLayer(
+                DesignUtils.dpToPx(context, 5f),
+                0f,
+                0f,
+                0x73000000.toInt()
+            )
         }
 
         // 로고
@@ -172,7 +183,7 @@ class DigitalTemplateBinder(
         val dunggeunmoFont = loadFont(R.font.dunggeunmo)    // DungGeunMo 폰트 로드
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 시간 설정 (HH:mm AM/PM)
+        // 시간 설정 (HH:mm AM/PM), 행간 Auto
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
@@ -184,10 +195,12 @@ class DigitalTemplateBinder(
             tvTime,
             timeText,
             dunggeunmoFont,
-            DesignUtils.getScaledTextSize(context, 50f)
+            DesignUtils.getScaledTextSize(context, 50f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
-        // 날짜 설정 (December DDth YYYY)
+        // 날짜 설정 (December DDth YYYY), 행간 Auto
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
@@ -199,7 +212,9 @@ class DigitalTemplateBinder(
             tvDate,
             dateText,
             dunggeunmoFont,
-            DesignUtils.getScaledTextSize(context, 24f)
+            DesignUtils.getScaledTextSize(context, 24f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
         // 로고
@@ -223,7 +238,7 @@ class DigitalTemplateBinder(
         val dunggeunmo = loadFont(R.font.dunggeunmo)    // DungGeunMo 폰트 로드
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 날짜 설정 (YYYY년MM월DD일(요일))
+        // 날짜 설정 (YYYY년MM월DD일(요일)), 행간 Auto
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1
@@ -235,10 +250,12 @@ class DigitalTemplateBinder(
             tvDate,
             dateText,
             dunggeunmo,
-            DesignUtils.getScaledTextSize(context, 28f)
+            DesignUtils.getScaledTextSize(context, 28f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
-        // 시간 설정 (오전/오후 HH:mm)
+        // 시간 설정 (오전/오후 HH:mm), 행간 Auto
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
@@ -250,7 +267,9 @@ class DigitalTemplateBinder(
             tvTime,
             timeText,
             dunggeunmo,
-            DesignUtils.getScaledTextSize(context, 28f)
+            DesignUtils.getScaledTextSize(context, 28f),
+            applyShadow = true,
+            lineSpacingMultiplier = null  // 행간 Auto
         )
 
         // 로고(그림자 없음)

@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <!-- Stampic 로고 이미지 (중앙 상단, 위 여백 16px) -->
     <ImageView
@@ -27,6 +29,8 @@
         android:layout_marginTop="70dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:clipToPadding="false"
+        android:clipChildren="false"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -40,6 +44,7 @@
             android:textColor="@color/white"
             android:fontFamily="@font/suit_extrabold"
             android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.0"
             android:letterSpacing="-0.02"
             android:background="@drawable/bg_digital_time_box"
             tools:text="0" />
@@ -54,6 +59,7 @@
             android:textColor="@color/white"
             android:fontFamily="@font/suit_extrabold"
             android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.0"
             android:letterSpacing="-0.02"
             android:background="@drawable/bg_digital_time_box"
             tools:text="4" />
@@ -69,6 +75,7 @@
             android:textColor="@color/white"
             android:fontFamily="@font/suit_extrabold"
             android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.0"
             android:letterSpacing="-0.02" />
 
         <!-- 분 첫째 자리 -->
@@ -80,6 +87,7 @@
             android:textColor="@color/white"
             android:fontFamily="@font/suit_extrabold"
             android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.0"
             android:letterSpacing="-0.02"
             android:background="@drawable/bg_digital_time_box"
             tools:text="0" />
@@ -94,6 +102,7 @@
             android:textColor="@color/white"
             android:fontFamily="@font/suit_extrabold"
             android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.0"
             android:letterSpacing="-0.02"
             android:background="@drawable/bg_digital_time_box"
             tools:text="0" />
@@ -107,9 +116,12 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:textColor="@color/white"
-        android:fontFamily="@font/suit_bold"
-        android:includeFontPadding="false"
+        android:fontFamily="@font/suit_heavy"
         android:letterSpacing="-0.02"
+        android:shadowColor="#73000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
         tools:text="2026.12.25"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
