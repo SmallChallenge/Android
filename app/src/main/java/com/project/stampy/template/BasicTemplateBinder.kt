@@ -106,13 +106,13 @@ class BasicTemplateBinder(
             lineSpacingMultiplier = null  // 행간 Auto
         )
 
-        // 시간 설정 (오전/오후 HH:mm),행간 Auto
+        // 시간 설정 (오전/오후 h:mm),행간 Auto
         val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
         val amPm = if (hour < 12) "오전" else "오후"
         val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
-        val timeText = String.format("%s %02d:%02d", amPm, displayHour, minute)
+        val timeText = String.format("%s %d:%02d", amPm, displayHour, minute)
 
         setupTextView(
             tvTime,

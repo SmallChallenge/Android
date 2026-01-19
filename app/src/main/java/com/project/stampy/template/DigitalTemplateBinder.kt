@@ -238,13 +238,13 @@ class DigitalTemplateBinder(
         val dunggeunmo = loadFont(R.font.dunggeunmo)    // DungGeunMo 폰트 로드
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 날짜 설정 (YYYY년MM월DD일(요일)), 행간 Auto
+        // 날짜 설정 (YYYY년M월D일(요일)), 행간 Auto
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         val dayOfWeek = getDayOfWeekKorean(calendar)
-        val dateText = String.format("%d년%02d월%02d일(%s)", year, month, day, dayOfWeek)
+        val dateText = String.format("%d년%d월%d일(%s)", year, month, day, dayOfWeek)
 
         setupTextView(
             tvDate,
