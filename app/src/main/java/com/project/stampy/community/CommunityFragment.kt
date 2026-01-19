@@ -285,7 +285,7 @@ class CommunityFragment : Fragment() {
             communityRepository.blockUser(feed.nickname)
                 .onSuccess { response ->
                     Log.d(TAG, "차단 성공: nickname=${feed.nickname}, blockedAt=${response.blockedAt}")
-                    showToast("게시자를 차단했습니다")
+                    showToast("게시자를 차단했습니다.")
 
                     // 차단된 사용자의 모든 게시물 제거
                     communityAdapter.removeBlockedUserPosts(feed.nickname)
@@ -306,7 +306,7 @@ class CommunityFragment : Fragment() {
                         // 이미 차단한 사용자
                         errorMsg.contains("DUPLICATE_BLOCK") ||
                                 errorMsg.contains("이미") ->
-                            "이미 차단한 사용자입니다"
+                            "이미 차단한 사용자입니다."
 
                         // 기타 에러
                         else ->
