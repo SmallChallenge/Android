@@ -66,6 +66,7 @@ class PhotoEditActivity : AppCompatActivity() {
     private var showLogo = true
     private var photoUri: Uri? = null
     private var photoTakenAt: Long = 0L
+    private var isFromGallery: Boolean = false // 갤러리에서 온 사진인지 확인
 
     private lateinit var amplitude: Amplitude
     private lateinit var tokenManager: TokenManager
@@ -88,6 +89,9 @@ class PhotoEditActivity : AppCompatActivity() {
         // Intent로 전달받은 사진 URI
         photoUri = intent.getParcelableExtra(EXTRA_PHOTO_URI)
         photoTakenAt = intent.getLongExtra(EXTRA_PHOTO_TAKEN_AT, System.currentTimeMillis())
+
+        // 갤러리에서 온 사진인지 확인 (EXTRA_PHOTO_TAKEN_AT이 명시적으로 전달되었는지)
+        isFromGallery = intent.hasExtra(EXTRA_PHOTO_TAKEN_AT)
 
         Log.d(TAG, "onCreate - photoUri: $photoUri, takenAt: $photoTakenAt")
 
@@ -122,14 +126,18 @@ class PhotoEditActivity : AppCompatActivity() {
             }
         }
 
-        // 실시간 시간 업데이트 시작
-        startTimeUpdate()
+        // 실시간 시간 업데이트 시작 (카메라로 찍은 사진만)
+        if (!isFromGallery) {
+            startTimeUpdate()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        // 화면 복귀 시 시간 업데이트 재시작
-        startTimeUpdate()
+        // 화면 복귀 시 시간 업데이트 재시작 (카메라로 찍은 사진만)
+        if (!isFromGallery) {
+            startTimeUpdate()
+        }
     }
 
     override fun onPause() {
@@ -145,9 +153,15 @@ class PhotoEditActivity : AppCompatActivity() {
     }
 
     /**
-     * 실시간 시간 업데이트 시작
+     * 실시간 시간 업데이트 시작 (카메라로 찍은 사진만)
      */
     private fun startTimeUpdate() {
+        // 갤러리 사진은 실시간 업데이트 안 함
+        if (isFromGallery) {
+            Log.d(TAG, "갤러리 사진은 실시간 시간 업데이트 안 함")
+            return
+        }
+
         // 기존 Runnable이 있으면 제거
         stopTimeUpdate()
 
