@@ -338,6 +338,7 @@ class MyPageActivity : AppCompatActivity() {
     private fun navigateToMyRecords() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        intent.putExtra(MainActivity.EXTRA_NAVIGATE_TO_STORAGE, true)
         startActivity(intent)
         finish()
     }

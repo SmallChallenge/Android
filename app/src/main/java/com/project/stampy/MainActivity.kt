@@ -150,6 +150,13 @@ class MainActivity : AppCompatActivity() {
             loadFragment(CommunityFragment())
             bottomNav.selectedItemId = R.id.navigation_community
         }
+
+        // 내 기록 탭으로 이동
+        if (intent.getBooleanExtra(EXTRA_NAVIGATE_TO_STORAGE, false)) {
+            Log.d(TAG, "onNewIntent: 내 기록 탭으로 이동")
+            loadFragment(MyRecordsFragment())
+            bottomNav.selectedItemId = R.id.navigation_storage
+        }
     }
 
     /**
