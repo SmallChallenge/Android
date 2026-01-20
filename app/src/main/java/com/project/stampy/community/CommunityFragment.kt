@@ -362,12 +362,6 @@ class CommunityFragment : Fragment() {
         if (isLoading) return
         isLoading = true
 
-        // SwipeRefreshLayout이 아직 표시 중이 아니라면 표시
-        if (!swipeRefreshLayout.isRefreshing) {
-            // 초기 로딩 시에는 SwipeRefreshLayout을 보이지 않게 할 수 있음
-            // 필요시 로딩 UI 추가
-        }
-
         // 페이징 초기화
         lastPublishedAt = null
         lastImageId = null
@@ -388,9 +382,11 @@ class CommunityFragment : Fragment() {
                     Log.d(TAG, "imageId=${feed.imageId}, liked=${feed.isLiked}, likeCount=${feed.likeCount}")
                 }
 
+                // 실제로 데이터가 없을 때만 빈 화면 표시
                 if (response.feeds.isEmpty()) {
                     showEmptyState()
                 } else {
+                    // 데이터가 있으면 RecyclerView만 표시
                     hideEmptyState()
                     communityAdapter.setFeeds(response.feeds)
 
@@ -401,6 +397,7 @@ class CommunityFragment : Fragment() {
                 }
             }.onFailure { error ->
                 Log.e(TAG, "커뮤니티 피드 로드 실패", error)
+                // 에러 발생 시에만 빈 화면 표시
                 showEmptyState()
             }
 
