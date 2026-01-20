@@ -150,4 +150,7 @@ dependencies {
 
     // 앰플리튜드 SDK
     implementation("com.amplitude:analytics-android:1.+")
+
+    // SwipeRefreshLayout (스와이프)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

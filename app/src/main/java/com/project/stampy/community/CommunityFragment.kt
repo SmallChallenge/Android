@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.project.stampy.auth.LoginActivity
 import com.project.stampy.auth.MyPageActivity
 import com.project.stampy.R
@@ -29,6 +30,7 @@ class CommunityFragment : Fragment() {
     private lateinit var rvCommunity: RecyclerView
     private lateinit var emptyStateContainer: ConstraintLayout
     private lateinit var btnProfile: ImageView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private lateinit var communityAdapter: CommunityFeedAdapter
     private lateinit var tokenManager: TokenManager
@@ -74,6 +76,9 @@ class CommunityFragment : Fragment() {
         // View 초기화
         initViews(view)
 
+        // SwipeRefreshLayout 설정
+        setupSwipeRefresh()
+
         // 프로필 버튼 클릭 리스너
         setupProfileButton()
 
@@ -97,6 +102,38 @@ class CommunityFragment : Fragment() {
         rvCommunity = view.findViewById(R.id.rv_community)
         emptyStateContainer = view.findViewById(R.id.empty_state_container)
         btnProfile = view.findViewById(R.id.btn_profile)
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
+    }
+
+    /**
+     * SwipeRefreshLayout 설정
+     */
+    private fun setupSwipeRefresh() {
+        swipeRefreshLayout.setOnRefreshListener {
+            Log.d(TAG, "Pull-to-Refresh 트리거됨")
+            refreshCommunity()
+        }
+
+        // 로딩 인디케이터 색상 설정
+        swipeRefreshLayout.setColorSchemeResources(
+            R.color.neon_600,
+            R.color.neon_500,
+            R.color.neon_400
+        )
+
+        // 프로그레스 뷰의 시작/끝 오프셋 설정 (dp를 px로 변환)
+        val displayMetrics = resources.displayMetrics
+        val startOffset = (0 * displayMetrics.density).toInt() // 시작 위치 (0dp)
+        val endOffset = (120 * displayMetrics.density).toInt() // 끝 위치 (120dp) - 스와이프 거리
+
+        swipeRefreshLayout.setProgressViewOffset(
+            false, // scale 애니메이션 사용 안함
+            startOffset,
+            endOffset
+        )
+
+        // 프로그레스 뷰 끝까지 당겨야 새로고침되도록 설정
+        swipeRefreshLayout.setDistanceToTriggerSync(endOffset)
     }
 
     /**
@@ -325,6 +362,12 @@ class CommunityFragment : Fragment() {
         if (isLoading) return
         isLoading = true
 
+        // SwipeRefreshLayout이 아직 표시 중이 아니라면 표시
+        if (!swipeRefreshLayout.isRefreshing) {
+            // 초기 로딩 시에는 SwipeRefreshLayout을 보이지 않게 할 수 있음
+            // 필요시 로딩 UI 추가
+        }
+
         // 페이징 초기화
         lastPublishedAt = null
         lastImageId = null
@@ -362,6 +405,8 @@ class CommunityFragment : Fragment() {
             }
 
             isLoading = false
+            // 로딩 완료 시 SwipeRefreshLayout 정지
+            swipeRefreshLayout.isRefreshing = false
         }
     }
 
@@ -459,9 +504,10 @@ class CommunityFragment : Fragment() {
     }
 
     /**
-     * 커뮤니티 새로고침 (MainActivity에서 호출 가능)
+     * 커뮤니티 새로고침 (MainActivity에서 호출 가능 + Pull-to-Refresh)
      */
     fun refreshCommunity() {
+        Log.d(TAG, "커뮤니티 새로고침 시작")
         loadCommunityPosts()
     }
 }
