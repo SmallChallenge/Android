@@ -86,13 +86,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="1:1">
 
-        <!-- 이미지 (1:1 정사각형, 라운드) -->
+        <!-- 배경 레이어 (테두리만) -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_photo_rounded" />
+
+        <!-- 이미지 (1dp 안쪽, 라운드 처리) -->
         <ImageView
             android:id="@+id/iv_feed_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="1dp"
             android:scaleType="centerCrop"
-            android:background="@drawable/bg_photo_rounded"
+            android:background="@drawable/bg_photo_rounded_inner"
             android:clipToOutline="true" />
 
         <!-- 팝오버 메뉴 (이미지 위에 겹침) -->

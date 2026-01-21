@@ -159,21 +159,36 @@
             android:paddingBottom="24dp">
 
             <!-- 사진 (1:1 정사각형) -->
-            <ImageView
-                android:id="@+id/iv_photo"
+            <FrameLayout
+                android:id="@+id/photo_container"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="6dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:scaleType="centerCrop"
-                android:background="@drawable/bg_photo_rounded"
-                android:clipToOutline="true"
-                android:contentDescription="사진"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintDimensionRatio="1:1" />
+                app:layout_constraintDimensionRatio="1:1">
+
+                <!-- 배경 레이어 (테두리만) -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_photo_rounded" />
+
+                <!-- 이미지 (1dp 안쪽, 라운드 처리) -->
+                <ImageView
+                    android:id="@+id/iv_photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="1dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_photo_rounded_inner"
+                    android:clipToOutline="true"
+                    android:contentDescription="사진" />
+
+            </FrameLayout>
 
             <!-- 카테고리 라벨 -->
             <TextView
@@ -190,7 +205,7 @@
                 android:textStyle="bold"
                 android:textAppearance="@style/TextAppearance.App.Subtitle2"
                 app:fontFamily="@font/pretendard_semibold"
-                app:layout_constraintTop_toBottomOf="@id/iv_photo"
+                app:layout_constraintTop_toBottomOf="@id/photo_container"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <!-- 카테고리 아이콘 + 이름 -->
