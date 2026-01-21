@@ -40,15 +40,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="1:1">
 
-        <!-- 배경 사진 (라운드 8dp) -->
-        <ImageView
-            android:id="@+id/iv_photo"
+        <!-- 테두리를 위한 래퍼 -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
             android:background="@drawable/bg_photo_rounded"
-            android:clipToOutline="true"
-            android:contentDescription="편집할 사진" />
+            android:padding="1dp">
+
+            <!-- 배경 사진 (라운드 8dp) -->
+            <ImageView
+                android:id="@+id/iv_photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_photo_rounded"
+                android:clipToOutline="true"
+                android:contentDescription="편집할 사진" />
+
+        </FrameLayout>
 
         <!-- 템플릿 오버레이 (선택된 템플릿) -->
         <TextView
