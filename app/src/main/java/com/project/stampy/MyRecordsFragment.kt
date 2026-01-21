@@ -624,6 +624,7 @@ class MyRecordsFragment : Fragment() {
 
         // 2. 전체 사진을 훑으며 '실제로 파일이 존재하는' 카테고리만 수집
         // 사용 가능한 카테고리 업데이트 (비로그인 사용자)
+        availableCategories.clear() //수집 전 반드시 기존 카테고리 목록 비움
         allMetadata.forEach { metadata ->
             val file = File(picturesDir, metadata.fileName)
             if (file.exists()) {
@@ -679,7 +680,6 @@ class MyRecordsFragment : Fragment() {
         // 전체 사진 개수 저장 (배너용)
         totalPhotoCount = photos.size // 현재 표시 가능한 사진 기준 (또는 전체 탭 기준)
 
-
         // 5. UI 업데이트 (배너용 숫자는 '전체' 사진 개수를 기준)
         if (photos.isEmpty() && selectedCategory == "전체") {
             showEmptyState()
@@ -691,8 +691,8 @@ class MyRecordsFragment : Fragment() {
         // 6. 카테고리 표시 업데이트(숨김 처리)
         updateCategoryVisibility()
 
-        // 배너 업데이트 (전체 사진 개수 기준)
-        updatePhotoLimitBanner(nonLoginPhotoManager.getPhotoCount())
+        // totalPhotoCount(실제 로드된 사진 개수)를 전달
+        updatePhotoLimitBanner(totalPhotoCount)
 
         Log.d("MyRecordsFragment", "비회원 로컬 사진 ${photos.size}개 로드됨 (전체: $totalPhotoCount)")
     }
