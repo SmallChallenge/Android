@@ -52,10 +52,10 @@ class PhotoEditActivity : AppCompatActivity() {
     // 로고 토글
     private lateinit var switchLogo: SwitchCompat
 
-    // 애드몹
-    private var rewardedAd: RewardedAd? = null
-    private var isAdLoading = false // 중복 로딩 방지
-    private var isRewardEarned = false // 광고 시청 완료 여부 저장
+    // 애드몹 (주석처리)
+    // private var rewardedAd: RewardedAd? = null
+    // private var isAdLoading = false // 중복 로딩 방지
+    // private var isRewardEarned = false // 광고 시청 완료 여부 저장
 
     // 템플릿 RecyclerView
     private lateinit var templateRecyclerView: RecyclerView
@@ -99,7 +99,7 @@ class PhotoEditActivity : AppCompatActivity() {
         setupListeners()
         loadPhoto()
         setupTemplateRecyclerView()
-        loadRewardedAd()
+        // loadRewardedAd() // 애드몹 주석처리
 
         // 촬영 시간 설정
         templateView.setPhotoTakenAt(photoTakenAt)
@@ -218,7 +218,8 @@ class PhotoEditActivity : AppCompatActivity() {
         timeUpdateRunnable = null
     }
 
-    // 애드몹 광고 불러오는 함수
+    // 애드몹 광고 불러오는 함수 (주석처리)
+    /*
     private fun loadRewardedAd() {
         if (isAdLoading || rewardedAd != null || isRewardEarned) return // 이미 보상을 얻었다면 로드 안 함
         isAdLoading = true
@@ -242,6 +243,7 @@ class PhotoEditActivity : AppCompatActivity() {
             }
         })
     }
+    */
 
     private fun initViews() {
         // 상단바
@@ -297,6 +299,16 @@ class PhotoEditActivity : AppCompatActivity() {
             selectCategory(TemplateCategory.DIGITAL, btnCategoryDigital)
         }
 
+        // 로고 토글 - 광고 없이 바로 ON/OFF 가능
+        switchLogo.setOnClickListener {
+            val isChecked = switchLogo.isChecked
+            showLogo = isChecked
+            templateView.setLogoVisibility(isChecked)
+            Log.d(TAG, "로고 표시 상태: $showLogo")
+        }
+
+        // 기존 광고 관련 리스너 (주석처리)
+        /*
         switchLogo.setOnClickListener {
             val isChecked = switchLogo.isChecked
 
@@ -315,6 +327,7 @@ class PhotoEditActivity : AppCompatActivity() {
                 templateView.setLogoVisibility(true)
             }
         }
+        */
     }
 
     /**
@@ -425,6 +438,7 @@ class PhotoEditActivity : AppCompatActivity() {
     /**
      * 로고 OFF 모달 표시
      */
+    /* (주석 처리)
     private fun showLogoOffDialog() {
         DoubleButtonDialog(this)
             .setTitle("광고 시청 후\n워터마크를 제거하세요.")
@@ -464,6 +478,7 @@ class PhotoEditActivity : AppCompatActivity() {
             loadRewardedAd()
         }
     }
+    */
 
     /**
      * PhotoSaveActivity로 이동
