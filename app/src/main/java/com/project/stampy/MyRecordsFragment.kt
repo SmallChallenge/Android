@@ -308,19 +308,28 @@ class MyRecordsFragment : Fragment() {
     }
 
     /**
-     * 사용 가능한 카테고리만 표시
+     * 사용 중인 카테고리만 표시
      */
     private fun updateCategoryVisibility() {
-        // 전체는 항상 표시 (사진이 1장이라도 있으면)
+        val categories = mapOf(
+            "공부" to categoryStudy,
+            "운동" to categoryExercise,
+            "음식" to categoryFood,
+            "기타" to categoryEtc
+        )
+
+        // 사진이 하나도 없으면 전체 탭도 숨김
         categoryAll.visibility = if (availableCategories.isNotEmpty()) View.VISIBLE else View.GONE
 
         // 각 카테고리는 해당 카테고리에 사진이 있을 때만 표시
-        categoryStudy.visibility = if (availableCategories.contains("공부")) View.VISIBLE else View.GONE
-        categoryExercise.visibility = if (availableCategories.contains("운동")) View.VISIBLE else View.GONE
-        categoryFood.visibility = if (availableCategories.contains("음식")) View.VISIBLE else View.GONE
-        categoryEtc.visibility = if (availableCategories.contains("기타")) View.VISIBLE else View.GONE
+        categories.forEach { (name, view) ->
+            view.visibility = if (availableCategories.contains(name)) View.VISIBLE else View.GONE
+        }
 
-        Log.d("MyRecordsFragment", "사용 가능한 카테고리: $availableCategories")
+        // 현재 선택된 카테고리가 사라졌다면 '전체'로 이동
+        if (selectedCategory != "전체" && !availableCategories.contains(selectedCategory)) {
+            selectCategory("전체")
+        }
     }
 
     /**
@@ -599,21 +608,39 @@ class MyRecordsFragment : Fragment() {
     private fun loadLocalPhotos() {
         val picturesDir = File(requireContext().filesDir, "Pictures")
 
-        if (!picturesDir.exists() || !picturesDir.isDirectory) {
+        // 1. 메타데이터 가져오기
+        val photoMetadataManager = PhotoMetadataManager(requireContext())
+
+        // 폴더가 없거나 파일이 하나도 없는 경우 예외 처리
+        val allMetadata = photoMetadataManager.getAllMetadata()
+        if (!picturesDir.exists() || allMetadata.isEmpty()) {
             totalPhotoCount = 0
             availableCategories.clear()
             updateCategoryVisibility()
             showEmptyState()
             updatePhotoLimitBanner(0)  // 배너 업데이트
-            return
+            return // 더 이상 진행하지 않고 종료
         }
 
-        // 1. 메타데이터 가져오기
-        val photoMetadataManager = PhotoMetadataManager(requireContext())
+        // 2. 전체 사진을 훑으며 '실제로 파일이 존재하는' 카테고리만 수집
+        // 사용 가능한 카테고리 업데이트 (비로그인 사용자)
+        allMetadata.forEach { metadata ->
+            val file = File(picturesDir, metadata.fileName)
+            if (file.exists()) {
+                val categoryKorean = when (metadata.category) {
+                    "STUDY" -> "공부"
+                    "EXERCISE" -> "운동"
+                    "FOOD" -> "음식"
+                    "ETC" -> "기타"
+                    else -> "기타"
+                }
+                availableCategories.add(categoryKorean)
+            }
+        }
 
-        // 2. 선택된 카테고리에 맞는 메타데이터 필터링
+        // 3. 현재 선택된 카테고리에 맞는 리스트 필터링
         val filteredMetadata = if (selectedCategory == "전체") {
-            photoMetadataManager.getAllMetadata()
+            allMetadata
         } else {
             // 카테고리 한글 → 영문 변환
             val categoryCode = when (selectedCategory) {
@@ -623,70 +650,49 @@ class MyRecordsFragment : Fragment() {
                 "기타" -> "ETC"
                 else -> null
             }
-
-            if (categoryCode != null) {
-                photoMetadataManager.getMetadataByCategory(categoryCode)
-            } else {
-                emptyList()
-            }
+            allMetadata.filter { it.category == categoryCode }
         }
 
-        // 3. 메타데이터에 해당하는 실제 파일만 로드
-        val photos = filteredMetadata
-            .mapNotNull { metadata ->
-                val file = File(picturesDir, metadata.fileName)
-                if (file.exists()) {
-                    // 메타데이터의 실제 카테고리를 한글로 변환
-                    val categoryKorean = when (metadata.category) {
-                        "STUDY" -> "공부"
-                        "EXERCISE" -> "운동"
-                        "FOOD" -> "음식"
-                        "ETC" -> "기타"
-                        else -> "기타"
-                    }
-
-                    Photo(
-                        file = file,
-                        category = categoryKorean,  //메타데이터의 실제 카테고리 사용
-                        timestamp = metadata.createdAt,  // 촬영 시간
-                        uploadedAt = metadata.uploadedAt,  // 업로드 시간
-                        visibility = metadata.visibility
-                    )
-                } else {
-                    null
+        // 4. 실제 Photo 객체 생성 (파일 존재 확인)
+        // 메타데이터에 해당하는 실제 파일만 로드
+        val photos = filteredMetadata.mapNotNull { metadata ->
+            val file = File(picturesDir, metadata.fileName)
+            if (file.exists()) {
+                // 메타데이터의 실제 카테고리를 한글로 변환
+                val categoryKorean = when (metadata.category) {
+                    "STUDY" -> "공부"
+                    "EXERCISE" -> "운동"
+                    "FOOD" -> "음식"
+                    "ETC" -> "기타"
+                    else -> "기타"
                 }
-            }
-            .sortedByDescending { it.uploadedAt }  // uploadedAt 기준 최신순 정렬
+                Photo(
+                    file = file,
+                    category = categoryKorean,  //메타데이터의 실제 카테고리 사용
+                    timestamp = metadata.createdAt,  // 촬영 시간
+                    uploadedAt = metadata.uploadedAt,  // 업로드 시간
+                    visibility = metadata.visibility
+                )
+            } else null
+        }.sortedByDescending { it.uploadedAt }  // uploadedAt 기준 최신순 정렬
 
         // 전체 사진 개수 저장 (배너용)
-        totalPhotoCount = nonLoginPhotoManager.getPhotoCount()
+        totalPhotoCount = photos.size // 현재 표시 가능한 사진 기준 (또는 전체 탭 기준)
 
-        // 사용 가능한 카테고리 업데이트 (비로그인 사용자)
-        availableCategories.clear()
-        photoMetadataManager.getAllMetadata().forEach { metadata ->
-            val categoryKorean = when (metadata.category) {
-                "STUDY" -> "공부"
-                "EXERCISE" -> "운동"
-                "FOOD" -> "음식"
-                "ETC" -> "기타"
-                else -> "기타"
-            }
-            availableCategories.add(categoryKorean)
-        }
 
-        // 4. UI 업데이트
-        if (photos.isEmpty()) {
+        // 5. UI 업데이트 (배너용 숫자는 '전체' 사진 개수를 기준)
+        if (photos.isEmpty() && selectedCategory == "전체") {
             showEmptyState()
         } else {
             hideEmptyState()
             photoAdapter.setPhotos(photos)
         }
 
-        // 카테고리 표시 업데이트
+        // 6. 카테고리 표시 업데이트(숨김 처리)
         updateCategoryVisibility()
 
         // 배너 업데이트 (전체 사진 개수 기준)
-        updatePhotoLimitBanner(totalPhotoCount)
+        updatePhotoLimitBanner(nonLoginPhotoManager.getPhotoCount())
 
         Log.d("MyRecordsFragment", "비회원 로컬 사진 ${photos.size}개 로드됨 (전체: $totalPhotoCount)")
     }
