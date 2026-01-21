@@ -10,6 +10,8 @@
         name="stampy_cache"
         path="/" />
 
-    <files-path name="images" path="Pictures/" />
-    <cache-path name="cache" path="." />
+    <!-- 공유용 캐시 폴더 -->
+    <cache-path
+        name="shared_images"
+        path="shared_images/" />
 </paths>

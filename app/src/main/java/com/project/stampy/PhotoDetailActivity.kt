@@ -430,17 +430,19 @@ class PhotoDetailActivity : AppCompatActivity() {
                 file
             )
 
+            Log.d(TAG, "로컬 파일 공유: ${file.name}, URI: $uri")
+
             // 공유 Intent 생성
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "image/jpeg"
+                type = "image/*"
                 putExtra(Intent.EXTRA_STREAM, uri)
+                clipData = android.content.ClipData.newRawUri("", uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
             // 공유 시트 표시
             startActivity(Intent.createChooser(shareIntent, "사진 공유하기"))
 
-            Log.d(TAG, "로컬 파일 공유: ${file.name}")
         } catch (e: Exception) {
             Log.e(TAG, "로컬 파일 공유 오류", e)
             showToast("공유에 실패했어요. 다시 시도해 주세요.")
@@ -461,8 +463,13 @@ class PhotoDetailActivity : AppCompatActivity() {
                     .submit()
                     .get()
 
-                // Glide 캐시 파일을 임시 파일로 복사 (FileProvider는 캐시 디렉토리 직접 접근 불가)
-                val tempFile = File(cacheDir, "share_temp_${System.currentTimeMillis()}.jpg")
+                // 앱의 캐시 디렉토리에 임시 파일 생성
+                val shareDir = File(cacheDir, "shared_images")
+                if (!shareDir.exists()) {
+                    shareDir.mkdirs()
+                }
+
+                val tempFile = File(shareDir, "share_${System.currentTimeMillis()}.jpg")
                 file.copyTo(tempFile, overwrite = true)
 
                 // 공유
@@ -470,7 +477,6 @@ class PhotoDetailActivity : AppCompatActivity() {
                     shareLocalFile(tempFile)
 
                     // 공유 후 임시 파일 삭제 예약 (5초 후)
-                    tempFile.deleteOnExit()
                     lifecycleScope.launch {
                         kotlinx.coroutines.delay(5000)
                         if (tempFile.exists()) {
