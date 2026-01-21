@@ -112,7 +112,7 @@ class PhotoEditActivity : AppCompatActivity() {
             Log.d(TAG, "기본 템플릿 적용: ${it.name}")
         }
 
-        // 기본 카테고리 선택 (이건 UI만 변경, 템플릿은 위에서 이미 적용됨)
+        // 기본 카테고리 선택 (BASIC만 활성화)
         selectCategory(TemplateCategory.BASIC, btnCategoryBasic)
 
         tokenManager = TokenManager(this)
@@ -130,6 +130,22 @@ class PhotoEditActivity : AppCompatActivity() {
         if (!isFromGallery) {
             startTimeUpdate()
         }
+    }
+
+    private fun resetCategoryButton(button: TextView) {
+        button.setTextColor(getColor(R.color.gray_500))
+        button.setBackgroundResource(0)
+        // setTextAppearance 제거하고 직접 설정 (Material 라이브러리가 덮어쓰지 않게)
+        button.typeface = resources.getFont(R.font.pretendard_medium)
+        button.textSize = 14f // sp 단위로 명시
+    }
+
+    private fun activateCategoryButton(button: TextView) {
+        button.setTextColor(getColor(R.color.gray_50))
+        button.setBackgroundResource(R.drawable.bg_category_selected)
+        // setTextAppearance 제거하고 직접 설정 (Material 라이브러리가 덮어쓰지 않게)
+        button.typeface = resources.getFont(R.font.pretendard_semibold)
+        button.textSize = 14f // sp 단위로 명시
     }
 
     override fun onResume() {
@@ -374,16 +390,6 @@ class PhotoEditActivity : AppCompatActivity() {
 
         // 해당 카테고리의 템플릿 로드
         loadTemplatesForCategory(category)
-    }
-
-    private fun resetCategoryButton(button: TextView) {
-        button.setTextColor(getColor(R.color.gray_400))
-        button.setBackgroundResource(0)
-    }
-
-    private fun activateCategoryButton(button: TextView) {
-        button.setTextColor(getColor(R.color.gray_50))
-        button.setBackgroundResource(R.drawable.bg_category_selected)
     }
 
     /**
