@@ -78,34 +78,40 @@
                 android:layout_height="match_parent"
                 android:visibility="gone">
 
-                <!-- 커뮤니티 캐릭터 이미지 -->
-                <ImageView
-                    android:id="@+id/iv_empty_character"
+                <!-- 빈 상태를 묶는 그룹 -->
+                <LinearLayout
+                    android:id="@+id/empty_state_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_empty_community"
-                    android:contentDescription="커뮤니티 빈 상태 캐릭터"
+                    android:orientation="vertical"
+                    android:gravity="center"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintVertical_bias="0.4" />
+                    app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- 빈 상태 메시지 (캐릭터 + 20dp) -->
-                <TextView
-                    android:id="@+id/tv_empty_state"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="아직은 우리만의 비밀 공간 같아요.\n첫 게시물로 문을 열어주세요!"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="16sp"
-                    android:textAppearance="@style/TextAppearance.App.Body1"
-                    android:textAlignment="center"
-                    android:gravity="center"
-                    android:layout_marginTop="20dp"
-                    app:layout_constraintTop_toBottomOf="@id/iv_empty_character"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    <!-- 커뮤니티 캐릭터 이미지 -->
+                    <ImageView
+                        android:id="@+id/iv_empty_character"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_empty_community"
+                        android:contentDescription="커뮤니티 빈 상태 캐릭터" />
+
+                    <!-- 빈 상태 메시지 (캐릭터 + 20dp) -->
+                    <TextView
+                        android:id="@+id/tv_empty_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="아직은 우리만의 비밀 공간 같아요.\n첫 게시물로 문을 열어주세요!"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="16sp"
+                        android:textAppearance="@style/TextAppearance.App.Body1"
+                        android:textAlignment="center"
+                        android:gravity="center"
+                        android:layout_marginTop="20dp" />
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
