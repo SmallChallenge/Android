@@ -52,7 +52,8 @@ android {
 
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true  // R8 활성화
+            isShrinkResources = true  // 사용하지 않는 리소스 제거
             signingConfig = signingConfigs.getByName("release")  // 서명 설정 적용
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -66,6 +67,13 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
+    }
+
+    // 16KB 페이지 크기 지원 추가
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
 
     compileOptions {
