@@ -56,6 +56,7 @@ class PhotoSaveActivity : AppCompatActivity() {
     private lateinit var photoContainer: FrameLayout
     private lateinit var templateView: TemplateView
     private lateinit var tvTemplateOverlay: TextView
+    private lateinit var viewBorder: View
 
     // 카테고리
     private lateinit var categoryStudy: LinearLayout
@@ -186,10 +187,14 @@ class PhotoSaveActivity : AppCompatActivity() {
         photoContainer = findViewById(R.id.photo_container)
         ivPhoto = findViewById(R.id.iv_photo)
         tvTemplateOverlay = findViewById(R.id.tv_template_overlay)
+        viewBorder = findViewById(R.id.view_border)
 
         // 템플릿 뷰 추가
         templateView = TemplateView(this)
         photoContainer.addView(templateView)
+
+        // 템플릿 뷰를 테두리 아래로
+        viewBorder.bringToFront()
 
         // 카테고리 LinearLayout
         categoryStudy = findViewById(R.id.category_study)
@@ -552,6 +557,9 @@ class PhotoSaveActivity : AppCompatActivity() {
                 return null
             }
 
+            // 캡처 전에 테두리 숨기기
+            viewBorder.visibility = View.GONE
+
             // 비트맵 생성
             val bitmap = Bitmap.createBitmap(
                 parentView.width,
@@ -561,10 +569,15 @@ class PhotoSaveActivity : AppCompatActivity() {
             val canvas = Canvas(bitmap)
             parentView.draw(canvas)
 
+            // 캡처 후 테두리 다시 보이기
+            viewBorder.visibility = View.VISIBLE
+
             Log.d(TAG, "화면 캡처 완료: ${parentView.width}x${parentView.height}")
             return bitmap
         } catch (e: Exception) {
             Log.e(TAG, "화면 캡처 실패", e)
+            // 에러 발생 시에도 테두리 복구
+            viewBorder.visibility = View.VISIBLE
             return null
         }
     }
