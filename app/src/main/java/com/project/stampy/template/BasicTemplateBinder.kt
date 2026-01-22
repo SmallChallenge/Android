@@ -5,6 +5,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.marginEnd
 import com.project.stampy.R
 import java.util.*
 
@@ -21,6 +23,7 @@ class BasicTemplateBinder(
             "basic_1" -> bindBasic1(showLogo, photoTakenAtTimestamp)
             "basic_2" -> bindBasic2(showLogo, photoTakenAtTimestamp)
             "basic_3" -> bindBasic3(showLogo, photoTakenAtTimestamp)
+            "basic_4" -> bindBasic4(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -200,5 +203,67 @@ class BasicTemplateBinder(
             root.findViewById(R.id.iv_stampic_logo),
             bottom = DesignUtils.dpToPxInt(context, 16f)
         )
+    }
+
+    /**
+     * Basic 4 템플릿 데이터 바인딩
+     */
+    private fun bindBasic4(showLogo: Boolean, timestamp: Long) {
+        val shipporiBold = loadFont(R.font.shippori_mincho_bold) // Shippori Mincho Bold 폰트 로드
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 날짜 설정 (YYYY年M月D日)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH) + 1
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val dateText = "${year}年${month}月${day}日"
+
+        setupTextView(
+            tvDate,
+            dateText,
+            shipporiBold,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = true, // 그림자
+            lineSpacingMultiplier = 1.0f  // 행간 100%
+        )
+
+        // 시간 설정 (h:mm am/pm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        // h:mm a 사용 시 '5:40 pm' 형태로 출력
+        val timeText = formatDate("h:mm a", timestamp, Locale.US).lowercase()
+
+        setupTextView(
+            tvTime,
+            timeText,
+            shipporiBold,
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true, // 그림자
+            lineSpacingMultiplier = 1.0f  // 행간 100%
+        )
+
+        // 로고 설정 (우측 상단 여백 16px)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // 로고 크기 및 마진 가변 대응 (375px 기준)
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                val logoSize = DesignUtils.dpToPxInt(context, 38f)
+                width = logoSize
+                height = logoSize
+                topMargin = DesignUtils.dpToPxInt(context, 16f)
+                marginEnd = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
+
+        // 전체 레이아웃 및 여백 조정
+        val bottomContainer = root.findViewById<LinearLayout>(R.id.bottom_container)
+        setMargin(
+            bottomContainer,
+            bottom = DesignUtils.dpToPxInt(context, 16f) // 중앙 하단 컨테이너: 하단 여백 16px
+        )
+
+        setMargin(tvTime, top = 0) // 날짜와 시간 사이 간격 (Gap : 0px)
     }
 }
