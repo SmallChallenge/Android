@@ -174,7 +174,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             // 첫 번째 뒤로가기
             backPressedTime = System.currentTimeMillis()
-            showToast("한 번 더 누르면 종료됩니다")
+            showToast("한 번 더 누르면 종료됩니다.")
         }
     }
 
