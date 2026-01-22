@@ -24,6 +24,7 @@ class BasicTemplateBinder(
             "basic_2" -> bindBasic2(showLogo, photoTakenAtTimestamp)
             "basic_3" -> bindBasic3(showLogo, photoTakenAtTimestamp)
             "basic_4" -> bindBasic4(showLogo, photoTakenAtTimestamp)
+            "basic_5" -> bindBasic5(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -265,5 +266,59 @@ class BasicTemplateBinder(
         )
 
         setMargin(tvTime, top = 0) // 날짜와 시간 사이 간격 (Gap : 0px)
+    }
+
+    /**
+     * Basic 5 템플릿 데이터 바인딩
+     */
+    private fun bindBasic5(showLogo: Boolean, timestamp: Long) {
+        val pretentardBold = loadFont(R.font.pretendard_bold)
+        val pretentardMedium = loadFont(R.font.pretendard_medium)
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 그라데이션 배경 설정 (왼쪽 1/3 지점까지 #000000 20% -> 0%)
+        val viewGradient = root.findViewById<View>(R.id.view_gradient)
+        viewGradient.visibility = View.VISIBLE
+
+        // 날짜 설정
+        val tvDateLine1 = root.findViewById<TextView>(R.id.tv_date_line1) // EEEE,
+        val tvDateLine2 = root.findViewById<TextView>(R.id.tv_date_line2) // d MMM
+
+        setupTextView(
+            tvDateLine1,
+            formatDate("EEEE,", timestamp, Locale.US),
+            pretentardBold,
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true
+        )
+        setupTextView(
+            tvDateLine2,
+            formatDate("d MMM", timestamp, Locale.US),
+            pretentardMedium,
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true
+        )
+
+        // 시간 설정 (HH:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        setupTextView(
+            tvTime,
+            formatDate("HH:mm", timestamp),
+            pretentardMedium,
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true
+        )
+
+        // 로고 설정
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+            setMargin(this, start = DesignUtils.dpToPxInt(context, 16f), bottom = DesignUtils.dpToPxInt(context, 16f))
+        }
+
+        // 여백 설정 (여백 전체 16)
+        val dateContainer = root.findViewById<View>(R.id.date_container)
+        setMargin(dateContainer, start = DesignUtils.dpToPxInt(context, 16f), top = DesignUtils.dpToPxInt(context, 16f))
+        setMargin(tvTime, start = DesignUtils.dpToPxInt(context, 16f))
     }
 }

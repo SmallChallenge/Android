@@ -51,6 +51,16 @@ object TemplateManager {
             )
         )
 
+        templates.add(
+            Template(
+                id = "basic_5",
+                category = TemplateCategory.BASIC,
+                name = "Basic 5",
+                layoutResId = R.layout.template_basic_5,
+                thumbnailResId = R.drawable.template_basic_5
+            )
+        )
+
         // Moody 카테고리 템플릿
         templates.add(
             Template(
