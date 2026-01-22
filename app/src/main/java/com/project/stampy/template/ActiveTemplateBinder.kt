@@ -5,6 +5,7 @@ import android.os.Build
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.project.stampy.R
 import java.util.*
 
@@ -21,6 +22,7 @@ class ActiveTemplateBinder(
             "active_1" -> bindActive1(showLogo, photoTakenAtTimestamp)
             "active_2" -> bindActive2(showLogo, photoTakenAtTimestamp)
             "active_3" -> bindActive3(showLogo, photoTakenAtTimestamp)
+            "active_4" -> bindActive4(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -193,5 +195,62 @@ class ActiveTemplateBinder(
         root.findViewById<android.widget.ImageView>(R.id.iv_stampic_logo)?.apply {
             visibility = if (showLogo) View.VISIBLE else View.GONE
         }
+    }
+
+    /**
+     * Active 4 템플릿 데이터 바인딩
+     */
+    private fun bindActive4(showLogo: Boolean, timestamp: Long) {
+        val partialSans = loadFont(R.font.partial_sans_kr) // 파셜산스 폰트 로드
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 시간 설정 (오전/오후 h:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "오전" else "오후"
+        val hour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
+        val minute = String.format("%02d", calendar.get(Calendar.MINUTE))
+
+        setupTextView(
+            tvTime,
+            "$amPm $hour:$minute",
+            partialSans,
+            DesignUtils.getScaledTextSize(context, 28f),
+            applyShadow = false,
+            lineSpacingMultiplier = null // 행간 Auto
+        )
+        applyTextShadow(tvTime)
+
+        // 날짜 설정 (YYYY. MM. DD (요일))
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("yyyy. MM. dd (${getDayOfWeekKorean(calendar)})", timestamp),
+            partialSans,
+            DesignUtils.getScaledTextSize(context, 12f),
+            applyShadow = false,
+            lineSpacingMultiplier = null
+        )
+        applyTextShadow(tvDate)
+
+        // 로고
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                // 로고 크기 조정 (예: 36dp)
+                val logoSize = DesignUtils.dpToPxInt(context, 36f)
+                width = logoSize
+                height = logoSize
+                bottomMargin = DesignUtils.dpToPxInt(context, 16f) // 하단 여백 16px
+            }
+        }
+
+        // 날짜/시간 여백 및 간격 조정
+        val topContainer = root.findViewById<View>(R.id.top_container)
+        setMargin(topContainer, top = DesignUtils.dpToPxInt(context, 24f))
+
+        // 시간/날짜 사이 간격 (Gap: 4)
+        setMargin(tvDate, top = DesignUtils.dpToPxInt(context, 4f))
     }
 }
