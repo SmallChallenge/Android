@@ -56,14 +56,14 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Stampic 로고 이미지 (중앙 하단, 아래 여백 16px) -->
-    <!-- 로고 그림자는 코드에서 처리 -->
     <ImageView
         android:id="@+id/iv_stampic_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/stampic_tem"
+        android:layout_marginBottom="11dp"
+        android:src="@drawable/stampic_tem_shadow"
         android:contentDescription="Stampic Logo"
+        android:adjustViewBounds="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

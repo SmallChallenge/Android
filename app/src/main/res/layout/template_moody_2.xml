@@ -22,11 +22,12 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 원형 배경 아이콘 (중앙, 220x220dp) -->
+    <!-- Blur 20은 사방으로 20px씩 번지기 때문에, 전체 이미지의 가로/세로 길이는 원래보다 40px 더 커짐 -->
     <ImageView
         android:id="@+id/iv_circle_bg"
-        android:layout_width="220dp"
-        android:layout_height="220dp"
-        android:src="@drawable/ic_circle_bg"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
+        android:src="@drawable/ic_circle_bg_shadow"
         android:contentDescription="Circle Background"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

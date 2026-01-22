@@ -57,22 +57,14 @@ class MoodyTemplateBinder(
 
         // 로고
         val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
-        ivLogo?.apply {
-            visibility = if (showLogo) View.VISIBLE else View.GONE
-
-            // 로고 그림자 추가
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                elevation = DesignUtils.dpToPx(context, 4f)
-                outlineProvider = android.view.ViewOutlineProvider.BOUNDS
-            }
-        }
+        ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
 
         // 여백 조정
         setMargin(tvDate, top = DesignUtils.dpToPxInt(context, 24f))    // 날짜: 상단에서 24px
         setMargin(tvTime, top = DesignUtils.dpToPxInt(context, 4f))     // 시간: 날짜 밑으로 4px
         setMargin(
             ivLogo,
-            bottom = DesignUtils.dpToPxInt(context, 16f)    // 로고: 하단 16px
+            bottom = DesignUtils.dpToPxInt(context, 11f) // 로고: 하단 16px (Blur 5 설정이 있어서 5dp 뺀 11f임)
         )
     }
 
@@ -137,6 +129,7 @@ class MoodyTemplateBinder(
             text = formatDate("yyyy.MM.dd", timestamp)
             suiteBold?.let { typeface = it }
             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledDateSize)
+            applyTextShadow(this)   // 기본 그림자 적용
         }
 
         // 로고
@@ -151,7 +144,8 @@ class MoodyTemplateBinder(
         // 원형 배경: 220dp 크기를 기기에 맞춰 조정
         val ivCircleBg = root.findViewById<ImageView>(R.id.iv_circle_bg)
         (ivCircleBg?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
-            val circleSize = DesignUtils.dpToPxInt(context, 220f)
+            // Blur 20은 사방으로 20px씩 번지기 때문에, 전체 이미지의 가로/세로 길이는 원래보다 40px 더 커짐
+            val circleSize = DesignUtils.dpToPxInt(context, 260f)   // 260dp지만 blur 제외하면 실제 크기는 220dp 맞음
             width = circleSize
             height = circleSize
             ivCircleBg.layoutParams = this

@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId = "com.project.stampy"
-        minSdk = 26
+        minSdk = 28
         targetSdk = 35
         versionCode = 15
         versionName = "1.0.1"
