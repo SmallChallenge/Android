@@ -61,20 +61,12 @@ class ActiveTemplateBinder(
 
         // 로고
         val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
-        ivLogo?.apply {
-            visibility = if (showLogo) View.VISIBLE else View.GONE
-
-            // 로고 그림자 추가
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                elevation = DesignUtils.dpToPx(context, 4f)
-                outlineProvider = android.view.ViewOutlineProvider.BOUNDS
-            }
-        }
+        ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
 
         // 여백 조정
         setMargin(
             ivLogo,
-            bottom = DesignUtils.dpToPxInt(context, 16f) // 로고: 아래 16px
+            bottom = DesignUtils.dpToPxInt(context, 11f) // 로고: 하단 16px (Blur 5 설정이 있어서 5dp 뺀 11f임)
         )
     }
 

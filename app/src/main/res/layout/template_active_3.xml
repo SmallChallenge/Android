@@ -71,14 +71,14 @@
         android:shadowRadius="5" />
 
     <!-- Stampic 로고 (하단 중앙) -->
-    <!-- 로고 그림자는 코드에서 처리 -->
+    <!-- 하단 16px (Blur 5 설정이 있어서 5dp 뺀 11dp임) -->
     <ImageView
         android:id="@+id/iv_stampic_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/stampic_tem"
+        android:layout_marginBottom="11dp"
+        android:src="@drawable/stampic_tem_shadow"
         android:contentDescription="Stampic Logo" />
 
 </FrameLayout>
