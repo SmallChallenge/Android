@@ -5,8 +5,8 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/bmk_kubulim"
+        android:font="@font/bm_kkubulim"
         app:fontStyle="normal"
         app:fontWeight="400"
-        app:font="@font/bmk_kubulim" />
+        app:font="@font/bm_kkubulim" />
 </font-family>

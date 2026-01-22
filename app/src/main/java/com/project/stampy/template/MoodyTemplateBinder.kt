@@ -1,9 +1,9 @@
 package com.project.stampy.template
 
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.project.stampy.R
@@ -22,6 +22,7 @@ class MoodyTemplateBinder(
             "moody_1" -> bindMoody1(showLogo, photoTakenAtTimestamp)
             "moody_2" -> bindMoody2(showLogo, photoTakenAtTimestamp)
             "moody_3" -> bindMoody3(showLogo, photoTakenAtTimestamp)
+            "moody_4" -> bindMoody4(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -217,5 +218,78 @@ class MoodyTemplateBinder(
         setLogoVisibility(R.id.iv_stampic_logo, showLogo)
 
         // 여백은 XML에서 다 처리되므로 별도 조정 불필요
+    }
+
+    /**
+     * Moody 4 템플릿 데이터 바인딩
+     */
+    private fun bindMoody4(showLogo: Boolean, timestamp: Long) {
+        val kkubulim = loadFont(R.font.bm_kkubulim) // 꾸불림체 폰트 로드
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 시간 설정 (오전/오후 h:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "오전" else "오후"
+        val hour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
+        val minute = String.format("%02d", calendar.get(Calendar.MINUTE))
+
+        setupTextView(
+            tvTime,
+            "$amPm $hour:$minute",
+            kkubulim,
+            DesignUtils.getScaledTextSize(context, 36f),
+            applyShadow = false,
+            lineSpacingMultiplier = null // 행간 Auto
+        )
+        applyTextShadow(tvTime)
+
+        // 날짜 설정 (YYYY. MM. DD (요일))
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("yyyy. MM. dd (${getDayOfWeekKorean(calendar)})", timestamp),
+            kkubulim,
+            DesignUtils.getScaledTextSize(context, 18f),
+            applyShadow = false,
+            lineSpacingMultiplier = null // 행간 Auto
+        )
+        applyTextShadow(tvDate)
+
+        // 하단 문구 설정 ("수고했어 오늘도")
+        val tvMessage = root.findViewById<TextView>(R.id.tv_message)
+        setupTextView(
+            tvMessage,
+            "“수고했어 오늘도”",
+            kkubulim,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = true,
+            lineSpacingMultiplier = null // 행간 Auto
+        )
+        applyTextShadow(tvMessage)
+
+        // 로고 설정 (우측 하단, 여백 16)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                val logoSize = DesignUtils.dpToPxInt(context, 36f) // 36*36px
+                width = logoSize
+                height = logoSize
+                // 직접 마진 설정
+                bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+                marginEnd = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
+
+        // 상단 컨테이너 (시간+날짜): 상단 여백 24px
+        val topContainer = root.findViewById<View>(R.id.top_container)
+        setMargin(topContainer, top = DesignUtils.dpToPxInt(context, 24f))
+
+        // 하단 문구: 하단 여백 16px
+        setMargin(tvMessage, bottom = DesignUtils.dpToPxInt(context, 16f))
+
+        // 시간/날짜 사이 간격 (Gap: 0)
+        setMargin(tvDate, top = 0)
     }
 }
