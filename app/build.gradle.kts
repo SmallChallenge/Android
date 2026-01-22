@@ -22,8 +22,8 @@ android {
         applicationId = "com.project.stampy"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.0"
+        versionCode = 15
+        versionName = "1.0.1"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -52,8 +52,7 @@ android {
 
         }
         release {
-            isMinifyEnabled = true  // R8 활성화
-            isShrinkResources = true  // 사용하지 않는 리소스 제거
+            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")  // 서명 설정 적용
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -67,13 +66,6 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
-    }
-
-    // 16KB 페이지 크기 지원 추가
-    packaging {
-        jniLibs {
-            useLegacyPackaging = false
-        }
     }
 
     compileOptions {
@@ -135,9 +127,9 @@ dependencies {
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     // CameraX (카메라)
-    implementation("androidx.camera:camera-camera2:1.3.1")
-    implementation("androidx.camera:camera-lifecycle:1.3.1")
-    implementation("androidx.camera:camera-view:1.3.1")
+    implementation("androidx.camera:camera-camera2:1.4.0")
+    implementation("androidx.camera:camera-lifecycle:1.4.0")
+    implementation("androidx.camera:camera-view:1.4.0")
 
     implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
     implementation("com.google.guava:guava:31.1-android")
