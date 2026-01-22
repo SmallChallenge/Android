@@ -39,6 +39,10 @@ class MainActivity : AppCompatActivity() {
     // 앰플리튜드
     private lateinit var amplitude: Amplitude
 
+    // 뒤로가기 두 번 눌러 종료
+    private var backPressedTime: Long = 0
+    private val BACK_PRESS_INTERVAL: Long = 2000 // 2초
+
     companion object {
         private const val TAG = "MainActivity"
 
@@ -156,6 +160,21 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "onNewIntent: 내 기록 탭으로 이동")
             loadFragment(MyRecordsFragment())
             bottomNav.selectedItemId = R.id.navigation_storage
+        }
+    }
+
+    /**
+     * 뒤로가기 두 번 눌러 종료
+     */
+    override fun onBackPressed() {
+        if (System.currentTimeMillis() - backPressedTime <= BACK_PRESS_INTERVAL) {
+            // 2초 이내에 뒤로가기를 다시 누르면 앱 종료
+            super.onBackPressed()
+            finishAffinity() // 모든 액티비티 종료
+        } else {
+            // 첫 번째 뒤로가기
+            backPressedTime = System.currentTimeMillis()
+            showToast("한 번 더 누르면 종료됩니다")
         }
     }
 
