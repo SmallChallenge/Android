@@ -164,7 +164,15 @@ object TemplateManager {
             )
         )
 
-        // TODO: 나머지 템플릿 추가
+        templates.add(
+            Template(
+                id = "digital_4",
+                category = TemplateCategory.DIGITAL,
+                name = "Digital 4",
+                layoutResId = R.layout.template_digital_4,
+                thumbnailResId = R.drawable.template_digital_4
+            )
+        )
     }
 
     /**

@@ -2,6 +2,7 @@ package com.project.stampy.template
 
 import android.content.Context
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -21,6 +22,7 @@ class DigitalTemplateBinder(
             "digital_1" -> bindDigital1(showLogo, photoTakenAtTimestamp)
             "digital_2" -> bindDigital2(showLogo, photoTakenAtTimestamp)
             "digital_3" -> bindDigital3(showLogo, photoTakenAtTimestamp)
+            "digital_4" -> bindDigital4(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -274,5 +276,59 @@ class DigitalTemplateBinder(
 
         // 로고(그림자 없음)
         setLogoVisibility(R.id.iv_stampic_logo, showLogo)
+    }
+
+    /**
+     * Digital 4 템플릿 데이터 바인딩
+     */
+    private fun bindDigital4(showLogo: Boolean, timestamp: Long) {
+        val suitHeavy = loadFont(R.font.suit_heavy)
+        val suitExtraBold = loadFont(R.font.suit_extrabold)
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 날짜 설정 ("yyyy.MM.dd")
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("yyyy.MM.dd", timestamp),
+            suitExtraBold,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = false
+        )
+        applyTextShadow(tvDate)
+
+        // 시간 설정 ("a h:mm")
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val timeText = formatDate("a h:mm", timestamp, Locale.US).lowercase()
+        setupTextView(
+            tvTime,
+            timeText,
+            suitHeavy,
+            DesignUtils.getScaledTextSize(context, 32f),
+            applyShadow = false
+        )
+        applyTextShadow(tvTime)
+
+        // REC 아이콘 (상 32, 좌 32)
+        val ivRec = root.findViewById<ImageView>(R.id.iv_rec)
+        setMargin(ivRec, top = DesignUtils.dpToPxInt(context, 32f), start = DesignUtils.dpToPxInt(context, 32f))
+
+        // 배터리 아이콘 (상 26, 우 32)
+        val ivBattery = root.findViewById<ImageView>(R.id.iv_battery)
+        setMargin(ivBattery, top = DesignUtils.dpToPxInt(context, 26f), end = DesignUtils.dpToPxInt(context, 32f))
+
+        // 날짜/시간 컨테이너 (하 32, 좌 32)
+        val bottomStartContainer = root.findViewById<LinearLayout>(R.id.bottom_start_container)
+        setMargin(bottomStartContainer, bottom = DesignUtils.dpToPxInt(context, 32f), start = DesignUtils.dpToPxInt(context, 32f))
+
+        // 로고 (하 32, 우 32)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+            setMargin(this, bottom = DesignUtils.dpToPxInt(context, 32f), end = DesignUtils.dpToPxInt(context, 32f))
+        }
+
+        // 날짜와 시간 사이 간격 (Gap: 0)
+        setMargin(tvTime, top = 0)
     }
 }
