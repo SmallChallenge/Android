@@ -23,6 +23,7 @@ class ActiveTemplateBinder(
             "active_2" -> bindActive2(showLogo, photoTakenAtTimestamp)
             "active_3" -> bindActive3(showLogo, photoTakenAtTimestamp)
             "active_4" -> bindActive4(showLogo, photoTakenAtTimestamp)
+            "active_5" -> bindActive5(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -252,5 +253,63 @@ class ActiveTemplateBinder(
 
         // 시간/날짜 사이 간격 (Gap: 4)
         setMargin(tvDate, top = DesignUtils.dpToPxInt(context, 4f))
+    }
+
+    /**
+     * Active 5 템플릿 데이터 바인딩
+     */
+    private fun bindActive5(showLogo: Boolean, timestamp: Long) {
+        val partialSansFont = loadFont(R.font.partial_sans_kr)
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 날짜 설정 (YYYY. MM. DD. EEE (영문 약어 대문자))
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        val dateText = formatDate("yyyy. MM. dd. ", timestamp) +
+                formatDate("EEE", timestamp, Locale.US).uppercase(Locale.US)
+
+        setupTextView(
+            tvDate,
+            dateText,
+            partialSansFont,
+            DesignUtils.getScaledTextSize(context, 14f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
+        )
+
+        // 시간 설정 (오전/오후 h:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "오전" else "오후"
+        val hour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
+        val minute = String.format("%02d", calendar.get(Calendar.MINUTE))
+
+        setupTextView(
+            tvTime,
+            "$amPm $hour:$minute",
+            partialSansFont,
+            DesignUtils.getScaledTextSize(context, 24f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
+        )
+
+        // 중앙 상단 문구
+        val tvMessage = root.findViewById<TextView>(R.id.tv_message)
+        setupTextView(
+            tvMessage,
+            "JUST DO IT",
+            partialSansFont,
+            DesignUtils.getScaledTextSize(context, 14f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
+        )
+
+        // 로고 설정: 우측 상단 (여백 16)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+
+        // 여백 설정
+        setMargin(tvDate, bottom = DesignUtils.dpToPxInt(context, 24f)) // 하단 전체 여백 24
+        setMargin(tvTime, top = DesignUtils.dpToPxInt(context, 6f))    // 날짜와 시간 사이 Gap 6
+        setMargin(tvMessage, top = DesignUtils.dpToPxInt(context, 14f)) // 상단 문구 여백 14
+        setMargin(ivLogo, top = DesignUtils.dpToPxInt(context, 16f), end = DesignUtils.dpToPxInt(context, 16f))
     }
 }
