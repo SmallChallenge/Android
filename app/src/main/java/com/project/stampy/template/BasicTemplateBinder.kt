@@ -25,6 +25,7 @@ class BasicTemplateBinder(
             "basic_3" -> bindBasic3(showLogo, photoTakenAtTimestamp)
             "basic_4" -> bindBasic4(showLogo, photoTakenAtTimestamp)
             "basic_5" -> bindBasic5(showLogo, photoTakenAtTimestamp)
+            "basic_6" -> bindBasic6(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -320,5 +321,55 @@ class BasicTemplateBinder(
         val dateContainer = root.findViewById<View>(R.id.date_container)
         setMargin(dateContainer, start = DesignUtils.dpToPxInt(context, 16f), top = DesignUtils.dpToPxInt(context, 16f))
         setMargin(tvTime, start = DesignUtils.dpToPxInt(context, 16f))
+    }
+
+    /**
+     * Basic 6 템플릿 데이터 바인딩
+     */
+    private fun bindBasic6(showLogo: Boolean, timestamp: Long) {
+        val lineSeedBold = loadFont(R.font.line_seed_kr_bold)
+
+        // 날짜 설정 (E, d MMM)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("E, d MMM", timestamp, Locale.US),
+            lineSeedBold,
+            DesignUtils.getScaledTextSize(context, 30f),
+            applyShadow = true,
+            lineSpacingMultiplier = null // 행간 Auto
+        )
+        tvDate?.letterSpacing = -0.02f // 자간 -2%
+
+        // 시간 설정 (am/pm HH:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val timeText = formatDate("a HH:mm", timestamp, Locale.US).lowercase(Locale.US)
+        setupTextView(
+            tvTime,
+            timeText,
+            lineSeedBold,
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true,
+            lineSpacingMultiplier = null
+        )
+        tvTime?.letterSpacing = -0.02f // 자간 -2%
+
+        // 로고 설정
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+
+        // 여백 설정
+        val bottomLeftContainer = root.findViewById<LinearLayout>(R.id.bottom_left_container)
+        setMargin(
+            bottomLeftContainer,
+            start = DesignUtils.dpToPxInt(context, 16f),
+            bottom = DesignUtils.dpToPxInt(context, 16f)
+        )
+
+        setMargin(
+            ivLogo,
+            end = DesignUtils.dpToPxInt(context, 16f),
+            bottom = DesignUtils.dpToPxInt(context, 16f)
+        )
     }
 }
