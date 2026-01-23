@@ -21,7 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+        <com.project.stampy.template.StrokeTextView
             android:id="@+id/tv_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -30,11 +30,10 @@
             android:includeFontPadding="false"
             android:clipChildren="false"
             android:clipToPadding="false"
-            app:layout_constraintVertical_chainStyle="packed"
             tools:text="2026.10.15 (수)"
             tools:fontFamily="@font/keris_kedu" />
 
-        <TextView
+        <com.project.stampy.template.StrokeTextView
             android:id="@+id/tv_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,7 +55,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
-    <TextView
+    <com.project.stampy.template.StrokeTextView
         android:id="@+id/tv_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

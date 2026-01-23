@@ -322,7 +322,7 @@ class ActiveTemplateBinder(
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
         // 날짜 설정: YYYY.mm.dd.(요일)
-        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        val tvDate = root.findViewById<StrokeTextView>(R.id.tv_date)
         val dateText = formatDate("yyyy.MM.dd.(${getDayOfWeekKorean(calendar)})", timestamp)
 
         setupTextView(
@@ -333,9 +333,11 @@ class ActiveTemplateBinder(
             applyShadow = true,
             lineSpacingMultiplier = null // 행간 Auto
         )
+        // 흰색 텍스트 + 검정 외곽선
+        tvDate?.setStroke(DesignUtils.dpToPx(context, 2f), 0xFF000000.toInt())
 
         // 시간 설정: 오전/오후 h:mm
-        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val tvTime = root.findViewById<StrokeTextView>(R.id.tv_time)
         val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "오전" else "오후"
         val hour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
         val minute = String.format("%02d", calendar.get(Calendar.MINUTE))
@@ -348,9 +350,11 @@ class ActiveTemplateBinder(
             applyShadow = true,
             lineSpacingMultiplier = null
         )
+        // 흰색 텍스트 + 검정 외곽선
+        tvTime?.setStroke(DesignUtils.dpToPx(context, 2f), 0xFF000000.toInt())
 
         // 중앙 하단 문구
-        val tvMessage = root.findViewById<TextView>(R.id.tv_message)
+        val tvMessage = root.findViewById<StrokeTextView>(R.id.tv_message)
         setupTextView(
             tvMessage,
             "오늘도 해냈다!",
@@ -359,6 +363,8 @@ class ActiveTemplateBinder(
             applyShadow = true,
             lineSpacingMultiplier = null
         )
+        // 흰색 텍스트 + 검정 외곽선
+        tvMessage?.setStroke(DesignUtils.dpToPx(context, 2f), 0xFF000000.toInt())
 
         // 로고: 우측 상단
         val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
