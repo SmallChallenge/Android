@@ -23,6 +23,7 @@ class MoodyTemplateBinder(
             "moody_2" -> bindMoody2(showLogo, photoTakenAtTimestamp)
             "moody_3" -> bindMoody3(showLogo, photoTakenAtTimestamp)
             "moody_4" -> bindMoody4(showLogo, photoTakenAtTimestamp)
+            "moody_5" -> bindMoody5(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -291,5 +292,56 @@ class MoodyTemplateBinder(
 
         // 시간/날짜 사이 간격 (Gap: 0)
         setMargin(tvDate, top = 0)
+    }
+
+    /**
+     * Moody 5 템플릿 데이터 바인딩
+     */
+    private fun bindMoody5(showLogo: Boolean, timestamp: Long) {
+        val ongleip = loadFont(R.font.ongleip_parkdahyeon) // 온글잎 박다현체
+
+        // 날짜 설정 (YYYY. MM. DD)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("yyyy. MM. dd", timestamp),
+            ongleip,
+            DesignUtils.getScaledTextSize(context, 24f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f // 행간
+        )
+
+        // 시간 설정 (HH:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        setupTextView(
+            tvTime,
+            formatDate("HH:mm", timestamp),
+            ongleip,
+            DesignUtils.getScaledTextSize(context, 40f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
+        )
+
+        // 원형 배경 설정
+        val ivCircle = root.findViewById<ImageView>(R.id.iv_circle_border)
+        ivCircle?.layoutParams = (ivCircle?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            val circleSize = DesignUtils.dpToPxInt(context, 300f) // 300*300px
+            width = circleSize
+            height = circleSize
+        }
+
+        // 로고 설정
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+            (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                // 좌측 하단 여백 16
+                leftMargin = DesignUtils.dpToPxInt(context, 16f)
+                bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
+
+        // Gap: 0px (날짜와 시간 사이 여백 제거)
+        setMargin(tvTime, top = 0)
     }
 }
