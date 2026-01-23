@@ -51,8 +51,8 @@ class MyPageActivity : AppCompatActivity() {
     private lateinit var tokenManager: TokenManager
     private lateinit var authRepository: AuthRepository
 
-    // 애드몹
-    private lateinit var mAdView: AdView
+    // 애드몹 (주석 처리)
+    // private lateinit var mAdView: AdView
 
     // 앰플리튜드
     private lateinit var amplitude: Amplitude
@@ -86,12 +86,14 @@ class MyPageActivity : AppCompatActivity() {
             amplitude.setUserId("user_${tokenManager.getUserId()}")
         }
 
-        // 애드몹 Mobile SDK 초기화
+        // 애드몹 초기화 및 광고 로드 (주석 처리)
+        /*
         MobileAds.initialize(this) {}
         // 뷰 초기화 및 광고 로드
         mAdView = findViewById(R.id.adView)
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
+        */
 
         initViews()
         setupListeners()
@@ -100,18 +102,18 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        mAdView.pause()
+        // mAdView.pause()  // 주석 처리
         super.onPause()
     }
 
     override fun onDestroy() {
-        mAdView.destroy()
+        // mAdView.destroy()  // 주석 처리
         super.onDestroy()
     }
 
     override fun onResume() {
         super.onResume()
-        mAdView.resume()
+        // mAdView.resume()  // 주석 처리
         updateUI()
     }
 

@@ -58,6 +58,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 애드몹 광고 (주석 처리) -->
+    <!--
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="0dp"
@@ -86,6 +88,7 @@
             android:orientation="vertical">
         </LinearLayout>
     </ScrollView>
+    -->
 
     <!-- 스크롤 가능한 콘텐츠 -->
     <ScrollView
