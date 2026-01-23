@@ -366,11 +366,18 @@ class ActiveTemplateBinder(
         // 흰색 텍스트 + 검정 외곽선
         tvMessage?.setStroke(DesignUtils.dpToPx(context, 2f), 0xFF000000.toInt())
 
-        // 로고: 우측 상단
+        // 로고
         val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
         ivLogo?.apply {
             visibility = if (showLogo) View.VISIBLE else View.GONE
-            // XML에서 마진 16dp 설정되어 있음
+
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                val logoSize = DesignUtils.dpToPxInt(context, 38f)
+                width = logoSize
+                height = logoSize
+                topMargin = DesignUtils.dpToPxInt(context, 16f)
+                marginEnd = DesignUtils.dpToPxInt(context, 16f)
+            }
         }
     }
 }

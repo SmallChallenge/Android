@@ -376,6 +376,16 @@ class MoodyTemplateBinder(
 
         // 로고 설정
         val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
-        ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                val logoSize = DesignUtils.dpToPxInt(context, 38f)
+                width = logoSize
+                height = logoSize
+                topMargin = DesignUtils.dpToPxInt(context, 16f)
+                marginEnd = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
     }
 }
