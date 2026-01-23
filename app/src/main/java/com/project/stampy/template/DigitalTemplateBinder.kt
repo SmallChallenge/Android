@@ -23,6 +23,7 @@ class DigitalTemplateBinder(
             "digital_2" -> bindDigital2(showLogo, photoTakenAtTimestamp)
             "digital_3" -> bindDigital3(showLogo, photoTakenAtTimestamp)
             "digital_4" -> bindDigital4(showLogo, photoTakenAtTimestamp)
+            "digital_5" -> bindDigital5(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -330,5 +331,64 @@ class DigitalTemplateBinder(
 
         // 날짜와 시간 사이 간격 (Gap: 0)
         setMargin(tvTime, top = 0)
+    }
+
+    /**
+     * Digital 5 템플릿 데이터 바인딩
+     */
+    private fun bindDigital5(showLogo: Boolean, timestamp: Long) {
+        val cafe24Font = loadFont(R.font.cafe24_pro_up) // 카페 24 프로 업 폰트
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 날짜 설정 (yyyy.mm.dd)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("yyyy.MM.dd", timestamp),
+            cafe24Font,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = false, // 기본 그림자 대신 커스텀 외곽선 적용
+            lineSpacingMultiplier = null // 행간 Auto
+        )
+        applyDigitalStroke(tvDate) // 검정 외곽선 적용
+
+        // 시간 설정 (am/pm hh:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val timeText = formatDate("a hh:mm", timestamp, Locale.US).lowercase(Locale.US)
+        setupTextView(
+            tvTime,
+            timeText,
+            cafe24Font,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = false,
+            lineSpacingMultiplier = null
+        )
+        applyDigitalStroke(tvTime) // 검정 외곽선 적용
+
+        // 로고 설정
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * digital5의 #000000 1px 외곽선 효과
+     */
+    private fun applyDigitalStroke(textView: TextView?) {
+        textView?.apply {
+            // 외곽선 설정: Paint 객체를 직접 조작하여 테두리 생성
+            paint.style = android.graphics.Paint.Style.STROKE
+            paint.strokeWidth = DesignUtils.dpToPx(context, 1f)
+            setTextColor(0xFF000000.toInt())
+
+            setShadowLayer(
+                0.1f, // 번짐 거의 없음
+                0f,
+                0f,
+                0xFFFFFFFF.toInt() // 내부 채우기 색상 (흰색)
+            )
+
+            // 뷰 갱신
+            invalidate()
+        }
     }
 }
