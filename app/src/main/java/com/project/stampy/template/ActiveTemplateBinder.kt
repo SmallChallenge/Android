@@ -24,6 +24,7 @@ class ActiveTemplateBinder(
             "active_3" -> bindActive3(showLogo, photoTakenAtTimestamp)
             "active_4" -> bindActive4(showLogo, photoTakenAtTimestamp)
             "active_5" -> bindActive5(showLogo, photoTakenAtTimestamp)
+            "active_6" -> bindActive6(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -311,5 +312,59 @@ class ActiveTemplateBinder(
         setMargin(tvTime, top = DesignUtils.dpToPxInt(context, 6f))    // 날짜와 시간 사이 Gap 6
         setMargin(tvMessage, top = DesignUtils.dpToPxInt(context, 14f)) // 상단 문구 여백 14
         setMargin(ivLogo, top = DesignUtils.dpToPxInt(context, 16f), end = DesignUtils.dpToPxInt(context, 16f))
+    }
+
+    /**
+     * Active 6 템플릿 데이터 바인딩
+     */
+    private fun bindActive6(showLogo: Boolean, timestamp: Long) {
+        val kerisFont = loadFont(R.font.keris_kedu) // 케리스 케듀체 폰트 로드
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 날짜 설정: YYYY.mm.dd.(요일)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        val dateText = formatDate("yyyy.MM.dd.(${getDayOfWeekKorean(calendar)})", timestamp)
+
+        setupTextView(
+            tvDate,
+            dateText,
+            kerisFont,
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true,
+            lineSpacingMultiplier = null // 행간 Auto
+        )
+
+        // 시간 설정: 오전/오후 h:mm
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "오전" else "오후"
+        val hour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
+        val minute = String.format("%02d", calendar.get(Calendar.MINUTE))
+
+        setupTextView(
+            tvTime,
+            "$amPm $hour:$minute",
+            kerisFont,
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true,
+            lineSpacingMultiplier = null
+        )
+
+        // 중앙 하단 문구
+        val tvMessage = root.findViewById<TextView>(R.id.tv_message)
+        setupTextView(
+            tvMessage,
+            "오늘도 해냈다!",
+            kerisFont,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = true,
+            lineSpacingMultiplier = null
+        )
+
+        // 로고: 우측 상단
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+            // XML에서 마진 16dp 설정되어 있음
+        }
     }
 }
