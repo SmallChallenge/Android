@@ -341,7 +341,7 @@ class DigitalTemplateBinder(
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
         // 날짜 설정 (yyyy.mm.dd)
-        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        val tvDate = root.findViewById<StrokeTextView>(R.id.tv_date)
         setupTextView(
             tvDate,
             formatDate("yyyy.MM.dd", timestamp),
@@ -350,10 +350,10 @@ class DigitalTemplateBinder(
             applyShadow = false, // 기본 그림자 대신 커스텀 외곽선 적용
             lineSpacingMultiplier = null // 행간 Auto
         )
-        applyDigitalStroke(tvDate) // 검정 외곽선 적용
+        tvDate?.setStroke(DesignUtils.dpToPx(context, 2f), 0xFF000000.toInt())
 
         // 시간 설정 (am/pm hh:mm)
-        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val tvTime = root.findViewById<StrokeTextView>(R.id.tv_time)
         val timeText = formatDate("a hh:mm", timestamp, Locale.US).lowercase(Locale.US)
         setupTextView(
             tvTime,
@@ -363,32 +363,10 @@ class DigitalTemplateBinder(
             applyShadow = false,
             lineSpacingMultiplier = null
         )
-        applyDigitalStroke(tvTime) // 검정 외곽선 적용
+        tvTime?.setStroke(DesignUtils.dpToPx(context, 2f), 0xFF000000.toInt())
 
         // 로고 설정
         val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
         ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
-    }
-
-    /**
-     * digital5의 #000000 1px 외곽선 효과
-     */
-    private fun applyDigitalStroke(textView: TextView?) {
-        textView?.apply {
-            // 외곽선 설정: Paint 객체를 직접 조작하여 테두리 생성
-            paint.style = android.graphics.Paint.Style.STROKE
-            paint.strokeWidth = DesignUtils.dpToPx(context, 1f)
-            setTextColor(0xFF000000.toInt())
-
-            setShadowLayer(
-                0.1f, // 번짐 거의 없음
-                0f,
-                0f,
-                0xFFFFFFFF.toInt() // 내부 채우기 색상 (흰색)
-            )
-
-            // 뷰 갱신
-            invalidate()
-        }
     }
 }
