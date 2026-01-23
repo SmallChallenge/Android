@@ -24,6 +24,7 @@ class DigitalTemplateBinder(
             "digital_3" -> bindDigital3(showLogo, photoTakenAtTimestamp)
             "digital_4" -> bindDigital4(showLogo, photoTakenAtTimestamp)
             "digital_5" -> bindDigital5(showLogo, photoTakenAtTimestamp)
+            "digital_6" -> bindDigital6(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -368,5 +369,52 @@ class DigitalTemplateBinder(
         // 로고 설정
         val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
         ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * Digital 6 템플릿 데이터 바인딩
+     */
+    private fun bindDigital6(showLogo: Boolean, timestamp: Long) {
+        val dunggeunmoFont = loadFont(R.font.dunggeunmo)
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 날짜 포맷: yy년 MM월 dd일 (E),
+        val dateStr = formatDate("yy년 MM월 dd일 (E), ", timestamp)
+        // 시간 포맷: a h시 mm분
+        val timeStr = formatDate("a h시 mm분", timestamp)
+        val fullText = dateStr + timeStr
+
+        val tvDateTime = root.findViewById<StrokeTextView>(R.id.tv_datetime)
+
+        tvDateTime?.apply {
+            text = fullText
+            dunggeunmoFont?.let { typeface = it }
+            val scaledSize = DesignUtils.getScaledTextSize(context, 16f)
+            setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, scaledSize)
+
+            // 색상 및 외곽선 설정 (#FFDD00 노란색 글자색, #000000 1px 외곽선)
+            setTextColor(0xFFFFDD00.toInt())
+            setStroke(DesignUtils.dpToPx(context, 2f), 0xFF000000.toInt())
+
+            // 자간 설정 (-2% -> -0.02f)
+            letterSpacing = -0.02f
+        }
+
+        // 로고
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                val logoSize = DesignUtils.dpToPxInt(context, 38f)
+                width = logoSize
+                height = logoSize
+                topMargin = DesignUtils.dpToPxInt(context, 16f)
+                marginEnd = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
+
+        // 여백
+        setMargin(tvDateTime, bottom = DesignUtils.dpToPxInt(context, 16f))
     }
 }
