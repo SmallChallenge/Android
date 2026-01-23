@@ -24,6 +24,7 @@ class MoodyTemplateBinder(
             "moody_3" -> bindMoody3(showLogo, photoTakenAtTimestamp)
             "moody_4" -> bindMoody4(showLogo, photoTakenAtTimestamp)
             "moody_5" -> bindMoody5(showLogo, photoTakenAtTimestamp)
+            "moody_6" -> bindMoody6(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -343,5 +344,38 @@ class MoodyTemplateBinder(
 
         // Gap: 0px (날짜와 시간 사이 여백 제거)
         setMargin(tvTime, top = 0)
+    }
+
+    /**
+     * Moody 6 템플릿 데이터 바인딩
+     */
+    private fun bindMoody6(showLogo: Boolean, timestamp: Long) {
+        val monofettFont = loadFont(R.font.monofett_regular)
+
+        // 날짜 설정 (yyyy.mm.dd)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("yyyy.MM.dd", timestamp),
+            monofettFont,
+            DesignUtils.getScaledTextSize(context, 25f),
+            applyShadow = true,
+            lineSpacingMultiplier = null // 행간 따로 설정 X
+        )
+
+        // 시간 설정 (HH:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        setupTextView(
+            tvTime,
+            formatDate("HH:mm", timestamp),
+            monofettFont,
+            DesignUtils.getScaledTextSize(context, 25f),
+            applyShadow = true,
+            lineSpacingMultiplier = null
+        )
+
+        // 로고 설정
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
     }
 }
