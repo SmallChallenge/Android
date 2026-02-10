@@ -26,7 +26,7 @@ class MoodyTemplateBinder(
             "moody_5" -> bindMoody5(showLogo, photoTakenAtTimestamp)
             "moody_6" -> bindMoody6(showLogo, photoTakenAtTimestamp)
             "moody_7" -> bindMoody7(showLogo, photoTakenAtTimestamp)
-            //"moody_8" -> bindMoody8(showLogo, photoTakenAtTimestamp)
+            "moody_8" -> bindMoody8(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -435,5 +435,64 @@ class MoodyTemplateBinder(
 
         // 날짜/시간 사이 간격
         setMargin(tvTime, top = 0)
+    }
+
+    /**
+     * Moody 8 템플릿 데이터 바인딩
+     */
+    private fun bindMoody8(showLogo: Boolean, timestamp: Long) {
+        val kkubulim = loadFont(R.font.bm_kkubulim)
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 시간 설정 (오전/오후 h:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "오전" else "오후"
+        val hour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
+        val minute = String.format("%02d", calendar.get(Calendar.MINUTE))
+
+        setupTextView(
+            tvTime,
+            "$amPm $hour:$minute",
+            kkubulim,
+            DesignUtils.getScaledTextSize(context, 40f),
+            applyShadow = true,
+            lineSpacingMultiplier = null // Auto
+        )
+
+        // 날짜 설정 (YYYY.MM.DD (요일))
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        val dateText = formatDate("yyyy.MM.dd (${getDayOfWeekKorean(calendar)})", timestamp)
+
+        setupTextView(
+            tvDate,
+            dateText,
+            kkubulim,
+            DesignUtils.getScaledTextSize(context, 18f),
+            applyShadow = true,
+            lineSpacingMultiplier = null // Auto
+        )
+
+        // 로고 설정 (시간 위에 배치)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo_icon)
+        ivLogo?.visibility = if (showLogo) View.VISIBLE else View.GONE
+
+        // 스프링 디자인 설정
+        val ivSpring = root.findViewById<ImageView>(R.id.iv_spring_design)
+        ivSpring?.apply {
+            val scaledWidth = DesignUtils.dpToPxInt(context, 340f)
+            val scaledHeight = DesignUtils.dpToPxInt(context, 13f)
+
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                width = scaledWidth
+                height = scaledHeight
+            }
+            scaleType = ImageView.ScaleType.FIT_XY
+        }
+
+        // 여백 조정 (로고 & 시간 & 날짜 Gap : 0)
+        val bottomContainer = root.findViewById<LinearLayout>(R.id.bottom_datetime_container)
+        setMargin(bottomContainer, bottom = DesignUtils.dpToPxInt(context, 16f))
+        setMargin(tvTime, top = 0)
+        setMargin(tvDate, top = 0)
     }
 }

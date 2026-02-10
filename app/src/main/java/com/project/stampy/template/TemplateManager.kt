@@ -162,6 +162,16 @@ object TemplateManager {
             )
         )
 
+        templates.add(
+            Template(
+                id = "moody_8",
+                category = TemplateCategory.MOODY,
+                name = "Moody 8",
+                layoutResId = R.layout.template_moody_8,
+                thumbnailResId = R.drawable.template_moody_8
+            )
+        )
+
         // Active 카테고리 템플릿
         templates.add(
             Template(
