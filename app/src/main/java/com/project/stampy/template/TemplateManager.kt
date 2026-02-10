@@ -323,6 +323,16 @@ object TemplateManager {
                 thumbnailResId = R.drawable.template_digital_7
             )
         )
+
+        templates.add(
+            Template(
+                id = "digital_8",
+                category = TemplateCategory.DIGITAL,
+                name = "Digital 8",
+                layoutResId = R.layout.template_digital_8,
+                thumbnailResId = R.drawable.template_digital_8
+            )
+        )
     }
 
     /**

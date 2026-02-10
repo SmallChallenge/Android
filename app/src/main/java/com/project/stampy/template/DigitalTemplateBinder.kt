@@ -27,7 +27,7 @@ class DigitalTemplateBinder(
             "digital_5" -> bindDigital5(showLogo, photoTakenAtTimestamp)
             "digital_6" -> bindDigital6(showLogo, photoTakenAtTimestamp)
             "digital_7" -> bindDigital7(showLogo, photoTakenAtTimestamp)
-            //"digital_8" -> bindDigital8(showLogo, photoTakenAtTimestamp)
+            "digital_8" -> bindDigital8(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -451,7 +451,7 @@ class DigitalTemplateBinder(
         val tvTime = root.findViewById<StrokeTextView>(R.id.tv_time)
         val timeText = formatDate("h:mm a", timestamp, Locale.US).uppercase()
 
-        // 4. 시간 뷰 설정
+        // 시간 뷰 설정
         setupTextView(
             tvTime,
             timeText,
@@ -479,6 +479,63 @@ class DigitalTemplateBinder(
             (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
                 marginEnd = DesignUtils.dpToPxInt(context, 16f)
                 bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
+    }
+
+    /**
+     * Digital 8 템플릿 데이터 바인딩
+     */
+    private fun bindDigital8(showLogo: Boolean, timestamp: Long) {
+        val galmuriFont = loadFont(R.font.galmuri_mono11)
+
+        // 날짜 및 시간 설정
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("yyyy년MM월dd일(E)", timestamp),
+            galmuriFont,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = true
+        )
+
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        setupTextView(
+            tvTime,
+            formatDate("ah:mm", timestamp),
+            galmuriFont,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = true
+        )
+
+        // 가변 수치 및 여백 설정
+        val margin16 = DesignUtils.dpToPxInt(context, 16f)
+
+        // 상단 컨테이너 여백
+        val topContainer = root.findViewById<LinearLayout>(R.id.ll_top_container)
+        (topContainer?.layoutParams as? ConstraintLayout.LayoutParams)?.topMargin = margin16
+
+        // 로고
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                val logoSize = DesignUtils.dpToPxInt(context, 38f)
+                width = logoSize
+                height = logoSize
+                topMargin = DesignUtils.dpToPxInt(context, 16f)
+                marginEnd = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
+
+        // 하단 경험치 이미지 설정 (가이드: 220x40)
+        val ivExpCombined = root.findViewById<ImageView>(R.id.iv_exp_combined)
+        ivExpCombined?.apply {
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                width = DesignUtils.dpToPxInt(context, 220f)
+                height = DesignUtils.dpToPxInt(context, 40f)
+                bottomMargin = margin16
             }
         }
     }
