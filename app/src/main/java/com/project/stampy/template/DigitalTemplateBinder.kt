@@ -1,6 +1,7 @@
 package com.project.stampy.template
 
 import android.content.Context
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -25,6 +26,8 @@ class DigitalTemplateBinder(
             "digital_4" -> bindDigital4(showLogo, photoTakenAtTimestamp)
             "digital_5" -> bindDigital5(showLogo, photoTakenAtTimestamp)
             "digital_6" -> bindDigital6(showLogo, photoTakenAtTimestamp)
+            "digital_7" -> bindDigital7(showLogo, photoTakenAtTimestamp)
+            //"digital_8" -> bindDigital8(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -416,5 +419,63 @@ class DigitalTemplateBinder(
 
         // 여백
         setMargin(tvDateTime, bottom = DesignUtils.dpToPxInt(context, 16f))
+    }
+
+    /**
+     * Digital 7 템플릿 데이터 바인딩
+     */
+    private fun bindDigital7(showLogo: Boolean, timestamp: Long) {
+        val boldDungGeunMo = loadFont(R.font.dunggeunmo_bold)
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 날짜 설정 (December ddth yyyy)
+        val tvDate = root.findViewById<StrokeTextView>(R.id.tv_date)
+        val month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)?.uppercase()
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val daySuffix = getDaySuffix(day).uppercase()
+        val year = calendar.get(Calendar.YEAR)
+
+        tvDate?.apply {
+            text = "$month ${day}${daySuffix} $year"
+            boldDungGeunMo?.let { typeface = it }
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 18f))
+            // 가이드 Stroke 1.5 적용
+            setStroke(DesignUtils.dpToPx(context, 2.4f), 0xFF000000.toInt())
+            // 그림자 적용
+            setShadowLayer(DesignUtils.dpToPx(context, 4f), 0f, 0f, 0x66000000.toInt())
+        }
+
+        // 시간 설정 (h:mm AM/PM)
+        val tvTime = root.findViewById<StrokeTextView>(R.id.tv_time)
+        val timeText = formatDate("h:mm a", timestamp, Locale.US).uppercase()
+
+        tvTime?.apply {
+            text = timeText
+            boldDungGeunMo?.let { typeface = it }
+            // 가이드 28 적용
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 28f))
+            setStroke(DesignUtils.dpToPx(context, 2.5f), 0xFF000000.toInt())
+            setShadowLayer(DesignUtils.dpToPx(context, 4f), 0f, 0f, 0x66000000.toInt())
+
+            // Gap : 2 적용
+            (layoutParams as? LinearLayout.LayoutParams)?.topMargin = DesignUtils.dpToPxInt(context, 2f)
+        }
+
+        // 컨테이너 여백 설정 (좌측 상단 여백 24)
+        val container = root.findViewById<LinearLayout>(R.id.ll_datetime_container)
+        (container?.layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            topMargin = DesignUtils.dpToPxInt(context, 24f)
+            marginStart = DesignUtils.dpToPxInt(context, 24f)
+        }
+
+        // 로고 설정 (우측 하단 여백 16)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+            (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                marginEnd = DesignUtils.dpToPxInt(context, 16f)
+                bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
     }
 }
