@@ -428,36 +428,40 @@ class DigitalTemplateBinder(
         val boldDungGeunMo = loadFont(R.font.dunggeunmo_bold)
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 날짜 설정 (December ddth yyyy)
-        val tvDate = root.findViewById<StrokeTextView>(R.id.tv_date)
+        // 날짜 (DECEMBER 16TH 2026)
         val month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)?.uppercase()
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         val daySuffix = getDaySuffix(day).uppercase()
         val year = calendar.get(Calendar.YEAR)
+        val dateText = "$month ${day}${daySuffix} $year"
 
-        tvDate?.apply {
-            text = "$month ${day}${daySuffix} $year"
-            boldDungGeunMo?.let { typeface = it }
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 18f))
-            // 가이드 Stroke 1.5 적용
-            setStroke(DesignUtils.dpToPx(context, 2.4f), 0xFF000000.toInt())
-            // 그림자 적용
-            setShadowLayer(DesignUtils.dpToPx(context, 4f), 0f, 0f, 0x66000000.toInt())
-        }
+        // 날짜 뷰 설정
+        val tvDate = root.findViewById<StrokeTextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            dateText,
+            boldDungGeunMo,
+            DesignUtils.getScaledTextSize(context, 18f),
+            applyShadow = true
+        )
+        // StrokeTextView 전용 속성 설정(Stroke 1.5 적용)
+        tvDate?.setStroke(DesignUtils.dpToPx(context, 2.4f), 0xFF000000.toInt())
 
-        // 시간 설정 (h:mm AM/PM)
+        // 시간 (1:42 AM)
         val tvTime = root.findViewById<StrokeTextView>(R.id.tv_time)
         val timeText = formatDate("h:mm a", timestamp, Locale.US).uppercase()
 
+        // 4. 시간 뷰 설정
+        setupTextView(
+            tvTime,
+            timeText,
+            boldDungGeunMo,
+            DesignUtils.getScaledTextSize(context, 28f),
+            applyShadow = true
+        )
+        // StrokeTextView 전용 속성 및 간격 설정(Stroke 1.5 적용, Gap: 2 적용)
         tvTime?.apply {
-            text = timeText
-            boldDungGeunMo?.let { typeface = it }
-            // 가이드 28 적용
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, DesignUtils.getScaledTextSize(context, 28f))
             setStroke(DesignUtils.dpToPx(context, 2.5f), 0xFF000000.toInt())
-            setShadowLayer(DesignUtils.dpToPx(context, 4f), 0f, 0f, 0x66000000.toInt())
-
-            // Gap : 2 적용
             (layoutParams as? LinearLayout.LayoutParams)?.topMargin = DesignUtils.dpToPxInt(context, 2f)
         }
 
