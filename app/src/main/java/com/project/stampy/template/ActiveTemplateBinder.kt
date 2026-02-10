@@ -449,36 +449,30 @@ class ActiveTemplateBinder(
         val kerisFont = loadFont(R.font.keris_kedu) // RixInooAriDuri 폰트 로드
         val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
 
-        // 날짜 설정 (2줄로 구성)
+        // 날짜, 시간 설정 (3줄로 구성)
         // 첫째 줄: YYYY년
         // 둘째 줄: mm월 dd일 (요일)
+        // 셋째 줄: 오전/오후 h:mm
         val tvDate = root.findViewById<TextView>(R.id.tv_date)
         val year = formatDate("yyyy년", timestamp)
         val dayMonth = formatDate("MM월 dd일 (${getDayOfWeekKorean(calendar)})", timestamp)
-        val dateText = "$year\n$dayMonth"
 
-        setupTextView(
-            tvDate,
-            dateText,
-            kerisFont,
-            DesignUtils.getScaledTextSize(context, 18f),
-            applyShadow = true,
-            lineSpacingMultiplier = 1.3f // 행간 130%
-        )
-
-        // 시간 설정: 오전/오후 h:mm
-        val tvTime = root.findViewById<TextView>(R.id.tv_time)
         val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "오전" else "오후"
         val hour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
         val minute = String.format("%02d", calendar.get(Calendar.MINUTE))
+        val timeText = "$amPm $hour:$minute"
 
+        // 세 줄을 하나로 합침
+        val fullContent = "$year\n$dayMonth\n$timeText"
+
+        val tvDateTime = root.findViewById<TextView>(R.id.tv_date_time)
         setupTextView(
-            tvTime,
-            "$amPm $hour:$minute",
+            tvDateTime,
+            fullContent,
             kerisFont,
             DesignUtils.getScaledTextSize(context, 18f),
             applyShadow = true,
-            lineSpacingMultiplier = 1.3f // 행간 130%
+            lineSpacingMultiplier = 1.3f // 행간 130% 적용
         )
 
         // 로고 설정: 우측 상단 (여백 16px)
@@ -497,10 +491,9 @@ class ActiveTemplateBinder(
             }
         }
 
-        // 컨테이너 여백 (좌측 하단 여백 16)
-        val bottomContainer = root.findViewById<View>(R.id.bottom_container)
+        // 텍스트 뷰 전체 여백 (좌측 하단 16)
         setMargin(
-            bottomContainer,
+            tvDateTime,
             start = DesignUtils.dpToPxInt(context, 16f),
             bottom = DesignUtils.dpToPxInt(context, 16f)
         )
