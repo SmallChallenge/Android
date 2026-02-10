@@ -53,6 +53,9 @@ class LoginActivity : AppCompatActivity() {
     // 사진 저장 화면에서 왔는지 여부
     private var shouldReturnToPhotoSave = false
 
+    // 사진 편집 화면에서 왔는지 여부
+    private var shouldReturnToPhotoEdit = false
+
     // 커뮤니티에서 왔는지 여부
     private var shouldReturnToCommunity = false
 
@@ -69,6 +72,9 @@ class LoginActivity : AppCompatActivity() {
 
         // 사진 저장 화면에서 왔는지 확인하는 Extra
         const val EXTRA_RETURN_TO_PHOTO_SAVE = "extra_return_to_photo_save"
+
+        // 사진 편집 화면에서 왔는지 확인하는 Extra
+        const val EXTRA_RETURN_TO_PHOTO_EDIT = "extra_return_to_photo_edit"
 
         // 커뮤니티에서 왔는지 확인하는 Extra
         const val EXTRA_RETURN_TO_COMMUNITY = "extra_return_to_community"
@@ -87,6 +93,10 @@ class LoginActivity : AppCompatActivity() {
         // 사진 저장 화면에서 왔는지 확인
         shouldReturnToPhotoSave = intent.getBooleanExtra(EXTRA_RETURN_TO_PHOTO_SAVE, false)
         Log.d(TAG, "shouldReturnToPhotoSave: $shouldReturnToPhotoSave")
+
+        // 사진 편집 화면에서 왔는지 확인
+        shouldReturnToPhotoEdit = intent.getBooleanExtra(EXTRA_RETURN_TO_PHOTO_EDIT, false)
+        Log.d(TAG, "shouldReturnToPhotoEdit: $shouldReturnToPhotoEdit")
 
         // 커뮤니티에서 왔는지 확인
         shouldReturnToCommunity = intent.getBooleanExtra(EXTRA_RETURN_TO_COMMUNITY, false)
@@ -447,6 +457,13 @@ class LoginActivity : AppCompatActivity() {
             // 사진 저장 화면에서 왔으면 그냥 닫기 (PhotoSaveActivity로 돌아감)
             shouldReturnToPhotoSave -> {
                 Log.d(TAG, "사진 저장 화면으로 돌아가기")
+                setResult(RESULT_OK)
+                finish()
+            }
+
+            // 사진 편집 화면에서 왔으면 그냥 닫기 (PhotoEditActivity로 돌아감)
+            shouldReturnToPhotoEdit -> {
+                Log.d(TAG, "사진 편집 화면으로 돌아가기")
                 setResult(RESULT_OK)
                 finish()
             }

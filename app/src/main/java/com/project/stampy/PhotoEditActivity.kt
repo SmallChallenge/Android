@@ -10,6 +10,7 @@ import android.util.Log
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +31,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.AdRequest
 import com.amplitude.android.Amplitude
 import com.amplitude.android.Configuration
+import com.project.stampy.auth.LoginActivity
 import com.project.stampy.data.local.TokenManager
 
 class PhotoEditActivity : AppCompatActivity() {
@@ -74,6 +76,22 @@ class PhotoEditActivity : AppCompatActivity() {
     // 실시간 시간 업데이트용
     private val timeUpdateHandler = Handler(Looper.getMainLooper())
     private var timeUpdateRunnable: Runnable? = null
+
+    // 로그인 결과 처리
+    private val loginLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // 로그인 성공 - 로고 OFF
+            Log.d(TAG, "로그인 성공 - 로고 OFF")
+            showLogo = false
+            switchLogo.isChecked = false
+            templateView.setLogoVisibility(false)
+        } else {
+            // 로그인 취소 - 스위치 원상복구
+            switchLogo.isChecked = true
+        }
+    }
 
     companion object {
         const val TAG = "PhotoEditActivity"
@@ -299,35 +317,57 @@ class PhotoEditActivity : AppCompatActivity() {
             selectCategory(TemplateCategory.DIGITAL, btnCategoryDigital)
         }
 
-        // 로고 토글 - 광고 없이 바로 ON/OFF 가능
-        switchLogo.setOnClickListener {
-            val isChecked = switchLogo.isChecked
-            showLogo = isChecked
-            templateView.setLogoVisibility(isChecked)
-            Log.d(TAG, "로고 표시 상태: $showLogo")
-        }
-
-        // 기존 광고 관련 리스너 (주석처리)
-        /*
+        // 로고 토글 - 로그인 확인 후 ON/OFF 가능
         switchLogo.setOnClickListener {
             val isChecked = switchLogo.isChecked
 
-            if (!isChecked) { // 로고를 끄려고 할 때
-                if (isRewardEarned) {
-                    // 이미 광고를 봤다면 바로 끄기 가능
+            if (!isChecked) {
+                // 로고를 끄려고 할 때 - 로그인 확인
+                if (tokenManager.isLoggedIn()) {
+                    // 로그인된 경우 바로 로고 OFF
                     showLogo = false
                     templateView.setLogoVisibility(false)
+                    Log.d(TAG, "로그인 유저 - 로고 OFF")
                 } else {
-                    // 광고를 아직 안 봤다면 다이얼로그 띄우기
-                    switchLogo.isChecked = true
-                    showLogoOffDialog()
+                    // 비로그인 유저 - 로그인 필요 다이얼로그
+                    switchLogo.isChecked = true // 스위치 원상복구
+                    showLoginRequiredDialog()
                 }
-            } else { // 로고를 다시 켤 때
+            } else {
+                // 로고를 다시 켤 때
                 showLogo = true
                 templateView.setLogoVisibility(true)
+                Log.d(TAG, "로고 ON")
             }
         }
-        */
+    }
+
+    /**
+     * 로그인 필요 다이얼로그 표시
+     */
+    private fun showLoginRequiredDialog() {
+        DoubleButtonDialog(this)
+            .setTitle("로그인이 필요해요.")
+            .setCancelButtonText("취소")
+            .setConfirmButtonText("로그인")
+            .setOnCancelListener {
+                Log.d(TAG, "로그인 취소")
+            }
+            .setOnConfirmListener {
+                Log.d(TAG, "로그인 화면으로 이동")
+                navigateToLogin()
+            }
+            .show()
+    }
+
+    /**
+     * 로그인 화면으로 이동
+     */
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java).apply {
+            putExtra(LoginActivity.EXTRA_RETURN_TO_PHOTO_EDIT, true)
+        }
+        loginLauncher.launch(intent)
     }
 
     /**
