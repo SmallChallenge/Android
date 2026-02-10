@@ -25,6 +25,8 @@ class ActiveTemplateBinder(
             "active_4" -> bindActive4(showLogo, photoTakenAtTimestamp)
             "active_5" -> bindActive5(showLogo, photoTakenAtTimestamp)
             "active_6" -> bindActive6(showLogo, photoTakenAtTimestamp)
+            "active_7" -> bindActive7(showLogo, photoTakenAtTimestamp)
+            //"active_8" -> bindActive8(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -379,5 +381,64 @@ class ActiveTemplateBinder(
                 marginEnd = DesignUtils.dpToPxInt(context, 16f)
             }
         }
+    }
+
+    /**
+     * Active 7 템플릿 데이터 바인딩
+     */
+    private fun bindActive7(showLogo: Boolean, timestamp: Long) {
+        val kerisFont = loadFont(R.font.keris_kedu) // 케리스 케듀체 폰트 로드
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 시간 설정: 오전/오후 h:mm (Size: 24, 행간 100%, 자간 0)
+        val tvTime = root.findViewById<StrokeTextView>(R.id.tv_time)
+        val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "오전" else "오후"
+        val hour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
+        val minute = String.format("%02d", calendar.get(Calendar.MINUTE))
+
+        setupTextView(
+            tvTime,
+            "$amPm $hour:$minute",
+            kerisFont,
+            DesignUtils.getScaledTextSize(context, 24f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
+        )
+        // 흰색 텍스트 + 검정 외곽선 (이미지의 외곽선 효과 반영)
+        tvTime?.setStroke(DesignUtils.dpToPx(context, 2f), 0xFF000000.toInt())
+
+        // 날짜 설정: YYYY.mm.dd (요일) (Size: 16, 행간 100%, 자간 0)
+        val tvDate = root.findViewById<StrokeTextView>(R.id.tv_date)
+        val dateText = formatDate("yyyy.MM.dd (${getDayOfWeekKorean(calendar)})", timestamp)
+
+        setupTextView(
+            tvDate,
+            dateText,
+            kerisFont,
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
+        )
+        tvDate?.setStroke(DesignUtils.dpToPx(context, 2f), 0xFF000000.toInt())
+
+        // 로고 설정: 우측 하단 (여백 16)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                // 우측 하단 배치 및 여백 16px
+                bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                topToTop = ConstraintLayout.LayoutParams.UNSET
+
+                val margin16 = DesignUtils.dpToPxInt(context, 16f)
+                setMargins(0, 0, margin16, margin16)
+            }
+        }
+
+        // 간격 조정 (Gap : 6)
+        // 날짜 텍스트의 상단 마진을 6으로 설정하여 시간과의 간격 유지
+        setMargin(tvDate, top = DesignUtils.dpToPxInt(context, 6f))
     }
 }
