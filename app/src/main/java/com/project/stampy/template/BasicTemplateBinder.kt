@@ -26,6 +26,7 @@ class BasicTemplateBinder(
             "basic_4" -> bindBasic4(showLogo, photoTakenAtTimestamp)
             "basic_5" -> bindBasic5(showLogo, photoTakenAtTimestamp)
             "basic_6" -> bindBasic6(showLogo, photoTakenAtTimestamp)
+            "basic_7" -> bindBasic7(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -369,6 +370,50 @@ class BasicTemplateBinder(
         setMargin(
             ivLogo,
             end = DesignUtils.dpToPxInt(context, 16f),
+            bottom = DesignUtils.dpToPxInt(context, 16f)
+        )
+    }
+
+    /**
+     * Basic 7 템플릿 데이터 바인딩
+     */
+    private fun bindBasic7(showLogo: Boolean, timestamp: Long) {
+        val spaceMonoBoldItalic = loadFont(R.font.space_mono_bold_italic)
+
+        // 날짜/시간 설정: yyyy.MM.dd am/pm hh:mm
+        val tvDateTime = root.findViewById<TextView>(R.id.tv_datetime)
+
+        // 날짜 부분 (yyyy.MM.dd)
+        val datePart = formatDate("yyyy.MM.dd", timestamp)
+        // 시간 부분 (am/pm hh:mm) - 소문자 처리
+        val timePart = formatDate("a hh:mm", timestamp, Locale.US).lowercase(Locale.US)
+
+        // 결과: 2025.12.31_pm_12:53 (체크된 두 곳에 띄어쓰기 적용)
+        val fullText = "$datePart $timePart"
+
+        setupTextView(
+            tvDateTime,
+            fullText,
+            spaceMonoBoldItalic,
+            DesignUtils.getScaledTextSize(context, 16f),
+            applyShadow = true,
+            lineSpacingMultiplier = null
+        )
+
+        // 로고 설정 (중앙 상단)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // 여백 및 크기 조정 (375 기준 16dp)
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                topMargin = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
+
+        // 하단 텍스트 여백 조정 (중앙 하단 16dp)
+        setMargin(
+            tvDateTime,
             bottom = DesignUtils.dpToPxInt(context, 16f)
         )
     }
