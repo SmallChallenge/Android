@@ -27,6 +27,7 @@ class BasicTemplateBinder(
             "basic_5" -> bindBasic5(showLogo, photoTakenAtTimestamp)
             "basic_6" -> bindBasic6(showLogo, photoTakenAtTimestamp)
             "basic_7" -> bindBasic7(showLogo, photoTakenAtTimestamp)
+            "basic_8" -> bindBasic8(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -416,5 +417,58 @@ class BasicTemplateBinder(
             tvDateTime,
             bottom = DesignUtils.dpToPxInt(context, 16f)
         )
+    }
+
+    /**
+     * Basic 8 템플릿 데이터 바인딩
+     */
+    private fun bindBasic8(showLogo: Boolean, timestamp: Long) {
+        val montserratSemiBold = loadFont(R.font.montserrat_semi_bold)
+
+        // 날짜 설정 (YY.MM.DD)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("yy.MM.dd", timestamp),
+            montserratSemiBold,
+            DesignUtils.getScaledTextSize(context, 40f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
+        )
+
+        // 시간 설정 (am/pm h:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val timeText = formatDate("a h:mm", timestamp, Locale.US).lowercase(Locale.US)
+        setupTextView(
+            tvTime,
+            timeText,
+            montserratSemiBold,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.0f
+        )
+
+        // 로고 설정 (우측 하단)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // 여백 조정 (우측 16, 하단 16)
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                marginEnd = DesignUtils.dpToPxInt(context, 16f)
+                bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
+
+        // 날짜/시간 컨테이너 여백 조정 (우측 상단 여백 16)
+        val topContainer = root.findViewById<LinearLayout>(R.id.datetime_container)
+        setMargin(
+            topContainer,
+            top = DesignUtils.dpToPxInt(context, 16f),
+            end = DesignUtils.dpToPxInt(context, 16f)
+        )
+
+        // 날짜와 시간 사이 여백 X (Gap 0)
+        setMargin(tvTime, top = 0)
     }
 }
