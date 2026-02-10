@@ -356,11 +356,16 @@ class CommunityFragment : Fragment() {
     }
 
     /**
-     * 커뮤니티 게시물 로드 (첫 페이지)
+     * 커뮤니티 게시물 로드 (첫 페이지 로딩 및 새로고침)
      */
     private fun loadCommunityPosts() {
         if (isLoading) return
         isLoading = true
+
+        // 즉시 로딩 인디케이터를 활성화
+        swipeRefreshLayout.post {
+            swipeRefreshLayout.isRefreshing = true
+        }
 
         // 페이징 초기화
         lastPublishedAt = null
@@ -368,6 +373,9 @@ class CommunityFragment : Fragment() {
         hasNext = true
 
         viewLifecycleOwner.lifecycleScope.launch {
+            // 로딩 시작 시간 기록
+            val startTime = System.currentTimeMillis()
+
             communityRepository.getCommunityFeeds(
                 category = null,
                 lastPublishedAt = null,
@@ -377,12 +385,7 @@ class CommunityFragment : Fragment() {
             ).onSuccess { response ->
                 Log.d(TAG, "커뮤니티 피드 ${response.feeds.size}개 로드됨")
 
-                // 디버깅: 좋아요 상태 로그
-                response.feeds.forEach { feed ->
-                    Log.d(TAG, "imageId=${feed.imageId}, liked=${feed.isLiked}, likeCount=${feed.likeCount}")
-                }
-
-                // 실제로 데이터가 없을 때만 빈 화면 표시
+                // 데이터 유무에 따른 UI 처리
                 if (response.feeds.isEmpty()) {
                     showEmptyState()
                 } else {
@@ -401,8 +404,16 @@ class CommunityFragment : Fragment() {
                 showEmptyState()
             }
 
+            // 통신이 0.1초 만에 끝나더라도 사용자가 로딩을 인지할 수 있게 0.7초 정도 유지
+            val minLoadingTime = 700L
+            val elapsedTime = System.currentTimeMillis() - startTime
+
+            if (elapsedTime < minLoadingTime) {
+                kotlinx.coroutines.delay(minLoadingTime - elapsedTime)
+            }
+
+            // 로딩 상태 해제 및 인디케이터 숨기기
             isLoading = false
-            // 로딩 완료 시 SwipeRefreshLayout 정지
             swipeRefreshLayout.isRefreshing = false
         }
     }
