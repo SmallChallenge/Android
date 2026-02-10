@@ -4,6 +4,8 @@ import android.util.Log
 import com.project.stampy.data.local.TokenManager
 import com.project.stampy.data.model.RefreshTokenRequest
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -19,6 +21,7 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
 
     companion object {
         private const val TAG = "AuthInterceptor"
+        private val refreshMutex = Mutex()  // 동시 갱신 방지
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -32,9 +35,15 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
         }
 
         // 사전 토큰 갱신: 만료 임박하면 미리 갱신
-        if (tokenManager.isAccessTokenExpiringSoon()) {
-            Log.d(TAG, "토큰 만료 임박 감지 - 사전 갱신 시작")
-            refreshTokenProactively()
+        runBlocking {
+            if (tokenManager.isAccessTokenExpiringSoon()) {
+                refreshMutex.withLock {
+                    if (tokenManager.isAccessTokenExpiringSoon()) {
+                        Log.d(TAG, "토큰 만료 임박 감지 - 사전 갱신 시작")
+                        refreshTokenProactively()
+                    }
+                }
+            }
         }
 
         // Access Token 가져오기
@@ -42,6 +51,7 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
 
         // 토큰이 없으면 원래 요청 그대로 진행
         if (accessToken.isNullOrEmpty()) {
+            Log.w(TAG, "Access Token 없음 - 인증 없이 요청")
             return chain.proceed(originalRequest)
         }
 
@@ -56,34 +66,42 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
     /**
      * 사전에 토큰을 갱신
      */
-    private fun refreshTokenProactively() {
-        val refreshToken = tokenManager.getRefreshToken() ?: return
+    private suspend fun refreshTokenProactively() {
+        val refreshToken = tokenManager.getRefreshToken()
+        if (refreshToken.isNullOrEmpty()) {
+            Log.e(TAG, "Refresh Token 없음 - 갱신 불가")
+            return
+        }
 
-        runBlocking {
-            try {
-                val authApi = RetrofitClient.createService(AuthApiService::class.java)
-                val request = RefreshTokenRequest(refreshToken)
-                val response = authApi.refreshToken(request)
+        try {
+            val authApi = RetrofitClient.createService(AuthApiService::class.java)
+            val request = RefreshTokenRequest(refreshToken)
+            val response = authApi.refreshToken(request)
 
-                if (response.isSuccessful && response.body()?.success == true) {
-                    val newTokens = response.body()?.data
+            if (response.isSuccessful && response.body()?.success == true) {
+                val newTokens = response.body()?.data
 
-                    if (newTokens != null) {
-                        // 새로운 Access Token과 Refresh Token 저장
-                        tokenManager.saveAccessToken(newTokens.accessToken)
-                        tokenManager.saveRefreshToken(newTokens.refreshToken)
-                        tokenManager.saveNickname(newTokens.nickname)
+                if (newTokens != null) {
+                    // expiresIn 값을 서버에서 받아와야 함
+                    val expiresIn = 3600L // 서버 응답에 포함되어야 함
 
-                        Log.d(TAG, "사전 토큰 갱신 성공")
-                    } else {
-                        Log.e(TAG, "사전 토큰 갱신 응답 데이터 없음")
-                    }
+                    tokenManager.saveAccessToken(newTokens.accessToken, expiresIn)
+                    tokenManager.saveRefreshToken(newTokens.refreshToken)
+                    tokenManager.saveNickname(newTokens.nickname)
+
+                    Log.d(TAG, "사전 토큰 갱신 성공")
                 } else {
-                    Log.e(TAG, "사전 토큰 갱신 실패: ${response.code()}")
+                    Log.e(TAG, "사전 토큰 갱신 응답 데이터 없음")
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "사전 토큰 갱신 중 예외", e)
+            } else {
+                Log.e(TAG, "사전 토큰 갱신 실패: ${response.code()}")
+                if (response.code() == 401) {
+                    Log.e(TAG, "Refresh Token도 만료됨 - 재로그인 필요")
+                    tokenManager.clearTokens()
+                }
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "사전 토큰 갱신 중 예외", e)
         }
     }
 }

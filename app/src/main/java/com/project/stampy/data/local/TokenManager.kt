@@ -21,24 +21,27 @@ class TokenManager(context: Context) {
         private const val KEY_NICKNAME = "nickname"
         private const val KEY_ACCESS_TOKEN_EXPIRE_AT = "access_token_expire_at"
 
-        // Access Token 유효기간: 1시간 (밀리초)
-        private const val ACCESS_TOKEN_VALIDITY = 60 * 60 * 1000L
-
         // 만료 5분 전에 갱신 (밀리초)
         private const val TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000L
     }
 
     /**
-     * Access Token 저장
+     * Access Token 저장 (만료 시간 포함)
+     * @param token Access Token
+     * @param expiresIn 토큰 유효 시간 (초 단위) - 서버에서 받은 값
      */
-    fun saveAccessToken(token: String) {
-        val expireAt = System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY
+    fun saveAccessToken(token: String, expiresIn: Long = 3600) {
+        val expireAt = System.currentTimeMillis() + (expiresIn * 1000)
         prefs.edit()
             .putString(KEY_ACCESS_TOKEN, token)
             .putLong(KEY_ACCESS_TOKEN_EXPIRE_AT, expireAt)
             .apply()
 
-        Log.d(TAG, "Access Token 저장 - 만료 시간: ${java.text.SimpleDateFormat("HH:mm:ss").format(expireAt)}")
+        val formatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
+        Log.d(TAG, "Access Token 저장 완료")
+        Log.d(TAG, "  - 현재 시간: ${formatter.format(System.currentTimeMillis())}")
+        Log.d(TAG, "  - 만료 시간: ${formatter.format(expireAt)}")
+        Log.d(TAG, "  - 유효 시간: ${expiresIn}초")
     }
 
     /**
@@ -56,12 +59,27 @@ class TokenManager(context: Context) {
     }
 
     /**
+     * Access Token이 만료되었는지 체크
+     */
+    fun isAccessTokenExpired(): Boolean {
+        val expireAt = getAccessTokenExpireAt()
+        if (expireAt == 0L) return true
+
+        val now = System.currentTimeMillis()
+        return now >= expireAt
+    }
+
+    /**
      * Access Token이 곧 만료되는지 체크
-     * @return true: 만료 임박 (5분 이내), false: 아직 여유 있음
+     * @return true: 만료 임박 (5분 이내) 또는 이미 만료됨, false: 아직 여유 있음
      */
     fun isAccessTokenExpiringSoon(): Boolean {
         val expireAt = getAccessTokenExpireAt()
-        if (expireAt == 0L) return true // 만료 시간 정보 없으면 갱신 필요
+        // 만료 시간 정보 없으면 갱신 필요
+        if (expireAt == 0L) {
+            Log.d(TAG, "만료 시간 정보 없음 - 갱신 필요")
+            return true
+        }
 
         val now = System.currentTimeMillis()
         val timeLeft = expireAt - now
@@ -69,7 +87,11 @@ class TokenManager(context: Context) {
         val isExpiring = timeLeft <= TOKEN_REFRESH_THRESHOLD
 
         if (isExpiring) {
-            Log.d(TAG, "Access Token 만료 임박 - 남은 시간: ${timeLeft / 1000}초")
+            if (timeLeft < 0) {
+                Log.w(TAG, "Access Token 이미 만료됨 - ${-timeLeft / 1000}초 전에 만료")
+            } else {
+                Log.d(TAG, "Access Token 만료 임박 - 남은 시간: ${timeLeft / 1000}초")
+            }
         }
 
         return isExpiring
@@ -80,6 +102,7 @@ class TokenManager(context: Context) {
      */
     fun saveRefreshToken(token: String) {
         prefs.edit().putString(KEY_REFRESH_TOKEN, token).apply()
+        Log.d(TAG, "Refresh Token 저장 완료")
     }
 
     /**
@@ -121,7 +144,19 @@ class TokenManager(context: Context) {
      * 로그인 상태 확인
      */
     fun isLoggedIn(): Boolean {
-        return getAccessToken() != null && getRefreshToken() != null
+        val hasTokens = getAccessToken() != null && getRefreshToken() != null
+
+        if (!hasTokens) {
+            return false
+        }
+
+        // 토큰이 있어도 완전히 만료되었으면 로그인 상태 아님
+        if (isAccessTokenExpired()) {
+            Log.w(TAG, "토큰이 완전히 만료됨 - 재로그인 필요")
+            return false
+        }
+
+        return true
     }
 
     /**

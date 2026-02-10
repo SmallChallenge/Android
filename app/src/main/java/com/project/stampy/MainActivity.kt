@@ -78,6 +78,15 @@ class MainActivity : AppCompatActivity() {
         tokenManager = TokenManager(this)
         nonLoginPhotoManager = NonLoginPhotoManager(this)
 
+        // 토큰 완전 만료 체크
+        if (tokenManager.getAccessToken() != null && tokenManager.isAccessTokenExpired()) {
+            Log.w(TAG, "토큰이 완전히 만료됨 - 로그인 필요")
+            tokenManager.clearTokens()
+            navigateToLogin()
+            finish() // MainActivity 종료
+            return
+        }
+
         bottomNav = findViewById(R.id.bottom_navigation)
         fabAdd = findViewById(R.id.fab_add)
 

@@ -25,25 +25,25 @@ class TokenAuthenticator(
         private const val MAX_RETRY = 3
     }
 
+    @Synchronized
     override fun authenticate(route: Route?, response: Response): Request? {
         // 이미 3번 시도했으면 포기
         if (responseCount(response) >= MAX_RETRY) {
-            Log.e(TAG, "토큰 갱신 최대 재시도 횟수 초과")
+            Log.e(TAG, "토큰 갱신 최대 재시도 횟수 초과 (${MAX_RETRY}회)")
+            tokenManager.clearTokens()
             return null
         }
 
         val refreshToken = tokenManager.getRefreshToken()
 
-        if (refreshToken == null) {
+        if (refreshToken.isNullOrEmpty()) {
             Log.e(TAG, "Refresh Token 없음 - 재인증 필요")
-            // 로그인 화면으로 이동하도록 토큰 삭제
             tokenManager.clearTokens()
             return null
         }
 
         Log.d(TAG, "401 에러 감지 - 토큰 갱신 시작")
 
-        // 동기적으로 토큰 갱신 (Authenticator는 동기 방식)
         return runBlocking {
             try {
                 val authApi = RetrofitClient.createService(AuthApiService::class.java)
@@ -54,8 +54,9 @@ class TokenAuthenticator(
                     val newTokens = refreshResponse.body()?.data
 
                     if (newTokens != null) {
-                        // 새로운 Access Token과 Refresh Token 저장
-                        tokenManager.saveAccessToken(newTokens.accessToken)
+                        val expiresIn = 3600L // 서버 응답에 포함되어야 함
+
+                        tokenManager.saveAccessToken(newTokens.accessToken, expiresIn)
                         tokenManager.saveRefreshToken(newTokens.refreshToken)
                         tokenManager.saveNickname(newTokens.nickname)
 
@@ -73,6 +74,9 @@ class TokenAuthenticator(
                 } else {
                     Log.e(TAG, "토큰 갱신 실패: ${refreshResponse.code()}")
                     // Refresh Token도 만료됨 - 재로그인 필요
+                    if (refreshResponse.code() == 401) {
+                        Log.e(TAG, "Refresh Token도 만료됨 - 재로그인 필요")
+                    }
                     tokenManager.clearTokens()
                     null
                 }
