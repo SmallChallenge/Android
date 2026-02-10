@@ -26,7 +26,7 @@ class ActiveTemplateBinder(
             "active_5" -> bindActive5(showLogo, photoTakenAtTimestamp)
             "active_6" -> bindActive6(showLogo, photoTakenAtTimestamp)
             "active_7" -> bindActive7(showLogo, photoTakenAtTimestamp)
-            //"active_8" -> bindActive8(showLogo, photoTakenAtTimestamp)
+            "active_8" -> bindActive8(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -440,5 +440,69 @@ class ActiveTemplateBinder(
         // 간격 조정 (Gap : 6)
         // 날짜 텍스트의 상단 마진을 6으로 설정하여 시간과의 간격 유지
         setMargin(tvDate, top = DesignUtils.dpToPxInt(context, 6f))
+    }
+
+    /**
+     * Active 8 템플릿 데이터 바인딩
+     */
+    private fun bindActive8(showLogo: Boolean, timestamp: Long) {
+        val kerisFont = loadFont(R.font.keris_kedu) // RixInooAriDuri 폰트 로드
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+        // 날짜 설정 (2줄로 구성)
+        // 첫째 줄: YYYY년
+        // 둘째 줄: mm월 dd일 (요일)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        val year = formatDate("yyyy년", timestamp)
+        val dayMonth = formatDate("MM월 dd일 (${getDayOfWeekKorean(calendar)})", timestamp)
+        val dateText = "$year\n$dayMonth"
+
+        setupTextView(
+            tvDate,
+            dateText,
+            kerisFont,
+            DesignUtils.getScaledTextSize(context, 18f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.3f // 행간 130%
+        )
+
+        // 시간 설정: 오전/오후 h:mm
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "오전" else "오후"
+        val hour = calendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
+        val minute = String.format("%02d", calendar.get(Calendar.MINUTE))
+
+        setupTextView(
+            tvTime,
+            "$amPm $hour:$minute",
+            kerisFont,
+            DesignUtils.getScaledTextSize(context, 18f),
+            applyShadow = true,
+            lineSpacingMultiplier = 1.3f // 행간 130%
+        )
+
+        // 로고 설정: 우측 상단 (여백 16px)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                startToStart = ConstraintLayout.LayoutParams.UNSET
+
+                val margin16 = DesignUtils.dpToPxInt(context, 16f)
+                setMargins(0, margin16, margin16, 0)
+            }
+        }
+
+        // 컨테이너 여백 (좌측 하단 여백 16)
+        val bottomContainer = root.findViewById<View>(R.id.bottom_container)
+        setMargin(
+            bottomContainer,
+            start = DesignUtils.dpToPxInt(context, 16f),
+            bottom = DesignUtils.dpToPxInt(context, 16f)
+        )
     }
 }

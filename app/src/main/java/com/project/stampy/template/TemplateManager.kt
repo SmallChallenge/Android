@@ -243,6 +243,16 @@ object TemplateManager {
             )
         )
 
+        templates.add(
+            Template(
+                id = "active_8",
+                category = TemplateCategory.ACTIVE,
+                name = "active 8",
+                layoutResId = R.layout.template_active_8,
+                thumbnailResId = R.drawable.template_active_8
+            )
+        )
+
         // Digital 카테고리 템플릿
         templates.add(
             Template(
