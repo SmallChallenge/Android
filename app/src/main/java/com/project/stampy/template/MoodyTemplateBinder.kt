@@ -25,6 +25,8 @@ class MoodyTemplateBinder(
             "moody_4" -> bindMoody4(showLogo, photoTakenAtTimestamp)
             "moody_5" -> bindMoody5(showLogo, photoTakenAtTimestamp)
             "moody_6" -> bindMoody6(showLogo, photoTakenAtTimestamp)
+            "moody_7" -> bindMoody7(showLogo, photoTakenAtTimestamp)
+            //"moody_8" -> bindMoody8(showLogo, photoTakenAtTimestamp)
         }
     }
 
@@ -387,5 +389,51 @@ class MoodyTemplateBinder(
                 marginEnd = DesignUtils.dpToPxInt(context, 16f)
             }
         }
+    }
+
+    /**
+     * Moody 7 템플릿 데이터 바인딩
+     */
+    private fun bindMoody7(showLogo: Boolean, timestamp: Long) {
+        val notableFont = loadFont(R.font.notable_regular)
+
+        // 날짜 설정 (yyyy.MM.dd)
+        val tvDate = root.findViewById<TextView>(R.id.tv_date)
+        setupTextView(
+            tvDate,
+            formatDate("yyyy.MM.dd", timestamp),
+            notableFont,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = true,
+            lineSpacingMultiplier = null // 행간 따로 설정 X
+        )
+
+        // 시간 설정 (AM/PM hh:mm)
+        val tvTime = root.findViewById<TextView>(R.id.tv_time)
+        // 오전 오후는 대문자 -> uppercase() 적용
+        val timeText = formatDate("a hh:mm", timestamp, Locale.US).uppercase(Locale.US)
+
+        setupTextView(
+            tvTime,
+            timeText,
+            notableFont,
+            DesignUtils.getScaledTextSize(context, 20f),
+            applyShadow = true,
+            lineSpacingMultiplier = null // 행간 따로 설정 X
+        )
+
+        // 로고 설정 (중앙 하단, 여백 16)
+        val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
+        ivLogo?.apply {
+            visibility = if (showLogo) View.VISIBLE else View.GONE
+
+            // 여백 조정 (하단 16)
+            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                bottomMargin = DesignUtils.dpToPxInt(context, 16f)
+            }
+        }
+
+        // 날짜/시간 사이 간격
+        setMargin(tvTime, top = 0)
     }
 }
