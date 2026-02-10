@@ -519,11 +519,7 @@ class DigitalTemplateBinder(
         val ivLogo = root.findViewById<ImageView>(R.id.iv_stampic_logo)
         ivLogo?.apply {
             visibility = if (showLogo) View.VISIBLE else View.GONE
-
-            layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
-                val logoSize = DesignUtils.dpToPxInt(context, 38f)
-                width = logoSize
-                height = logoSize
+            (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
                 topMargin = DesignUtils.dpToPxInt(context, 16f)
                 marginEnd = DesignUtils.dpToPxInt(context, 16f)
             }
@@ -532,11 +528,17 @@ class DigitalTemplateBinder(
         // 하단 경험치 이미지 설정 (가이드: 220x40)
         val ivExpCombined = root.findViewById<ImageView>(R.id.iv_exp_combined)
         ivExpCombined?.apply {
+            val scaledWidth = DesignUtils.dpToPxInt(context, 220f)
+            val scaledHeight = DesignUtils.dpToPxInt(context, 40f)
+
             layoutParams = (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
-                width = DesignUtils.dpToPxInt(context, 220f)
-                height = DesignUtils.dpToPxInt(context, 40f)
+                width = scaledWidth
+                height = scaledHeight
                 bottomMargin = margin16
             }
+
+            // 이미지가 가변 영역 내에서 꽉 차도록 설정
+            scaleType = ImageView.ScaleType.FIT_XY
         }
     }
 }
