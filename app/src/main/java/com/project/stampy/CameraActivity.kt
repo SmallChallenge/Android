@@ -130,7 +130,7 @@ class CameraActivity : AppCompatActivity() {
         amplitude.track("photo_view_enter", mapOf(
             "is_logged_in" to tokenManager.isLoggedIn(),
             "platform" to "android",
-            "app_version" to "1.0.0"
+            "app_version" to BuildConfig.VERSION_NAME
         ))
     }
 

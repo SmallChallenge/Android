@@ -165,7 +165,7 @@ class PhotoSaveActivity : AppCompatActivity() {
         val commonProps = mutableMapOf(
             "is_logged_in" to tokenManager.isLoggedIn(),
             "platform" to "android",
-            "app_version" to "1.0.0",
+            "app_version" to BuildConfig.VERSION_NAME,
             "category" to (selectedCategory ?: "기타"),
             "save_scope" to if (isPublic == true) "public" else "private",
             "template_id" to (templateId ?: "none"),

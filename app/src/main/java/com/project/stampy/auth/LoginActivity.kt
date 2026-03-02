@@ -38,6 +38,7 @@ import com.project.stampy.utils.showToast
 import kotlinx.coroutines.launch
 import com.amplitude.android.Amplitude
 import com.amplitude.android.Configuration
+import com.project.stampy.BuildConfig
 
 class LoginActivity : AppCompatActivity() {
 
@@ -385,7 +386,7 @@ class LoginActivity : AppCompatActivity() {
                     val commonProps = mapOf(
                         "is_logged_in" to true,
                         "platform" to "android",
-                        "app_version" to "1.0.0", // 필요시 BuildConfig.VERSION_NAME 등으로 자동화 가능
+                        "app_version" to BuildConfig.VERSION_NAME,
                         "login_method" to socialType.lowercase() // kakao, google 등
                     )
 
