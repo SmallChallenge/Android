@@ -46,4 +46,10 @@
     <color name="button_text_active">#171717</color>
     <color name="button_text_inactive">#CECECE</color>
     <color name="button_text_press">#171717</color>
+
+    <!-- Community Feed banner Colors -->
+    <color name="banner_orange">#FFC5A4</color>
+    <color name="banner_purple">#F6DFFF</color>
+    <color name="banner_blue">#CFEFFF</color>
+    <color name="banner_green">#E6FF8A</color>
 </resources>
