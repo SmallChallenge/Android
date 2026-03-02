@@ -19,6 +19,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.button.MaterialButton
+import com.project.stampy.BuildConfig
 import com.project.stampy.MainActivity
 import com.project.stampy.R
 import com.project.stampy.data.local.TokenManager
@@ -133,6 +134,12 @@ class MyPageActivity : AppCompatActivity() {
         btnPrivacy = findViewById(R.id.btn_privacy)
         btnOpenSource = findViewById(R.id.btn_open_source)
         btnLogout = findViewById(R.id.btn_logout)
+
+        // 앱 버전 텍스트 뷰 초기화
+        val tvAppVersion = findViewById<TextView>(R.id.tv_app_version)
+
+        // BuildConfig에서 versionName을 가져와 설정 (1.0.n이 자동으로 들어감)
+        tvAppVersion.text = BuildConfig.VERSION_NAME
     }
 
     /**
@@ -216,12 +223,14 @@ class MyPageActivity : AppCompatActivity() {
         val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:") // 메일 앱만 필터링
             putExtra(Intent.EXTRA_EMAIL, arrayOf("stampy7373@gmail.com"))
-            putExtra(Intent.EXTRA_SUBJECT, "[Stampyic] 서비스 문의")
+            putExtra(Intent.EXTRA_SUBJECT, "[Stampic] 서비스 문의")
             // 본문에 적을 기본적인 앱 정보나 유저 정보를 미리 작성
             val body = "\n\n\n------------------\n" +
-                    "앱 버전: 1.0.0\n" +
+                    "앱 버전: ${BuildConfig.VERSION_NAME}\n" +
                     "사용자 ID: ${if(tokenManager.isLoggedIn()) tokenManager.getUserId() else "GUEST"}\n" +
+                    "기기 정보: ${android.os.Build.MODEL} (OS ${android.os.Build.VERSION.RELEASE})\n" +
                     "문의 내용을 상세히 작성해 주세요."
+
             putExtra(Intent.EXTRA_TEXT, body)
         }
 
