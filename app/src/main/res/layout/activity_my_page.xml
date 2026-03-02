@@ -396,22 +396,24 @@
 
                 <!-- 문의방법 -->
                 <LinearLayout
+                    android:id="@+id/layout_contact"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingStart="20dp"
-                    android:paddingEnd="12dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="문의방법"
-                        android:textColor="@color/gray_300"
-                        android:textSize="14sp"
-                        android:textAppearance="@style/TextAppearance.App.Button2.Large"
-                        app:fontFamily="@font/pretendard_semibold"/>
+                    android:paddingEnd="12dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"> <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="문의방법"
+                    android:textColor="@color/gray_300"
+                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.App.Button2.Large"
+                    app:fontFamily="@font/pretendard_semibold"/>
 
                     <TextView
                         android:id="@+id/tv_contact_email"

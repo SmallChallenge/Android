@@ -1,6 +1,7 @@
 package com.project.stampy.auth
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -182,6 +183,11 @@ class MyPageActivity : AppCompatActivity() {
             }
         }
 
+        // 문의방법 버튼
+        findViewById<LinearLayout>(R.id.layout_contact).setOnClickListener {
+            sendEmail()
+        }
+
         // 이용약관
         btnTerms.setOnClickListener {
             openWebView(TERMS_URL)
@@ -200,6 +206,29 @@ class MyPageActivity : AppCompatActivity() {
         // 로그아웃
         btnLogout.setOnClickListener {
             showLogoutDialog()
+        }
+    }
+
+    /**
+     * 이메일 문의하기 실행
+     */
+    private fun sendEmail() {
+        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:") // 메일 앱만 필터링
+            putExtra(Intent.EXTRA_EMAIL, arrayOf("stampy7373@gmail.com"))
+            putExtra(Intent.EXTRA_SUBJECT, "[Stampyic] 서비스 문의")
+            // 본문에 적을 기본적인 앱 정보나 유저 정보를 미리 작성
+            val body = "\n\n\n------------------\n" +
+                    "앱 버전: 1.0.0\n" +
+                    "사용자 ID: ${if(tokenManager.isLoggedIn()) tokenManager.getUserId() else "GUEST"}\n" +
+                    "문의 내용을 상세히 작성해 주세요."
+            putExtra(Intent.EXTRA_TEXT, body)
+        }
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "문의 메일 보내기"))
+        } catch (e: Exception) {
+            showToast("메일 앱을 찾을 수 없어요.")
         }
     }
 
