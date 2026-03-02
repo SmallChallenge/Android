@@ -55,6 +55,7 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var ivSwitchCamera: ImageView
     private lateinit var btnFlashTouchArea: FrameLayout
     private lateinit var ivFlash: ImageView
+    private var isCapturing = false
 
     // 하단 버튼
     private lateinit var btnGallery: TextView
@@ -135,6 +136,8 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        isCapturing = false
+        btnCapture.isEnabled = true
 
         // 카메라 모드일 때만 템플릿 시간 업데이트
         if (isCameraMode) {
@@ -428,6 +431,13 @@ class CameraActivity : AppCompatActivity() {
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
 
+        // 이미 촬영 중이라면 중복 실행 방지
+        if (isCapturing) return
+
+        // 촬영 시작 상태로 변경 및 버튼 비활성화
+        isCapturing = true
+        btnCapture.isEnabled = false
+
         // 임시 파일로 저장 (캐시 디렉토리)
         val tempFile = File(cacheDir, generateFileName())
         val outputOptions = ImageCapture.OutputFileOptions.Builder(tempFile).build()
@@ -437,6 +447,10 @@ class CameraActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    // 촬영 프로세스 종료
+                    isCapturing = false
+                    btnCapture.isEnabled = true
+
                     val savedUri = Uri.fromFile(tempFile)
                     Log.d(TAG, "임시 사진 저장: ${tempFile.absolutePath}")
 
@@ -447,6 +461,10 @@ class CameraActivity : AppCompatActivity() {
                 }
 
                 override fun onError(exception: ImageCaptureException) {
+                    // 에러 발생 시에도 다시 촬영 가능하도록 상태 복구
+                    isCapturing = false
+                    btnCapture.isEnabled = true
+
                     showToast("사진 촬영에 실패했어요.: ${exception.message}")
                     Log.e(TAG, "사진 촬영 실패", exception)
                 }
