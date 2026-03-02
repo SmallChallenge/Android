@@ -153,7 +153,7 @@ class CommunityFragment : Fragment() {
         communityAdapter = CommunityFeedAdapter(
             isLoggedIn = tokenManager.isLoggedIn(),
             onLoginClick = {
-                showLoginRequiredDialog() // 배너의 로그인 버튼 클릭 시 다이얼로그 표시
+                navigateToLogin()
             }
         )
 

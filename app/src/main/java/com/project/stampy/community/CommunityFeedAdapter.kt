@@ -3,7 +3,6 @@ package com.project.stampy.community
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -30,7 +29,7 @@ data class BannerItem(
  * 커뮤니티 피드 어댑터
  */
 class CommunityFeedAdapter(
-    private val isLoggedIn: Boolean,
+    private var isLoggedIn: Boolean,
     private val onLoginClick: (() -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -189,8 +188,8 @@ class CommunityFeedAdapter(
         private val card: CardView = itemView.findViewById(R.id.banner_card)
         private val tvText1: TextView = itemView.findViewById(R.id.tv_banner_text1)
         private val tvText2: TextView = itemView.findViewById(R.id.tv_banner_text2)
-        private val btnLogin: View = itemView.findViewById(R.id.btn_banner_login)
-        private val ivArrow: View = itemView.findViewById(R.id.iv_arrow)
+        private val btnLogin: TextView = itemView.findViewById(R.id.btn_banner_login)
+        private val ivArrow: ImageView = itemView.findViewById(R.id.iv_arrow)
 
         fun bind(banner: BannerItem) {
             tvText1.text = banner.text1
